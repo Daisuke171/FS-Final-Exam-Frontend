@@ -23,6 +23,9 @@ export default function Home() {
           <li className="tracking-[-.01em]">
             Save and see your changes instantly.
           </li>
+          <li>
+            Whereas disregard and contempt for human rights have resulted
+          </li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
@@ -49,6 +52,13 @@ export default function Home() {
           >
             Read our docs
           </a>
+
+          <div className="h-full w-full bg-white/10 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100 shadow-lg p-3">
+          <h2 className="text-xl font-semibold">Glass Effect</h2>
+          <p className="mt-2 text-sm">
+              Este es un panel con estilo glassmorphism usando Tailwind.
+          </p>
+          </div>
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
