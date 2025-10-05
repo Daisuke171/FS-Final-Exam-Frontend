@@ -1,10 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #11012D;
-  --foreground: #FFFFFF;
-  --stroke: #4CC9F0;
-  --fill-one: #4CC9F0;
+  --background: radial-gradient(
+  circle,
+  oklch(0.2088 0.0988 271.67) 0%,
+  oklch(0.1889 0.087 275.96) 7%,
+  oklch(0.1463 0.0559 298.52) 63%
+  );
+  --button-background: linear-gradient(
+    90deg,
+    oklch(0.7813 0.1562 317.26) 3%, 
+    oklch(0.7824 0.1213 222.46) 100%
+  );
+  --foreground: oklch(1 0 129.63);
+  --box-fill: oklch(0.6843 0.1083 222.73 / 5%);
+  --captcha-fill: oklch(0.7824 0.1213 222.46 / 15%);
+  --stroke: oklch(0.7824 0.1213 222.46);
+  --font-dark: oklch(0.1517 0.0548 298.37);
+  --font-light: oklch(1 0 129.63);
+  --online-user: oklch(0.8693 0.1716 128.44);
+  --ranking: oklch(0.8007 0.1675 75.56);
 }
 
 @theme inline {
