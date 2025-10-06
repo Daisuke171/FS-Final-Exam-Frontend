@@ -13,6 +13,7 @@
   --foreground: oklch(1 0 129.63);
 
   /* Purple tones */
+  --bright-purple: oklch(60.816% 0.27519 306.708);
   --light-purple: oklch(0.4468 0.2282 304.02);
   --hover-purple: oklch(50.281% 0.2557 303.899);
   --shadow-purple: oklch(0.3589 0.1953 304.02);
@@ -45,6 +46,7 @@
   --color-background: var(--background-gradient-3);
   --color-foreground: var(--foreground);
 
+  --color-bright-purple: var(--bright-purple);
   --color-light-purple: var(--light-purple);
   --color-shadow-purple: var(--shadow-purple);
   --color-hover-purple: var(--hover-purple);
