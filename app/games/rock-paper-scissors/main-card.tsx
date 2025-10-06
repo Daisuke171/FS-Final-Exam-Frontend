@@ -21,7 +21,7 @@ export default function MainCard() {
     });
     socket.on("joinRoomSuccess", ({ roomId }) => {
       setError(null);
-      router.push(`/rock-paper-scissors/${roomId}`);
+      router.push(`/games/rock-paper-scissors/${roomId}`);
     });
     return () => {
       socket.off("joinRoomError");

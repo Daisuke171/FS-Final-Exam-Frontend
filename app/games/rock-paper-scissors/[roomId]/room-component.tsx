@@ -43,7 +43,7 @@ export default function RoomComponent() {
       setError(data.message);
       if (error) {
         setTimeout(() => {
-          router.push("/rock-paper-scissors");
+          router.push("/games/rock-paper-scissors");
         }, 3000);
       }
     });
@@ -53,7 +53,7 @@ export default function RoomComponent() {
       if (data === 0) {
         setIsRedirecting(true);
         setCountDown(null);
-        router.push(`/rock-paper-scissors/${roomId}/match`);
+        router.push(`/games/rock-paper-scissors/${roomId}/match`);
       }
     });
 
@@ -87,7 +87,7 @@ export default function RoomComponent() {
   };
 
   const shareRoomLink = () => {
-    const roomUrl = `${window.location.origin}/rock-paper-scissors/${roomId}`;
+    const roomUrl = `${window.location.origin}/games/rock-paper-scissors/${roomId}`;
     navigator.clipboard.writeText(roomUrl);
     setModalOpen(true);
     setTimeout(() => setModalOpen(false), 2000);

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { getSocket } from "@/app/socket";
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import CustomButtonOne from "../buttons/CustomButtonOne";
