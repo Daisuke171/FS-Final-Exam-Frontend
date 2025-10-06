@@ -16,48 +16,51 @@ export default function Card({
   disableCards,
 }: CardProps) {
   const disableStyles = disableCards
-    ? "bg-slate-400 border-slate-600 shadow-none transform translate-y-1 pointer-events-none"
+    ? "bg-background opacity-50 border-light-gray shadow-none transform translate-y-1 pointer-events-none"
     : "";
 
   return (
-    <div
-      onClick={onClick}
-      className={`flex flex-col items-center group p-4 gap-2 cursor-pointer border-2 transition-all rounded-xl shadow-[0_4px_0_var(--color-slate-900)]  ${
-        disableCards && isClicked
-          ? "bg-indigo-950 border-indigo-500 shadow-none transform translate-y-1 pointer-events-none"
-          : disableCards
-          ? disableStyles
-          : isClicked
-          ? "bg-slate-400 border-slate-600 shadow-none transform translate-y-1 pointer-events-none"
-          : "hover:bg-slate-200"
-      }`}
-    >
-      <Icon
-        icon={img}
-        width={90}
-        className={`pointer-events-none ${
+    <div className="relative group">
+      <div
+        onClick={onClick}
+        className={`flex flex-col items-center p-4 gap-2 cursor-pointer border-2 bg-background transition-all rounded-xl  ${
           disableCards && isClicked
-            ? "scale-110 rotate-12 text-indigo-500"
+            ? "bg-bright-purple border-hover-purple opacity-80 shadow-none transform translate-y-1 pointer-events-none"
             : disableCards
-            ? "scale-110 rotate-12 text-slate-600"
+            ? disableStyles
             : isClicked
-            ? "scale-110 rotate-12 text-slate-600"
-            : "group-hover:scale-110 group-hover:rotate-12 text-slate-900  duration-300"
-        } transition-all`}
-      />
-      <h2
-        className={`text-2xl ${galindo.className} ${
-          disableCards && isClicked
-            ? "text-indigo-500"
-            : disableCards
-            ? "text-slate-600"
-            : isClicked
-            ? "text-slate-600"
-            : "text-slate-900"
+            ? "bg-hover-purple border-background shadow-none transform translate-y-1 pointer-events-none"
+            : "hover:border-hover-purple"
         }`}
       >
-        {title}
-      </h2>
+        <Icon
+          icon={img}
+          width={90}
+          className={`pointer-events-none ${
+            disableCards && isClicked
+              ? "scale-110 rotate-12 text-shadow-purple"
+              : disableCards
+              ? "scale-110 rotate-12 text-light-gray"
+              : isClicked
+              ? "scale-110 rotate-12 text-background"
+              : "group-hover:scale-110 group-hover:text-bright-purple group-hover:rotate-12 text-subtitle  duration-300"
+          } transition-all`}
+        />
+        <h2
+          className={`text-2xl ${galindo.className} ${
+            disableCards && isClicked
+              ? "text-shadow-purple"
+              : disableCards
+              ? "text-light-gray"
+              : isClicked
+              ? "text-background"
+              : "text-font"
+          }`}
+        >
+          {title}
+        </h2>
+      </div>
+      <div className="absolute transition-all delay-100 duration-500 inset-0 rounded-lg pointer-events-none w-full h-full bg-bright-purple blur-xl opacity-0 group-hover:opacity-50 -z-1"></div>
     </div>
   );
 }
