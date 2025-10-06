@@ -1,18 +1,23 @@
 @import "tailwindcss";
 
 :root {
+  /* Background colors for gradient */
   --background-gradient-1: oklch(0.2088 0.0988 271.67);
   --background-gradient-2: oklch(0.1889 0.087 275.96);
   --background-gradient-3: oklch(0.1463 0.0559 298.52);
 
+  /* Buttons colors for gradient */
   --btn-gradient-1: oklch(0.7813 0.1562 317.26);
   --btn-gradient-2: oklch(0.7824 0.1213 222.46);
+
   --foreground: oklch(1 0 129.63);
 
+  /* Purple tones */
   --light-purple: oklch(0.4468 0.2282 304.02);
   --hover-purple: oklch(50.281% 0.2557 303.899);
   --shadow-purple: oklch(0.3589 0.1953 304.02);
 
+  /* Blue tones */
   --light-blue: oklch(72.883% 0.1358 252.731);
   --medium-blue: oklch(0.5558 0.2141 269.02);
   --shadow-blue: oklch(0.4517 0.2153 275.85);
@@ -20,28 +25,48 @@
   --box-fill: oklch(0.6843 0.1083 222.73 / 5%);
   --captcha-fill: oklch(0.7824 0.1213 222.46 / 15%);
   --stroke: oklch(0.7824 0.1213 222.46);
+
+  /* Font colors */
   --font-dark: oklch(0.1517 0.0548 298.37);
   --font-light: oklch(95.514% 0.00011 271.152);
   --font-medium: oklch(79.837% 0.00009 271.152);
+
+  /* Gray tones */
   --light-gray: oklch(65.004% 0.00007 271.152);
+
+  /* Utility colors */
   --online-user: oklch(0.8693 0.1716 128.44);
   --ranking: oklch(0.8007 0.1675 75.56);
 }
 
 @theme {
-  --color-background: var(--background);
+  --color-background: var(--background-gradient-3);
   --color-foreground: var(--foreground);
+
   --color-light-purple: var(--light-purple);
   --color-shadow-purple: var(--shadow-purple);
   --color-hover-purple: var(--hover-purple);
+
   --color-font: var(--font-light);
-  --color-light-gray: var(--light-gray);
   --color-subtitle: var(--font-medium);
+
+  --color-light-gray: var(--light-gray);
+
   --color-light-blue: var(--light-blue);
   --color-medium-blue: var(--medium-blue);
   --color-shadow-blue: var(--shadow-blue);
+
   --font-sans: var(--font-raleway);
 }
+
+/* Clases de utilidad */
+
+/* Miscelaneo */
+.glass-box-one {
+  @apply p-10 border-2 bg-white/7 backdrop-blur-md border-light-gray rounded-xl;
+}
+
+/* Gradientes */
 .bg-gradient-one {
   @apply bg-radial from-[var(--background-gradient-1)] from-0% via-[var(--background-gradient-2)] 
     via-[7%] to-[var(--background-gradient-3)] to-[63%];
@@ -57,7 +82,7 @@ body {
 
 /* Animaciones para el rock, paper, scissors */
 
-@keyframes changeColorWinner {
+/* @keyframes changeColorWinner {
   from {
     color: var(--color-slate-800);
   }
@@ -74,7 +99,7 @@ body {
   to {
     color: var(--color-rose-800);
   }
-}
+} */
 
 @keyframes vibrate-1 {
   0% {
