@@ -116,7 +116,7 @@ export default function RoomComponent() {
           text="Volver al inicio"
           variant="outlined"
           color="secondary"
-          action={() => router.push("/rock-paper-scissors")}
+          action={() => router.push("/games/rock-paper-scissors")}
           icon="streamline:return-2"
         />
       </div>
@@ -137,7 +137,7 @@ export default function RoomComponent() {
           text="Volver al inicio"
           variant="outlined"
           color="secondary"
-          action={() => router.push("/rock-paper-scissors")}
+          action={() => router.push("/games/rock-paper-scissors")}
           icon="streamline:return-2"
         />
       </div>
@@ -199,7 +199,7 @@ export default function RoomComponent() {
                 text="Salir de la sala"
                 variant="outlined"
                 color="secondary"
-                action={() => router.push("/rock-paper-scissors")}
+                action={() => router.push("/games/rock-paper-scissors")}
                 icon="streamline:return-2"
               />
             </div>
