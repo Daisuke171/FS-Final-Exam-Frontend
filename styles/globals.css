@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  /* Añadir los colores y otros estilos personalizados aquí */
+  --color-primary: "asd";
+}
