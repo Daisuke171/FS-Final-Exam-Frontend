@@ -31,7 +31,7 @@ export default function CustomButtonOne({
     "border-2 border-slate-400 opacity-50 text-slate-400 bg-transparent pointer-events-none cursor-not-allowed";
 
   const filledPrimary =
-    "bg-indigo-900 text-indigo-200 border-2 border-indigo-900 hover:bg-indigo-700 hover:border-indigo-700";
+    "bg-light-purple text-font border-2 border-light-purple hover:bg-hover-purple hover:border-hover-purple";
 
   const filledSecondary =
     "bg-slate-900 text-slate-200 border-2 border-slate-900 hover:bg-slate-700";
