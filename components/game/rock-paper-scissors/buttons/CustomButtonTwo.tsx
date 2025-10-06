@@ -51,13 +51,6 @@ export default function CustomButtonTwo({
               }`
         } w-full`}
         disabled={clicked === null || confirmed}
-        onClick={() => {
-          console.log("🔵 Click en confirmar - Estado ANTES:", {
-            clicked,
-            confirmed,
-          });
-          onClick?.();
-        }}
       >
         {icon && (
           <Icon
