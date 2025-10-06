@@ -37,6 +37,8 @@
   /* Utility colors */
   --online-user: oklch(0.8693 0.1716 128.44);
   --ranking: oklch(0.8007 0.1675 75.56);
+  --success: oklch(0.4659 0.1003 145.59);
+  --error: oklch(0.5134 0.1504 24.88);
 }
 
 @theme {
@@ -55,6 +57,9 @@
   --color-light-blue: var(--light-blue);
   --color-medium-blue: var(--medium-blue);
   --color-shadow-blue: var(--shadow-blue);
+
+  --color-success: var(--success);
+  --color-error: var(--error);
 
   --font-sans: var(--font-raleway);
 }
