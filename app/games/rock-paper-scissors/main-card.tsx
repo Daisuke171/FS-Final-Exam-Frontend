@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence } from "motion/react";
-import { Icon } from "@iconify/react";
+import { Icon } from "@iconify-icon/react";
 import CreateRoomModal from "@/components/game/rock-paper-scissors/modals/CreateRoomModal";
 import { useEffect, useState } from "react";
 import CustomButtonTwo from "@/components/game/rock-paper-scissors/buttons/CustomButtonTwo";
@@ -59,7 +59,7 @@ export default function MainCard() {
               text="Ver salas"
               icon="lucide-lab:houses"
               onClick={() => {
-                window.location.href = "/rock-paper-scissors/rooms";
+                window.location.href = "/games/rock-paper-scissors/rooms";
               }}
               full
             />

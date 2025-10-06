@@ -1,5 +1,5 @@
 import { Easing, motion } from "motion/react";
-import { Icon } from "@iconify/react";
+import { Icon } from "@iconify-icon/react";
 import FistIcon from "@iconify-icons/game-icons/fist";
 import HandIcon from "@iconify-icons/game-icons/hand";
 import ScissorsIcon from "@iconify-icons/game-icons/scissors";

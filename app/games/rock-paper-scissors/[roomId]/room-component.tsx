@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getSocket } from "@/app/socket";
 import { useParams, useRouter } from "next/navigation";
-import { Icon } from "@iconify/react";
+import { Icon } from "@iconify-icon/react";
 import PlayersInRoom from "@/components/game/rock-paper-scissors/general/PlayersInRoom";
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
 import { AnimatePresence, motion } from "motion/react";

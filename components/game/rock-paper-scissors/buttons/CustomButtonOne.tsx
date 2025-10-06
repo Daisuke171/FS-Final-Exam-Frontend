@@ -1,4 +1,4 @@
-import { Icon, IconifyIcon } from "@iconify/react";
+import { Icon, IconifyIcon } from "@iconify-icon/react";
 
 interface CustomButtonProps {
   text: string;

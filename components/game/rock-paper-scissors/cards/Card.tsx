@@ -1,4 +1,4 @@
-import { Icon } from "@iconify/react";
+import { Icon } from "@iconify-icon/react";
 import { Galindo } from "next/font/google";
 import type { CardProps } from "@/types/rock-paper-scissors/CardProps";
 
@@ -20,7 +20,7 @@ export default function Card({
     : "";
 
   return (
-    <button
+    <div
       onClick={onClick}
       className={`flex flex-col items-center group p-4 gap-2 cursor-pointer border-2 transition-all rounded-xl shadow-[0_4px_0_var(--color-slate-900)]  ${
         disableCards && isClicked
@@ -35,7 +35,7 @@ export default function Card({
       <Icon
         icon={img}
         width={90}
-        className={`${
+        className={`pointer-events-none ${
           disableCards && isClicked
             ? "scale-110 rotate-12 text-indigo-500"
             : disableCards
@@ -58,6 +58,6 @@ export default function Card({
       >
         {title}
       </h2>
-    </button>
+    </div>
   );
 }
