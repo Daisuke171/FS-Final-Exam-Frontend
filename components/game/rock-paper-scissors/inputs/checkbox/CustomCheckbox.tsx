@@ -22,7 +22,7 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
   id,
   color = "primary",
 }) => {
-  const primaryColor = "border-indigo-600 bg-indigo-600";
+  const primaryColor = "border-shadow-blue bg-shadow-blue";
   const secondaryColor = "border-slate-600 bg-slate-600";
 
   const selectedColor = color === "primary" ? primaryColor : secondaryColor;
@@ -54,7 +54,7 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
   return (
     <div
       className={`flex items-center gap-2 ${
-        color === "primary" ? "text-indigo-950" : "text-slate-950"
+        color === "primary" ? "text-font" : "text-slate-950"
       } ${className}`}
     >
       <div

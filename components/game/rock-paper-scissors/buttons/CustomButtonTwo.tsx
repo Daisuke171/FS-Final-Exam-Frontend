@@ -41,6 +41,7 @@ export default function CustomButtonTwo({
   return (
     <div className={`relative ${full ? "w-full" : "w-fit"} group`}>
       <button
+        onClick={onClick}
         className={`${baseStyles} ${variant === "filled" ? filled : outlined} ${
           clicked === null || confirmed
             ? "pointer-events-none opacity-50 shadow-[0px_0px_0px_0px_black]"

@@ -86,15 +86,15 @@ export default function CreateRoomModal({ setCloseModal }: any) {
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed p-10 top-1/2 left-1/2 z-10 transform -translate-x-1/2 -translate-y-1/2 bg-slate-200 w-130 border-2 border-slate-900 rounded-xl"
+        className="glass-box-one fixed p-10 top-1/2 left-1/2 z-10 transform -translate-x-1/2 -translate-y-1/2 w-130"
       >
         <Icon
           icon="material-symbols:close"
           width={30}
-          className="absolute top-4 right-4 cursor-pointer hover:text-indigo-600 transition-all"
+          className="absolute top-4 right-4 cursor-pointer hover:text-shadow-blue transition-all"
           onClick={setCloseModal}
         />
-        <h2 className="text-4xl font-bold text-slate-900">Crea tu sala</h2>
+        <h2 className="text-4xl font-bold text-font">Crea tu sala</h2>
         <form
           onSubmit={handleSubmit}
           className="mt-10 flex flex-col gap-5 w-full justify-center"
@@ -104,7 +104,7 @@ export default function CreateRoomModal({ setCloseModal }: any) {
               type="text"
               placeholder="Nombre de la sala"
               onChange={(e) => handleInputChange("roomName", e.target.value)}
-              className="placeholder:text-slate-600 w-full py-4 px-6 focus:border-indigo-600 rounded-xl border-2 border-slate-700 focus:outline-none text-slate-900"
+              className="placeholder:text-light-gray w-full py-4 px-6 focus:border-hover-purple rounded-xl border-2 border-light-gray focus:outline-none text-font"
             />
             {errors.roomName && (
               <p className="text-rose-900 mt-2">{errors.roomName}</p>
@@ -124,7 +124,7 @@ export default function CreateRoomModal({ setCloseModal }: any) {
                   onChange={(e) =>
                     handleInputChange("password", e.target.value)
                   }
-                  className="placeholder:text-slate-600 w-full py-4 px-6 focus:border-indigo-600 rounded-xl border-2 border-slate-700 focus:outline-none text-slate-900"
+                  className="placeholder:text-light-gray w-full py-4 px-6 focus:border-hover-purple rounded-xl border-2 border-light-gray focus:outline-none text-font"
                 />
                 {errors.password && (
                   <p className="text-rose-900 mt-2">{errors.password}</p>
