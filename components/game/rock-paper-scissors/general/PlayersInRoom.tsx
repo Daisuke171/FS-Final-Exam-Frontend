@@ -19,11 +19,11 @@ export default function PlayersInRoom({
   return (
     <div className="flex flex-col items-center">
       {label && (
-        <h3 className="text-lg text-slate-800 mb-2 font-medium">
+        <h3 className="text-lg text-font mb-2 font-light">
           Jugadores confirmados: ({confirmedPlayers.length}/2)
         </h3>
       )}
-      <div className="flex flex-col items-center border-2 border-slate-800 justify-center px-6 py-3 bg-slate-400 rounded-xl">
+      <div className="flex flex-col items-center border-2 border-font justify-center px-6 py-3 bg-transparent rounded-xl">
         <div className="flex gap-2 text-slate-950">
           {[...players]
             .sort((a, b) => {
@@ -47,8 +47,8 @@ export default function PlayersInRoom({
                     width={25}
                     className={`transition-all ${
                       isConfirmed
-                        ? "text-indigo-800 drop-shadow-[0_0_8px_var(--color-indigo-700)]"
-                        : "text-slate-950"
+                        ? "text-hover-purple drop-shadow-[0_0_8px_var(--light-purple)]"
+                        : "text-background"
                     }`}
                   />
                 </div>

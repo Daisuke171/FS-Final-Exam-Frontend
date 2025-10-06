@@ -22,10 +22,10 @@ export default function CustomButtonOne({
   type = "button",
 }: CustomButtonProps) {
   const outlinedPrimary =
-    "border-2 border-indigo-900 text-indigo-900 bg-transparent hover:bg-indigo-900 hover:text-indigo-200";
+    "border-2 border-light-purple text-hover-purple bg-transparent hover:border-hover-purple";
 
   const outlinedSecondary =
-    "border-2 border-slate-900 text-slate-900 bg-transparent hover:bg-slate-900 hover:text-slate-200";
+    "border-2 border-medium-blue text-light-blue bg-transparent hover:border-light-blue";
 
   const outlinedLoading =
     "border-2 border-slate-400 opacity-50 text-slate-400 bg-transparent pointer-events-none cursor-not-allowed";
@@ -54,28 +54,35 @@ export default function CustomButtonOne({
   const baseStyles =
     "py-4 px-8 w-fit cursor-pointer rounded-xl font-bold flex items-center gap-2 transition-all truncate";
   return (
-    <button
-      className={`${baseStyles} ${variant === "filled" ? filled : outlined} ${
-        full ? "w-full" : "w-fit"
-      }`}
-      onClick={action}
-      type={type}
-    >
-      {loading ? (
-        <Icon
-          icon="line-md:loading-twotone-loop"
-          width="24"
-          height="24"
-        />
-      ) : icon ? (
-        <Icon
-          icon={icon}
-          width="24"
-          height="24"
-        />
-      ) : null}
-
-      {text}
-    </button>
+    <div className={`relative group ${full ? "w-full" : "w-fit"}`}>
+      <button
+        className={`${baseStyles} ${variant === "filled" ? filled : outlined}`}
+        onClick={action}
+        type={type}
+      >
+        {loading ? (
+          <Icon
+            icon="line-md:loading-twotone-loop"
+            width="24"
+            height="24"
+          />
+        ) : icon ? (
+          <Icon
+            icon={icon}
+            width="24"
+            height="24"
+          />
+        ) : null}
+        {text}
+      </button>
+      {variant === "outlined" && (
+        <div
+          className={`absolute inset-0 rounded-lg transform
+              ${
+                color === "primary" ? "bg-shadow-purple" : "bg-shadow-blue"
+              } blur-2xl duration-500 -z-10 transition-all opacity-0 group-hover:opacity-60`}
+        ></div>
+      )}
+    </div>
   );
 }

@@ -148,19 +148,19 @@ export default function RoomComponent() {
     return (
       <>
         <div className="flex gap-5 w-[95%] h-100 justify-center">
-          <div className="flex flex-col p-6 bg-slate-300 rounded-xl h-full border-2 min-w-120 border-slate-900">
+          <div className="flex flex-col glass-box-one h-full min-w-120 ">
             <div className="flex items-center justify-between mb-5">
-              <h1 className="text-3xl font-bold text-slate-800">
+              <h1 className="text-3xl font-bold text-font">
                 Sala {roomInfo.name}
               </h1>
-              <p className=" text-slate-700 mr-5">
+              <p className="text-subtitle mr-3">
                 {players.length}/{roomInfo.maxPlayers} Jugadores en sala
               </p>
             </div>
             <div className="flex flex-col h-full justify-center items-center mb-6 gap-5">
               <div
                 onClick={shareRoomLink}
-                className="cursor-pointer py-2 px-4 flex items-center gap-2 bg-slate-800 text-slate-200 rounded-lg"
+                className="cursor-pointer py-2 px-4 flex items-center gap-2 bg-shadow-blue text-font rounded-lg"
               >
                 <Icon
                   icon="material-symbols:file-copy-outline"

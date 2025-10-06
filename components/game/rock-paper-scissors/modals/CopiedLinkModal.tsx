@@ -1,3 +1,4 @@
+import { Icon } from "@iconify-icon/react";
 import { motion } from "motion/react";
 
 export default function CopiedLinkModal() {
@@ -6,13 +7,14 @@ export default function CopiedLinkModal() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className="flex flex-col fixed bottom-5 p-6 items-center gap-4 bg-indigo-950 rounded-xl  w-120"
+      className="flex fixed bottom-5 py-6 px-10 items-center gap-2 bg-success rounded-xl"
     >
-      <h2 className="text-2xl font-bold text-slate-100">Enlace copiado!</h2>
-      <p className="text-indigo-200 text-center">
-        El enlace de la sala ha sido copiado al portapapeles. Compartelo con tus
-        amigos para que puedan unirse!.
-      </p>
+      <Icon
+        icon="material-symbols:check-circle-outline"
+        width="34"
+        className="text-slate-100"
+      />
+      <h2 className="text-xl font-bold text-slate-100">Enlace copiado!</h2>
     </motion.div>
   );
 }
