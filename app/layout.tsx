@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${raleway.variable} font-sans antialiased`}
+        className={`${raleway.variable} bg-gradient-one font-sans antialiased`}
       >
         {children}
       </body>
