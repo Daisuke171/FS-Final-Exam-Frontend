@@ -47,7 +47,7 @@ export default function MainCard() {
   };
   return (
     <div>
-      <div className="p-10 border-2 bg-white/7 backdrop-blur-md border-light-gray rounded-xl w-140 flex flex-col items-center">
+      <div className="glass-box-one w-140 flex flex-col items-center">
         <h1 className="text-4xl font-bold text-font">Piedra, papel o tijera</h1>
         <p className="text-lg text-center text-subtitle">
           Juega esta versión reinventada del juego!
