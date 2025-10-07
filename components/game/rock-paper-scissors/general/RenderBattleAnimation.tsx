@@ -203,7 +203,7 @@ export default function RenderBattleAnimation({
             <Icon
               icon={getMoveIcon(playerMove.move)}
               width={80}
-              className={`text-indigo-400 ${
+              className={`text-bright-purple ${
                 playerMove.id !== winner && battleStage === "damage"
                   ? "animate-[blink-1_.5s_ease-in-out_.4s]"
                   : ""
@@ -227,7 +227,7 @@ export default function RenderBattleAnimation({
             initial={{ opacity: 0, y: 20 }}
             animate={getTextAnimation()}
             transition={getTextTransition()}
-            className="text-lg font-semibold text-slate-300 mt-2 relative"
+            className="text-lg font-semibold text-font mt-2 relative"
             style={{ zIndex: 20 }}
           >
             Tú: {playerMove.move}
@@ -243,7 +243,7 @@ export default function RenderBattleAnimation({
           <Icon
             icon="game-icons:crossed-swords"
             width={70}
-            className="text-slate-200"
+            className="text-font"
           />
         </motion.div>
 
@@ -258,7 +258,7 @@ export default function RenderBattleAnimation({
             <Icon
               icon={getMoveIcon(opponentMove.move)}
               width={80}
-              className={`text-rose-400 transform scale-x-[-1] ${
+              className={`text-error transform scale-x-[-1] ${
                 opponentMove.id !== winner && battleStage === "damage"
                   ? "animate-[blink-1_.5s_ease-in-out_.4s]"
                   : ""
@@ -282,7 +282,7 @@ export default function RenderBattleAnimation({
             initial={{ opacity: 0, y: 20 }}
             animate={getTextAnimation()}
             transition={getTextTransition()}
-            className="text-lg font-semibold text-slate-300 mt-2 relative z-20"
+            className="text-lg font-semibold text-font mt-2 relative z-20"
           >
             Rival: {opponentMove.move}
           </motion.p>

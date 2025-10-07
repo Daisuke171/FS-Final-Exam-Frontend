@@ -60,7 +60,13 @@ export default function Card({
           {title}
         </h2>
       </div>
-      <div className="absolute transition-all delay-100 duration-500 inset-0 rounded-lg pointer-events-none w-full h-full bg-bright-purple blur-xl opacity-0 group-hover:opacity-50 -z-1"></div>
+      {!disableCards && !isClicked && (
+        <div
+          className="absolute transition-all delay-100
+       duration-500 inset-0 rounded-lg pointer-events-none 
+       w-full h-full bg-bright-purple blur-md opacity-0 group-hover:opacity-40 -z-2"
+        ></div>
+      )}
     </div>
   );
 }

@@ -18,11 +18,14 @@ import RenderBattleAnimation from "@/components/game/rock-paper-scissors/general
 
 interface GameResult {
   text: string;
-  icon: string;
-  styles: string;
+  icon: {
+    img: IconifyIcon | string;
+    styles: string;
+  };
   points: {
     number: number;
     symbol: string;
+    styles: string;
   };
 }
 
@@ -87,40 +90,49 @@ export default function GameComponent() {
   ];
 
   const getHealthColor = (health: number) => {
-    if (health > 60) return "bg-emerald-500";
-    if (health > 30) return "bg-yellow-600";
-    if (health > 10) return "bg-orange-500";
-    return "bg-rose-500";
+    if (health > 70) return "bg-success";
+    if (health > 45) return "bg-ranking";
+    if (health > 25) return "bg-orange-500";
+    return "bg-error";
   };
 
   const gameResult: GameResult[] = [
     gameWinner === playerId
       ? {
           text: "¡Has ganado!",
-          icon: "game-icons:laurel-crown",
-          styles: "text-emerald-700",
+          icon: {
+            img: "game-icons:laurel-crown",
+            styles: "text-ranking drop-shadow-[0_0_14px_var(--color-ranking)]",
+          },
           points: {
             number: 20,
             symbol: "+",
+            styles: "text-success",
           },
         }
       : gameWinner === "tie"
       ? {
           text: "Empate",
-          icon: "game-icons:crossed-swords",
-          styles: "text-slate-500",
+          icon: {
+            img: "game-icons:crossed-swords",
+            styles: "text-light-gray",
+          },
           points: {
             number: 5,
             symbol: "+",
+            styles: "text-slate-500",
           },
         }
       : {
           text: "Has perdido",
-          icon: "game-icons:dead-head",
-          styles: "text-rose-800",
+          icon: {
+            img: "game-icons:dead-head",
+            styles: "text-error",
+          },
           points: {
             number: 20,
             symbol: "-",
+            styles: "text-error",
           },
         },
   ].filter(Boolean);
@@ -137,25 +149,23 @@ export default function GameComponent() {
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.5 }}
-          className="flex flex-col h-full items-center p-10 bg-slate-300 m-auto w-100 rounded-xl border-2 border-slate-600"
+          className="flex flex-col h-full items-center glass-box-one m-auto w-100"
         >
-          <p className="text-2xl mt-2 text-slate-700"></p>
           {gameResult.map((r, idx) => (
             <div
-              className={
-                "flex flex-col items-center gap-2 mb-5 px-4 text-slate-800"
-              }
+              className={"flex flex-col items-center gap-2 mb-5 px-4 text-font"}
               key={idx}
             >
               <Icon
-                icon={r.icon}
+                icon={r.icon.img}
                 width={100}
+                className={r.icon.styles}
               />
               <p className="text-4xl font-bold">{r.text}</p>
               <motion.p
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1, transition: { delay: 0.5 } }}
-                className={`text-2xl font-bold ${r.styles}`}
+                className={`text-2xl font-bold ${r.points.styles}`}
               >
                 {r.points.symbol}
                 <NumbersAnimation
@@ -186,22 +196,23 @@ export default function GameComponent() {
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.5 }}
-          className="flex flex-col items-center bg-slate-300 w-150 m-auto rounded-xl border-2 border-slate-900"
+          className="flex flex-col items-center  w-150 m-auto rounded-xl border-2 border-subtitle"
         >
-          <div className="rounded-t-xl h-70 w-full flex flex-col">
+          <div className="rounded-t-xl h-80 w-full flex flex-col">
             <div className="relative w-full">
-              <div className="bg-slate-800 h-60 w-full rounded-t-xl"></div>
-              <div className="bg-slate-900 h-20 w-full"></div>
+              <div className="bg-white/5 backdrop-blur-md h-60 w-full rounded-t-xl"></div>
+              <div className="bg-white/10 backdrop-blur-md h-20 w-full"></div>
               <div className="absolute top-5 flex justify-between w-full px-5">
                 <div className="space-y-6 flex w-full justify-between">
-                  {Object.keys(playerHealth)
+                  {players
+                    .map((p) => p.id)
                     .sort((a, b) =>
                       a === playerId ? -1 : b === playerId ? 1 : 0
                     )
                     .map((id) => {
                       const oldHealth =
                         previousHealth[id] || playerHealth[id] || 100;
-                      const newHealth = playerHealth[id] || 100;
+                      const newHealth = playerHealth[id];
                       const isPlayer = id === playerId;
 
                       return (
@@ -215,17 +226,17 @@ export default function GameComponent() {
                           >
                             <div className="flex justify-between items-center px-1">
                               <span
-                                className={` ${
-                                  isPlayer ? "text-indigo-500" : "text-rose-500"
+                                className={`font-medium ${
+                                  isPlayer ? "text-medium-blue" : "text-error"
                                 }`}
                               >
                                 {isPlayer ? "Tu Vida" : "Vida del Rival"}
                               </span>
                               <div className="flex items-center space-x-2">
-                                <span className="text-sm line-through text-slate-500">
-                                  {oldHealth} HP
+                                <span className="text-sm line-through text-light-gray">
+                                  100 HP
                                 </span>
-                                <span className="text-sm font-bold text-rose-400">
+                                <span className="text-sm font-bold text-error">
                                   <NumbersAnimation value={newHealth} /> HP
                                 </span>
                               </div>
@@ -299,30 +310,30 @@ export default function GameComponent() {
               </div>
             </div>
           </div>
-          <div className="p-8">
+          <div className="p-8 bg-background z-8 w-full rounded-b-xl">
             <AnimatePresence mode="wait">
               {timeLeft !== null && timeLeft >= 0 && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="w-full flex flex-col items-center mt-5"
+                  className="w-full flex flex-col items-center "
                 >
-                  <p className="text-2xl mt-2 text-slate-800">
+                  <p className="text-2xl mt-2 text-font">
                     Tiempo restante: {timeLeft}s
                   </p>
-                  <div className="w-full h-2 rounded-full mt-2 bg-slate-500 relative overflow-hidden">
+                  <div className="w-full h-2 rounded-full mt-2 bg-light-gray relative overflow-hidden">
                     <motion.div
                       animate={{ scaleX: timeLeft / totalDuration }}
                       transition={{ duration: 0.1, ease: "linear" }}
-                      className="absolute top-0 left-0 h-2 bg-slate-900 rounded-full"
+                      className="absolute top-0 left-0 h-2 bg-hover-purple rounded-full"
                       style={{ width: "100%", transformOrigin: "left" }}
                     ></motion.div>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
-            <div className="flex gap-5 w-full items-center justify-center my-10">
+            <div className="flex gap-5 w-full items-center justify-center z-10 my-10">
               {Buttons.map((b) => (
                 <Card
                   key={b.title}
