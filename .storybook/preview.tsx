@@ -5,7 +5,7 @@ import "../app/globals.css";
 const preview: Preview = {
   decorators: [
     (Story) => (
-      <div className="h-screen w-screen bg-gradient-one flex justify-center items-center">
+      <div className="h-screen w-screen -z-11 bg-gradient-one flex justify-center items-center">
         <Story />
       </div>
     ),
