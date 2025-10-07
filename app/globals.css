@@ -34,6 +34,7 @@
 
   /* Gray tones */
   --light-gray: oklch(65.004% 0.00007 271.152);
+  --dark-gray: oklch(42.393% 0.00005 271.152);
 
   /* Utility colors */
   --online-user: oklch(0.8693 0.1716 128.44);
@@ -55,6 +56,7 @@
   --color-subtitle: var(--font-medium);
 
   --color-light-gray: var(--light-gray);
+  --color-dark-gray: var(--dark-gray);
 
   --color-light-blue: var(--light-blue);
   --color-medium-blue: var(--medium-blue);
