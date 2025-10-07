@@ -11,6 +11,8 @@ import CopiedLinkModal from "@/components/game/rock-paper-scissors/modals/Copied
 import LoaderCard from "@/components/game/rock-paper-scissors/cards/LoaderCard";
 import ChatComponent from "@/components/game/rock-paper-scissors/general/ChatComponent";
 import CountdownCard from "@/components/game/rock-paper-scissors/cards/CountdownCard";
+import RoomErrorCard from "@/components/game/rock-paper-scissors/cards/RoomErrorCard";
+import { set } from "zod";
 
 const socket = getSocket();
 
@@ -29,6 +31,7 @@ export default function RoomComponent() {
   const [confirmedPlayers, setConfirmedPlayers] = useState<string[]>([]);
   const [playerId, setPlayerId] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
+  const [clicked, setClicked] = useState<boolean>(false);
   const [countDown, setCountDown] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -84,6 +87,14 @@ export default function RoomComponent() {
   const handleConfirmPlayers = () => {
     socket.emit("confirmReady", { roomId, ready: true });
     setLoading(true);
+    setClicked(true);
+    if (clicked) {
+      setTimeout(() => {
+        socket.emit("confirmReady", { roomId, ready: false });
+        setLoading(false);
+        setClicked(false);
+      }, 100);
+    }
   };
 
   const shareRoomLink = () => {
@@ -103,51 +114,34 @@ export default function RoomComponent() {
 
   if (error?.includes("existe")) {
     return (
-      <div className="flex flex-col p-10 items-center gap-5 bg-slate-300 rounded-xl border-2 w-140 border-slate-500">
-        <h2 className="text-4xl font-bold text-slate-600">
-          Sala no encontrada
-        </h2>
-        <Icon
-          icon="streamline-freehand:help-question-circle"
-          width={150}
-          className="text-slate-500"
-        />
-        <CustomButtonOne
-          text="Volver al inicio"
-          variant="outlined"
-          color="secondary"
-          action={() => router.push("/games/rock-paper-scissors")}
-          icon="streamline:return-2"
-        />
-      </div>
+      <RoomErrorCard
+        error="La sala no existe"
+        subtitle="Redireccionando..."
+        icon="streamline-freehand:help-question-circle"
+        action={() => router.push("/games/rock-paper-scissors")}
+      />
     );
   }
 
   if (error?.includes("llena")) {
     return (
-      <div className="flex flex-col p-10 items-center gap-5 bg-slate-300 rounded-xl border-2 w-140 border-slate-500">
-        <h2 className="text-4xl font-bold text-slate-600">{error}</h2>
-        <p className="text-slate-600 text-2xl">Redirigiendo...</p>
-        <Icon
-          icon="streamline-freehand:help-question-circle"
-          width={150}
-          className="text-slate-500"
-        />
-        <CustomButtonOne
-          text="Volver al inicio"
-          variant="outlined"
-          color="secondary"
-          action={() => router.push("/games/rock-paper-scissors")}
-          icon="streamline:return-2"
-        />
-      </div>
+      <RoomErrorCard
+        error={error}
+        subtitle="Redireccionando..."
+        icon="ph:users-four-light"
+        action={() => router.push("/games/rock-paper-scissors")}
+      />
     );
   }
 
   if (roomInfo) {
     return (
       <>
-        <div className="flex gap-5 w-[95%] h-100 justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex gap-5 w-[95%] h-100 justify-center"
+        >
           <div className="flex flex-col glass-box-one h-full min-w-120 ">
             <div className="flex items-center justify-between mb-5">
               <h1 className="text-3xl font-bold text-font">
@@ -187,9 +181,9 @@ export default function RoomComponent() {
                     exit={{ opacity: 0, width: 0 }}
                   >
                     <CustomButtonOne
-                      text="Confirmar jugador"
+                      text={clicked ? "Cancelar" : "Confirmar"}
                       action={handleConfirmPlayers}
-                      icon="mage:user-check"
+                      icon={clicked ? "mage:user-cross" : "mage:user-check"}
                       loading={loading}
                     />
                   </motion.div>
@@ -212,7 +206,7 @@ export default function RoomComponent() {
             playerId={playerId}
             players={players}
           />
-        </div>
+        </motion.div>
       </>
     );
   }

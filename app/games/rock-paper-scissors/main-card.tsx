@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Icon } from "@iconify-icon/react";
 import CreateRoomModal from "@/components/game/rock-paper-scissors/modals/CreateRoomModal";
 import { useEffect, useState } from "react";
@@ -14,11 +14,19 @@ const socket = getSocket();
 export default function MainCard() {
   const [openModal, setOpenModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [roomId, setRoomId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     socket.on("joinRoomError", (data) => {
       setError(data.message);
+    });
+    socket.on("isPrivate", (data) => {
+      setIsPrivate(true);
+      setMessage(data.message);
+      setRoomId(data.roomId);
     });
     socket.on("joinRoomSuccess", ({ roomId }) => {
       setError(null);
@@ -45,9 +53,55 @@ export default function MainCard() {
     }
     socket.emit("joinRoom", { roomId });
   };
+
+  const handleJoinRoomByPassword = () => {
+    const input = document.querySelector(
+      'input[name="password"]'
+    ) as HTMLInputElement;
+    const password = input.value.trim();
+    if (password.length === 0) {
+      setError("El campo no puede estar vacío");
+      return;
+    }
+    socket.emit("joinRoom", { roomId, password });
+  };
+
+  if (isPrivate) {
+    return (
+      <div className="glass-box-one w-130 flex flex-col">
+        <div className="flex items-center gap-2 mb-10 w-full">
+          <Icon
+            icon="material-symbols:lock"
+            width={70}
+            className="text-font"
+          />
+          <div>
+            <h2 className="text-4xl font-bold text-font">{message}</h2>
+            <p className="text-lg text-subtitle">
+              Ingresa la contraseña para unirte
+            </p>
+          </div>
+        </div>
+        <CustomTextInput
+          placeholder="Contraseña"
+          name="password"
+          type="password"
+          action={handleJoinRoomByPassword}
+          icon="material-symbols:subdirectory-arrow-left"
+        />
+        {error && <p className="text-error mt-3">{error}</p>}
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div className="glass-box-one w-140 flex flex-col items-center">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="glass-box-one w-140 flex flex-col items-center"
+      >
         <h1 className="text-4xl font-bold text-font">Piedra, papel o tijera</h1>
         <p className="text-lg text-center text-subtitle">
           Juega esta versión reinventada del juego!
@@ -88,7 +142,7 @@ export default function MainCard() {
             {error && <p className="text-rose-800">{error}</p>}
           </div>
         </div>
-      </div>
+      </motion.div>
       <AnimatePresence>
         {openModal && <CreateRoomModal setCloseModal={handleOpenModal} />}
       </AnimatePresence>
