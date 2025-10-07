@@ -37,8 +37,8 @@
 
   /* Utility colors */
   --online-user: oklch(0.8693 0.1716 128.44);
-  --ranking: oklch(0.8007 0.1675 75.56);
-  --success: oklch(0.4659 0.1003 145.59);
+  --ranking: oklch(81.221% 0.13758 83.506);
+  --success: oklch(70.071% 0.16051 145.321);
   --error: oklch(0.5134 0.1504 24.88);
 }
 
@@ -62,6 +62,8 @@
 
   --color-success: var(--success);
   --color-error: var(--error);
+  --color-online-user: var(--online-user);
+  --color-ranking: var(--ranking);
 
   --font-sans: var(--font-raleway);
 }
