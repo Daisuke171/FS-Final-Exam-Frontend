@@ -60,16 +60,16 @@ export function useGameSocket(roomId: string | string[]) {
 
     setPlayerId(socket.id);
 
-    const playerHealth: PlayerHealth = {};
-    players.forEach((player) => {
-      playerHealth[player.id] = 100;
-    });
-    setPlayerHealth(playerHealth);
+    // const playerHealth: PlayerHealth = {};
+    // players.forEach((player) => {
+    //   playerHealth[player.id] = 100;
+    // });
+    // setPlayerHealth(playerHealth);
 
     socket.on("gameState", async (data) => {
       setPlayers(data.players.map((id: string) => ({ id })));
       if (!isAnimatingHealthRef.current) {
-        setPlayerHealth(data.hp || {});
+        setPlayerHealth(data.hp);
       }
       const confirmed = Object.entries(data.ready)
         .filter(([_, isReady]) => isReady)
