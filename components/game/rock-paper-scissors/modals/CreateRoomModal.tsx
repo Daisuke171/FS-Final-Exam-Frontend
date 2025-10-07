@@ -107,7 +107,7 @@ export default function CreateRoomModal({ setCloseModal }: any) {
               className="placeholder:text-light-gray w-full py-4 px-6 focus:border-hover-purple rounded-xl border-2 border-light-gray focus:outline-none text-font"
             />
             {errors.roomName && (
-              <p className="text-rose-900 mt-2">{errors.roomName}</p>
+              <p className="text-error mt-2">{errors.roomName}</p>
             )}
           </div>
           <AnimatePresence>
@@ -127,7 +127,7 @@ export default function CreateRoomModal({ setCloseModal }: any) {
                   className="placeholder:text-light-gray w-full py-4 px-6 focus:border-hover-purple rounded-xl border-2 border-light-gray focus:outline-none text-font"
                 />
                 {errors.password && (
-                  <p className="text-rose-900 mt-2">{errors.password}</p>
+                  <p className="text-error mt-2">{errors.password}</p>
                 )}
               </motion.div>
             )}
