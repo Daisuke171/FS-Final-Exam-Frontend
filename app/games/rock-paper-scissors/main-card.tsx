@@ -51,7 +51,12 @@ export default function MainCard() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{
+          type: "spring",
+          duration: 1,
+          stiffness: 100,
+          damping: 10,
+        }}
         className="glass-box-one w-140 flex flex-col items-center"
       >
         <h1 className="text-4xl font-bold text-font">Piedra, papel o tijera</h1>
@@ -60,24 +65,61 @@ export default function MainCard() {
         </p>
         <div className="mt-10 flex flex-col items-center gap-5  justify-center w-[85%]">
           <div className="flex gap-3 w-full justify-center">
-            <CustomButtonTwo
-              text="Ver salas"
-              icon="lucide-lab:houses"
-              onClick={() => {
-                window.location.href = "/games/rock-paper-scissors/rooms";
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: [0, 0.4, 0.6, 1], x: 0 }}
+              transition={{
+                type: "spring",
+                duration: 1,
+                stiffness: 100,
+                damping: 10,
+                delay: 0.2,
               }}
-              full
-            />
-            <CustomButtonTwo
-              color="secondary"
-              text="Crea una sala"
-              icon="mdi:home-plus-outline"
-              variant="outlined"
-              onClick={handleOpenModal}
-              full
-            />
+              className="w-full"
+            >
+              <CustomButtonTwo
+                text="Ver salas"
+                icon="lucide-lab:houses"
+                onClick={() => {
+                  window.location.href = "/games/rock-paper-scissors/rooms";
+                }}
+                full
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: [0, 0.4, 0.6, 1], x: 0 }}
+              transition={{
+                type: "spring",
+                duration: 1,
+                stiffness: 100,
+                damping: 10,
+                delay: 0.3,
+              }}
+              className="w-full"
+            >
+              <CustomButtonTwo
+                color="secondary"
+                text="Crea una sala"
+                icon="mdi:home-plus-outline"
+                variant="outlined"
+                onClick={handleOpenModal}
+                full
+              />
+            </motion.div>
           </div>
-          <div className="flex flex-col gap-2 justify-center w-full items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: [0, 0.4, 0.6, 1], x: 0 }}
+            transition={{
+              type: "spring",
+              duration: 1,
+              stiffness: 100,
+              damping: 10,
+              delay: 0.4,
+            }}
+            className="flex flex-col gap-2 justify-center w-full items-center"
+          >
             <label
               className="text-lg text-font font-medium"
               htmlFor="roomId"
@@ -92,7 +134,7 @@ export default function MainCard() {
               icon="iconamoon:enter"
             />
             {error && <p className="text-rose-800">{error}</p>}
-          </div>
+          </motion.div>
         </div>
       </motion.div>
       <AnimatePresence>
