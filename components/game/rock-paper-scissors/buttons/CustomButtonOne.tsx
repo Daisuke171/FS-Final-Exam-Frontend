@@ -1,7 +1,7 @@
 import { Icon, IconifyIcon } from "@iconify-icon/react";
 
 interface CustomButtonProps {
-  text: string;
+  text?: string;
   action?: () => void;
   icon?: IconifyIcon | string;
   full?: boolean;
@@ -9,6 +9,7 @@ interface CustomButtonProps {
   color?: "primary" | "secondary";
   loading?: boolean;
   type?: "button" | "submit" | "reset";
+  size?: "sm" | "md" | "lg";
 }
 
 export default function CustomButtonOne({
@@ -20,7 +21,15 @@ export default function CustomButtonOne({
   color = "primary",
   loading,
   type = "button",
+  size = "md",
 }: CustomButtonProps) {
+  const selectedSize =
+    size === "sm"
+      ? "py-2 px-4 text-sm"
+      : size === "md"
+      ? "py-3 px-6 text-base"
+      : "py-4 px-8 text-lg";
+
   const outlinedPrimary =
     "border-2 border-light-purple text-bright-purple bg-transparent hover:border-bright-purple";
 
@@ -34,7 +43,7 @@ export default function CustomButtonOne({
     "bg-light-purple text-font border-2 border-light-purple hover:bg-hover-purple hover:border-hover-purple";
 
   const filledSecondary =
-    "bg-shadow-blue text-slate-200 border-2 border-shadow-blue hover:bg-medium-blue hover:border-medium-blue";
+    "bg-shadow-blue text-font border-2 border-shadow-blue hover:bg-medium-blue hover:border-medium-blue";
 
   const filledLoading =
     "bg-dark-gray text-font border-2 opacity-60 border-dark-gray pointer-events-none cursor-not-allowed";
@@ -50,8 +59,7 @@ export default function CustomButtonOne({
     ? filledPrimary
     : filledSecondary;
 
-  const baseStyles =
-    "py-4 px-8 w-fit cursor-pointer rounded-xl font-bold flex items-center gap-2 transition-all truncate";
+  const baseStyles = `${selectedSize} w-fit cursor-pointer rounded-xl font-medium flex items-center gap-2 transition-all truncate`;
   return (
     <div className={`relative z-1 group ${full ? "w-full" : "w-fit"}`}>
       <button
@@ -62,14 +70,12 @@ export default function CustomButtonOne({
         {loading ? (
           <Icon
             icon="line-md:loading-twotone-loop"
-            width="24"
-            height="24"
+            width={size === "sm" ? 22 : size === "md" ? 24 : 26}
           />
         ) : icon ? (
           <Icon
             icon={icon}
-            width="24"
-            height="24"
+            width={size === "sm" ? 22 : size === "md" ? 24 : 26}
           />
         ) : null}
         {text}

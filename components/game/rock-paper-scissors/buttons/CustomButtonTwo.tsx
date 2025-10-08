@@ -9,6 +9,7 @@ interface CustomButtonProps {
   variant?: "filled" | "outlined";
   full?: boolean;
   color?: "primary" | "secondary";
+  size?: "sm" | "md" | "lg";
 }
 
 export default function CustomButtonTwo({
@@ -20,7 +21,14 @@ export default function CustomButtonTwo({
   variant = "filled",
   full,
   color = "primary",
+  size = "md",
 }: CustomButtonProps) {
+  const selectedSize =
+    size === "sm"
+      ? "py-2 px-4 text-sm"
+      : size === "md"
+      ? "py-3 px-6 text-base"
+      : "py-4 px-8 text-lg";
   const outlinedPrimary =
     "border-2 border-indigo-900 text-indigo-900 bg-transparent hover:bg-indigo-900 hover:text-indigo-200";
 
@@ -32,8 +40,7 @@ export default function CustomButtonTwo({
   const filledSecondary =
     "bg-slate-800 text-slate-200 border-2 border-slate-800 hover:bg-slate-700 hover:border-slate-700";
 
-  const baseStyles =
-    "py-4 px-8 w-fit cursor-pointer rounded-xl font-bold flex items-center gap-2 transition-all truncate duration-300";
+  const baseStyles = `${selectedSize} cursor-pointer rounded-xl font-bold flex justify-center items-center gap-2 transition-all truncate duration-300`;
 
   const filled = color === "primary" ? filledPrimary : filledSecondary;
 
