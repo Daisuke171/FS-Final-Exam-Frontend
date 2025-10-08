@@ -31,7 +31,11 @@ type FormData = z.infer<typeof formSchema>;
 
 const socket = getSocket();
 
-export default function CreateRoomModal({ setCloseModal }: any) {
+export default function CreateRoomModal({
+  setCloseModal,
+}: {
+  setCloseModal: () => void;
+}) {
   const [formData, setFormData] = useState<FormData>({
     roomName: "",
     isPrivate: false,
@@ -45,7 +49,8 @@ export default function CreateRoomModal({ setCloseModal }: any) {
     socket.on("roomCreated", (data) => {
       console.log("Sala creada:", data.roomInfo);
       setLoading(false);
-      router.push(`rock-paper-scissors/${data.roomId}`);
+      setCloseModal();
+      router.push(`/games/rock-paper-scissors/${data.roomId}`);
     });
 
     return () => {
@@ -64,7 +69,6 @@ export default function CreateRoomModal({ setCloseModal }: any) {
         isPrivate: formData.isPrivate,
         password: formData.isPrivate ? formData.password : undefined,
       });
-      setCloseModal();
     } else {
       const fieldErrors: { [key: string]: string } = {};
 
