@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getSocket } from "@/app/socket";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface PlayedMovements {
   id: string;
@@ -9,15 +11,13 @@ interface PlayerHealth {
   [playerId: string]: number;
 }
 
-// interface GameResult {
-//   players: {
-//     id: string;
-//     userName: string;
-//     move: string;
-//   };
-//   winner: string;
-//   healthDamage: number;
-// }
+interface RoomInfo {
+  id: string;
+  name: string;
+  maxPlayers: number;
+  currentPlayers: number;
+  isPrivate: boolean;
+}
 
 export function useGameSocket(roomId: string | string[]) {
   const [winner, setWinner] = useState<string | null | undefined>(undefined);
@@ -37,6 +37,10 @@ export function useGameSocket(roomId: string | string[]) {
   const [healthDamage, setHealthDamage] = useState<Record<string, number>>({});
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [totalDuration, setTotalDuration] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null);
+  const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
   const [gameWinner, setGameWinner] = useState<string | null>(null);
   const [showBattleAnimation, setShowBattleAnimation] =
     useState<boolean>(false);
@@ -47,6 +51,8 @@ export function useGameSocket(roomId: string | string[]) {
   const socketRef = useRef(getSocket());
   const isAnimatingHealthRef = useRef(false);
   const previousHealthRef = useRef<PlayerHealth>({});
+  const router = useRouter();
+  const currentPathname = usePathname();
 
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -55,16 +61,12 @@ export function useGameSocket(roomId: string | string[]) {
     const socket = socketRef.current;
 
     if (roomId) {
-      socket.emit("playerReadyForMatch", { roomId });
+      setTimeout(() => {
+        socket.emit("playerReadyForMatch", { roomId });
+      }, 10);
     }
 
     setPlayerId(socket.id);
-
-    // const playerHealth: PlayerHealth = {};
-    // players.forEach((player) => {
-    //   playerHealth[player.id] = 100;
-    // });
-    // setPlayerHealth(playerHealth);
 
     socket.on("gameState", async (data) => {
       setPlayers(data.players.map((id: string) => ({ id })));
@@ -75,15 +77,16 @@ export function useGameSocket(roomId: string | string[]) {
         .filter(([_, isReady]) => isReady)
         .map(([playerId]) => playerId);
       setConfirmedPlayers(confirmed);
+      setRoomInfo(data.roomInfo);
       console.log(confirmed);
       console.log(data.hp);
       if (data.state === "PlayingState") {
         setWinner(undefined);
         setState("PlayingState");
         console.log(data.state);
-
         setGameInitialized(true);
       }
+
       if (data.state === "RevealingState") {
         setTimeLeft(null);
       }
@@ -97,9 +100,6 @@ export function useGameSocket(roomId: string | string[]) {
       console.log(`TIMER RECIBIDO: ${data}`);
       if (data === 0) {
         setCountDown(null);
-        setTimeout(() => {
-          socket.emit("playerReadyForMatch", { roomId });
-        }, 200);
       }
     });
 
@@ -145,6 +145,27 @@ export function useGameSocket(roomId: string | string[]) {
       socket.emit("playerReadyForMatch", { roomId });
     });
 
+    socket.on("isPrivate", (data) => {
+      setIsPrivate(true);
+      setMessage(data.message);
+    });
+
+    socket.on("joinRoomError", (data) => {
+      setError(data.message);
+    });
+
+    socket.on("joinRoomSuccess", ({ roomId }) => {
+      setError(null);
+      setIsPrivate(false);
+      const targetUrl = `/games/rock-paper-scissors/${roomId}`;
+
+      if (currentPathname === targetUrl) {
+        router.refresh();
+      } else {
+        router.push(targetUrl);
+      }
+    });
+
     socket.on("playAgainStatus", (data) => {
       setConfirmedPlayers(data.confirmed);
     });
@@ -184,6 +205,9 @@ export function useGameSocket(roomId: string | string[]) {
       socket.off("playersUpdate");
       socket.off("playAgainStatus");
       socket.off("playAgainConfirmed");
+      socket.off("playerReadyForMatch");
+      socket.off("timerStart");
+      socket.off("roundOver");
       socket.off("roundStart");
       socket.off("autoMove");
       socket.off("gameOver");
@@ -192,12 +216,16 @@ export function useGameSocket(roomId: string | string[]) {
       socket.off("countDown");
       socket.off("timerTick");
       socket.off("gameState");
+      socket.off("roundResult");
+      socket.off("joinRoomError");
+      socket.off("joinRoomSuccess");
+      socket.off("isPrivate");
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
     };
-  }, []);
+  }, [roomId]);
 
   useEffect(() => {
     console.log("🔄 Estado cambió:", { clicked, confirmed, disableCards });
@@ -226,6 +254,30 @@ export function useGameSocket(roomId: string | string[]) {
     socketRef.current.emit("confirmReady", { roomId });
   };
 
+  const handleJoinRoomById = () => {
+    const input = document.querySelector(
+      'input[name="roomId"]'
+    ) as HTMLInputElement;
+    const roomId = input.value.trim();
+    if (roomId.length === 0) {
+      setError("El campo no puede estar vacío");
+      return;
+    }
+    socketRef.current.emit("joinRoom", { roomId });
+  };
+
+  const handleJoinRoomByPassword = () => {
+    const input = document.querySelector(
+      'input[name="password"]'
+    ) as HTMLInputElement;
+    const password = input.value.trim();
+    if (password.length === 0) {
+      setError("El campo no puede estar vacío");
+      return;
+    }
+    socketRef.current.emit("joinRoom", { roomId, password });
+  };
+
   return {
     handlePlayerMove,
     handleConfirmMove,
@@ -251,5 +303,11 @@ export function useGameSocket(roomId: string | string[]) {
     clicked,
     state,
     totalDuration,
+    handleJoinRoomByPassword,
+    handleJoinRoomById,
+    error,
+    message,
+    isPrivate,
+    roomInfo,
   };
 }
