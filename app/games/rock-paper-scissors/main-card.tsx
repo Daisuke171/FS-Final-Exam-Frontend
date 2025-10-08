@@ -1,40 +1,34 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Icon } from "@iconify-icon/react";
 import CreateRoomModal from "@/components/game/rock-paper-scissors/modals/CreateRoomModal";
 import { useEffect, useState } from "react";
 import CustomButtonTwo from "@/components/game/rock-paper-scissors/buttons/CustomButtonTwo";
 import { getSocket } from "@/app/socket";
-import { useRouter } from "next/navigation";
 import CustomTextInput from "@/components/game/rock-paper-scissors/inputs/text/CustomTextInput";
+import { useGameSocket } from "@/hooks/rock-paper-scissors/useGameSocket";
+import JoinByPassword from "@/components/game/rock-paper-scissors/general/JoinByPassword";
 
 const socket = getSocket();
 
 export default function MainCard() {
   const [openModal, setOpenModal] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isPrivate, setIsPrivate] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [roomId, setRoomId] = useState<string | null>(null);
-  const router = useRouter();
+  const {
+    error,
+    handleJoinRoomByPassword,
+    handleJoinRoomById,
+    message,
+    isPrivate,
+  } = useGameSocket(roomId || "");
 
   useEffect(() => {
-    socket.on("joinRoomError", (data) => {
-      setError(data.message);
-    });
     socket.on("isPrivate", (data) => {
-      setIsPrivate(true);
-      setMessage(data.message);
       setRoomId(data.roomId);
     });
-    socket.on("joinRoomSuccess", ({ roomId }) => {
-      setError(null);
-      router.push(`/games/rock-paper-scissors/${roomId}`);
-    });
+
     return () => {
-      socket.off("joinRoomError");
-      socket.off("joinRoomSuccess");
+      socket.off("isPrivate");
     };
   }, []);
 
@@ -42,55 +36,13 @@ export default function MainCard() {
     setOpenModal(!openModal);
   };
 
-  const handleJoinRoomById = () => {
-    const input = document.querySelector(
-      'input[name="roomId"]'
-    ) as HTMLInputElement;
-    const roomId = input.value.trim();
-    if (roomId.length === 0) {
-      setError("El campo no puede estar vacío");
-      return;
-    }
-    socket.emit("joinRoom", { roomId });
-  };
-
-  const handleJoinRoomByPassword = () => {
-    const input = document.querySelector(
-      'input[name="password"]'
-    ) as HTMLInputElement;
-    const password = input.value.trim();
-    if (password.length === 0) {
-      setError("El campo no puede estar vacío");
-      return;
-    }
-    socket.emit("joinRoom", { roomId, password });
-  };
-
   if (isPrivate) {
     return (
-      <div className="glass-box-one w-130 flex flex-col">
-        <div className="flex items-center gap-2 mb-10 w-full">
-          <Icon
-            icon="material-symbols:lock"
-            width={70}
-            className="text-font"
-          />
-          <div>
-            <h2 className="text-4xl font-bold text-font">{message}</h2>
-            <p className="text-lg text-subtitle">
-              Ingresa la contraseña para unirte
-            </p>
-          </div>
-        </div>
-        <CustomTextInput
-          placeholder="Contraseña"
-          name="password"
-          type="password"
-          action={handleJoinRoomByPassword}
-          icon="material-symbols:subdirectory-arrow-left"
-        />
-        {error && <p className="text-error mt-3">{error}</p>}
-      </div>
+      <JoinByPassword
+        error={error}
+        message={message}
+        action={handleJoinRoomByPassword}
+      />
     );
   }
 
