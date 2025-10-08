@@ -74,7 +74,11 @@
 
 /* Miscelaneo */
 .glass-box-one {
-  @apply p-10 border-2 bg-white/7 backdrop-blur-md border-light-gray rounded-xl;
+  @apply p-8 border-2 bg-white/7 backdrop-blur-md border-light-gray rounded-xl;
+}
+
+.glass-box-two {
+  @apply bg-white/7 backdrop-blur-md rounded-xl;
 }
 
 /* Gradientes */
