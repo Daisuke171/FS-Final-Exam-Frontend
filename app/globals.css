@@ -15,12 +15,14 @@
   /* Purple tones */
   --bright-purple: oklch(60.816% 0.27519 306.708);
   --light-purple: oklch(0.4468 0.2282 304.02);
+  --transparent-purple: oklch(44.549% 0.22807 303.598 / 0.24);
   --hover-purple: oklch(50.281% 0.2557 303.899);
   --shadow-purple: oklch(0.3589 0.1953 304.02);
 
   /* Blue tones */
   --light-blue: oklch(72.883% 0.1358 252.731);
   --medium-blue: oklch(0.5558 0.2141 269.02);
+  --transparent-blue: oklch(55.766% 0.21303 268.838 / 0.226);
   --shadow-blue: oklch(0.4517 0.2153 275.85);
 
   --box-fill: oklch(0.6843 0.1083 222.73 / 5%);
@@ -39,6 +41,9 @@
   /* Utility colors */
   --online-user: oklch(0.8693 0.1716 128.44);
   --ranking: oklch(81.221% 0.13758 83.506);
+  --transparent-ranking: oklch(81.221% 0.13758 83.506 / 0.123);
+  --medium-ranking: oklch(79.07% 0.15253 81.243);
+  --shadow-ranking: oklch(66.329% 0.13566 78.165);
   --success: oklch(70.071% 0.16051 145.321);
   --error: oklch(0.5134 0.1504 24.88);
 }
@@ -49,6 +54,7 @@
 
   --color-bright-purple: var(--bright-purple);
   --color-light-purple: var(--light-purple);
+  --color-transparent-purple: var(--transparent-purple);
   --color-shadow-purple: var(--shadow-purple);
   --color-hover-purple: var(--hover-purple);
 
@@ -59,13 +65,18 @@
   --color-dark-gray: var(--dark-gray);
 
   --color-light-blue: var(--light-blue);
+  --color-transparent-blue: var(--transparent-blue);
   --color-medium-blue: var(--medium-blue);
   --color-shadow-blue: var(--shadow-blue);
 
   --color-success: var(--success);
   --color-error: var(--error);
   --color-online-user: var(--online-user);
+
   --color-ranking: var(--ranking);
+  --color-medium-ranking: var(--medium-ranking);
+  --color-shadow-ranking: var(--shadow-ranking);
+  --color-transparent-ranking: var(--transparent-ranking);
 
   --font-sans: var(--font-raleway);
 }
