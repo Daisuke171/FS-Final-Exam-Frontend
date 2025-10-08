@@ -12,44 +12,33 @@ import LoaderCard from "@/components/game/rock-paper-scissors/cards/LoaderCard";
 import ChatComponent from "@/components/game/rock-paper-scissors/general/ChatComponent";
 import CountdownCard from "@/components/game/rock-paper-scissors/cards/CountdownCard";
 import RoomErrorCard from "@/components/game/rock-paper-scissors/cards/RoomErrorCard";
-import { set } from "zod";
+import { useGameSocket } from "@/hooks/rock-paper-scissors/useGameSocket";
+import JoinByPassword from "@/components/game/rock-paper-scissors/general/JoinByPassword";
 
 const socket = getSocket();
 
-interface RoomInfo {
-  id: string;
-  name: string;
-  maxPlayers: number;
-  currentPlayers: number;
-  isPrivate: boolean;
-}
-
 export default function RoomComponent() {
-  const [error, setError] = useState<string | null>(null);
-  const [players, setPlayers] = useState<{ id: string }[]>([]);
-  const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
-  const [confirmedPlayers, setConfirmedPlayers] = useState<string[]>([]);
-  const [playerId, setPlayerId] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [clicked, setClicked] = useState<boolean>(false);
   const [countDown, setCountDown] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [playerId, setPlayerId] = useState<string | undefined>(undefined);
   const [isRedirecting, setIsRedirecting] = useState(false);
-
   const router = useRouter();
   const params = useParams();
-
   const roomId = params.roomId || "";
   console.log(roomId);
+
+  const {
+    handleJoinRoomByPassword,
+    message,
+    isPrivate,
+    error,
+    roomInfo,
+    players,
+    confirmedPlayers,
+  } = useGameSocket(roomId || "");
   useEffect(() => {
-    socket.on("joinRoomError", (data) => {
-      setError(data.message);
-      if (error) {
-        setTimeout(() => {
-          router.push("/games/rock-paper-scissors");
-        }, 3000);
-      }
-    });
     socket.on("countDown", (data) => {
       setCountDown(data);
       console.log(`TIMER RECIBIDO: ${data}`);
@@ -60,19 +49,8 @@ export default function RoomComponent() {
       }
     });
 
-    socket.on("gameState", (data) => {
-      console.log(data.players);
-      const normalized = data.players.map((id: string) => ({ id }));
-      setPlayers(normalized);
-      setRoomInfo(data.roomInfo);
+    socket.on("gameState", () => {
       setPlayerId(socket.id);
-      console.log(normalized);
-      const confirmed = Object.entries(data.ready)
-        .filter(([_, isReady]) => isReady)
-        .map(([playerId]) => playerId);
-      setConfirmedPlayers(confirmed);
-      setLoading(false);
-      console.log(data.state);
     });
 
     socket.emit("joinRoom", { roomId });
@@ -110,6 +88,16 @@ export default function RoomComponent() {
 
   if (isRedirecting) {
     return <LoaderCard />;
+  }
+
+  if (isPrivate) {
+    return (
+      <JoinByPassword
+        error={error}
+        message={message}
+        action={handleJoinRoomByPassword}
+      />
+    );
   }
 
   if (error?.includes("existe")) {
@@ -184,7 +172,7 @@ export default function RoomComponent() {
                       text={clicked ? "Cancelar" : "Confirmar"}
                       action={handleConfirmPlayers}
                       icon={clicked ? "mage:user-cross" : "mage:user-check"}
-                      loading={loading}
+                      // loading={loading}
                     />
                   </motion.div>
                 )}
