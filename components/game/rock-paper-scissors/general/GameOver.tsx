@@ -83,11 +83,24 @@ export default function GameOver({
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.5 }}
-      className="flex flex-col items-center glass-box-one m-auto w-100"
+      className="flex flex-col relative items-center glass-box-one m-auto w-100"
     >
+      <button
+        className="absolute hover:text-font transition-all top-5 cursor-pointer left-4 flex items-center gap-2 text-subtitle text-sm font-medium"
+        onClick={() => router.push("/games/rock-paper-scissors")}
+        type="button"
+      >
+        <Icon
+          icon="material-symbols:arrow-left-alt"
+          width="20"
+        />
+        Volver al inicio
+      </button>
       {gameResult.map((r, idx) => (
         <div
-          className={"flex flex-col items-center gap-2 mb-5 px-4 text-font"}
+          className={
+            "flex flex-col items-center gap-2 mb-5 px-4 pt-6 text-font"
+          }
           key={idx}
         >
           <Icon
@@ -123,15 +136,6 @@ export default function GameOver({
           text="Volver a jugar"
           icon="game-icons:rapidshare-arrow"
           onClick={action}
-        />
-        <CustomButtonTwo
-          icon="material-symbols:arrow-back-rounded"
-          text="Salir"
-          variant="outlined"
-          color="secondary"
-          onClick={() => {
-            router.push("/games/rock-paper-scissors");
-          }}
         />
       </div>
     </motion.div>
