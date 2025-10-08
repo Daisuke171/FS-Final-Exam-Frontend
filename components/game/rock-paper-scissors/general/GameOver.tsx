@@ -42,7 +42,7 @@ export default function GameOver({
           text: "¡Has ganado!",
           icon: {
             img: "game-icons:laurel-crown",
-            styles: "text-ranking drop-shadow-[0_0_14px_var(--color-ranking)]",
+            styles: "text-ranking animate-[glow_1.5s_ease-in-out_infinite]",
           },
           points: {
             number: 20,

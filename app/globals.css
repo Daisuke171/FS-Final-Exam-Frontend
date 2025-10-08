@@ -176,3 +176,15 @@ body {
     opacity: 0;
   }
 }
+
+@keyframes glow {
+  100% {
+    filter: drop-shadow(0 0 10px var(--color-ranking));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px var(--color-ranking));
+  }
+  0% {
+    filter: drop-shadow(0 0 10px var(--color-ranking));
+  }
+}
