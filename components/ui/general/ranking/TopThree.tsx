@@ -2,6 +2,7 @@
 
 import { Icon } from "@iconify/react";
 import LvlChip from "../../chips/ranking/LvlChip";
+import { motion } from "motion/react";
 
 interface RankingListProps {
   firstPlace: {
@@ -28,10 +29,16 @@ export default function TopThree({
 }: RankingListProps) {
   return (
     /* Ranking component */
-    <div className="flex items-end z-9">
-      <div className="flex relative flex-col gap-3 items-center px-12 py-6 inset-shadow-[-6px_0px_6px_rgba(0,0,0,0.25)] pt-17 bg-white/4 backdrop-blur-md rounded-t-4xl">
-        <div className="absolute -top-15 flex flex-col items-center">
-          <div className="rounded-full flex items-center justify-center relative border-4 border-medium-blue bg-background w-25 h-25">
+    <div className="flex items-end z-9 w-full justify-center">
+      <motion.div
+        initial={{ opacity: 0, scaleY: 0 }}
+        animate={{ opacity: 1, scaleY: 1 }}
+        exit={{ opacity: 0, scaleY: 0 }}
+        transition={{ delay: 0.1 }}
+        className="flex relative  flex-col origin-bottom gap-3 items-center w-[28%] md:w-50 py-6 inset-shadow-[-6px_0px_6px_rgba(0,0,0,0.25)] pt-14 sm:pt-17 bg-white/4 backdrop-blur-md rounded-t-4xl"
+      >
+        <div className="absolute -top-12 sm:-top-15 flex flex-col items-center">
+          <div className="rounded-full flex items-center justify-center relative border-4 border-medium-blue bg-background w-21 h-21 sm:w-25 sm:h-25">
             <Icon
               icon="mdi:user"
               width="80"
@@ -44,7 +51,7 @@ export default function TopThree({
             </div>
           </div>
         </div>
-        <h3 className="text-md font-medium text-font">
+        <h3 className="text-sm sm:text-md font-medium text-font">
           {secondPlace.username}
         </h3>
         <LvlChip
@@ -57,18 +64,23 @@ export default function TopThree({
             icon="ix:trophy-filled"
             width="21"
           />
-          <p className="text-xl font-bold ">{secondPlace.score}</p>
+          <p className="text-lg sm:text-xl font-bold ">{secondPlace.score}</p>
         </div>
-      </div>
+      </motion.div>
       {/* Ranking component */}
-      <div className="flex relative flex-col gap-6 min-h-50 items-center px-12 py-6 pt-20 bg-white/7 backdrop-blur-md rounded-t-4xl">
-        <div className="absolute -top-30 flex flex-col items-center">
+      <motion.div
+        initial={{ opacity: 0, scaleY: 0 }}
+        animate={{ opacity: 1, scaleY: 1 }}
+        exit={{ opacity: 0, scaleY: 0 }}
+        className="flex relative flex-col origin-bottom gap-6 min-h-50 items-center w-[35%] md:w-60 py-6 pt-18 sm:pt-20 bg-white/7 backdrop-blur-md rounded-t-4xl"
+      >
+        <div className="absolute -top-28 sm:-top-30 flex flex-col items-center">
           <Icon
             icon="material-symbols:crown"
             width="60"
-            className="text-medium-ranking drop-shadow-[0_0_8px_var(--color-medium-ranking)]"
+            className="text-medium-ranking  drop-shadow-[0_0_8px_var(--color-medium-ranking)]"
           />
-          <div className="rounded-full flex items-center justify-center relative border-4 border-medium-ranking bg-background w-28 h-28">
+          <div className="rounded-full flex items-center justify-center relative border-4 border-medium-ranking bg-background w-24 h-24 sm:w-28 sm:h-28">
             <Icon
               icon="mdi:user"
               width="90"
@@ -81,7 +93,9 @@ export default function TopThree({
             </div>
           </div>
         </div>
-        <h3 className="text-lg font-medium text-font">{firstPlace.username}</h3>
+        <h3 className="text-base sm:text-lg font-medium text-font">
+          {firstPlace.username}
+        </h3>
         <LvlChip
           lvl={firstPlace.lvl}
           color="top-one"
@@ -92,13 +106,19 @@ export default function TopThree({
             icon="ix:trophy-filled"
             width="26"
           />
-          <p className="text-2xl font-bold ">{firstPlace.score}</p>
+          <p className="text-xl sm:text-2xl font-bold ">{firstPlace.score}</p>
         </div>
-      </div>
+      </motion.div>
       {/* Ranking component */}
-      <div className="flex relative flex-col gap-3 items-center px-12 py-6 pt-17 inset-shadow-[6px_0px_6px_rgba(0,0,0,0.25)] bg-white/4 backdrop-blur-md rounded-t-4xl">
-        <div className="absolute -top-15 flex flex-col items-center">
-          <div className="rounded-full flex items-center justify-center relative border-4 border-light-purple bg-background w-25 h-25">
+      <motion.div
+        initial={{ opacity: 0, scaleY: 0 }}
+        animate={{ opacity: 1, scaleY: 1 }}
+        exit={{ opacity: 0, scaleY: 0 }}
+        transition={{ delay: 0.2 }}
+        className="flex relative origin-bottom flex-col gap-3 items-center w-[28%] md:w-50 py-6 pt-14 sm:pt-17 inset-shadow-[6px_0px_6px_rgba(0,0,0,0.25)] bg-white/4 backdrop-blur-md rounded-t-4xl"
+      >
+        <div className="absolute -top-12 sm:-top-15 flex flex-col items-center">
+          <div className="rounded-full flex items-center justify-center relative border-4 border-light-purple bg-background w-21 h-21 sm:w-25 sm:h-25">
             <Icon
               icon="mdi:user"
               width="80"
@@ -111,7 +131,9 @@ export default function TopThree({
             </div>
           </div>
         </div>
-        <h3 className="text-md font-medium text-font">{thirdPlace.username}</h3>
+        <h3 className="text-sm sm:text-md font-medium text-font">
+          {thirdPlace.username}
+        </h3>
         <LvlChip
           lvl={thirdPlace.lvl}
           color="top-three"
@@ -122,9 +144,9 @@ export default function TopThree({
             icon="ix:trophy-filled"
             width="21"
           />
-          <p className="text-xl font-bold ">{thirdPlace.score}</p>
+          <p className="text-lg sm:text-xl font-bold ">{thirdPlace.score}</p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
