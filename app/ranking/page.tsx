@@ -5,6 +5,7 @@ import TopThree from "@/components/ui/general/ranking/TopThree";
 import CustomSelect from "@/components/ui/inputs/CustomSelect";
 import data from "@/users.json";
 import { useState } from "react";
+import { motion } from "motion/react";
 
 type GameFilter = "general" | "rockPaperScissors" | "codeWar" | "ticTacToe";
 export default function Ranking() {
@@ -38,18 +39,26 @@ export default function Ranking() {
 
   return (
     <div className="flex flex-col min-h-screen items-center mb-10">
-      <header className="px-8 flex justify-center py-4 w-full">
+      <header className="bg-white/3 shadow-lg py-3 z-10 sm:p-0 sm:backdrop-blur-md px-8 flex justify-center w-full">
         <div className="hidden sm:flex gap-3">
           {filterOptions.map((option) => (
             <button
+              key={option.value}
               onClick={() => setFilter(option.value)}
-              className={`px-6 py-2 rounded-lg cursor-pointer font-medium whitespace-nowrap  transition-colors ${
+              className={`p-5 relative cursor-pointer font-medium whitespace-nowrap  transition-colors ${
                 filter === option.value
-                  ? "bg-shadow-blue text-white"
-                  : "bg-white/7 text-subtitle hover:bg-white/10"
+                  ? "text-font"
+                  : "text-light-gray hover:bg-white/10"
               }`}
             >
               {option.label}
+              {filter === option.value && (
+                <motion.div
+                  className="w-full h-1 bg-shadow-blue absolute bottom-0 left-0 shadow-[0px_0px_12px_var(--color-shadow-blue)]"
+                  layoutId="underline"
+                  transition={{ type: "spring", stiffness: 500, damping: 28 }}
+                ></motion.div>
+              )}
             </button>
           ))}
         </div>
