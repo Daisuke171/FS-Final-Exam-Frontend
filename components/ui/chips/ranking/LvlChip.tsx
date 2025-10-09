@@ -12,15 +12,15 @@ const colors: { [key: string]: string } = {
 };
 
 const sizes: { [key: string]: string } = {
-  sm: "text-sm",
-  md: "text-md",
-  lg: "text-lg",
+  sm: "text-xs sm:text-sm",
+  md: "text-sm sm:text-base",
+  lg: "text-base sm:text-lg",
 };
 
 export default function LvlChip({ lvl, color, size }: LvlChipProps) {
   return (
     <div
-      className={` ${colors[color]} px-3 py-1 flex ${sizes[size]} items-center gap-1.5 border-2 rounded-lg`}
+      className={` ${colors[color]} px-3 py-1 flex ${sizes[size]} items-center gap-1.5 border-2 rounded-lg `}
     >
       <span className="font-medium ">LVL</span>
       <p className="font-bold ">{lvl}</p>
