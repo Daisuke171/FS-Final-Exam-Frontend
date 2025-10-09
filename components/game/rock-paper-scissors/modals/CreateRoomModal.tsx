@@ -46,7 +46,7 @@ export default function CreateRoomModal({
   const router = useRouter();
 
   useEffect(() => {
-    socket.on("roomCreated", (data) => {
+    socket.on("roomCreated", (data: { roomInfo?: unknown; roomId: string }) => {
       console.log("Sala creada:", data.roomInfo);
       setLoading(false);
       setCloseModal();
@@ -81,8 +81,11 @@ export default function CreateRoomModal({
     }
   };
 
-  const handleInputChange = (field: any, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleInputChange = (
+    field: keyof FormData | string,
+    value: string | boolean | undefined
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value } as FormData));
   };
   return (
     <>

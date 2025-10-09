@@ -42,6 +42,7 @@ export default function Ranking() {
         <div className="hidden sm:flex gap-3">
           {filterOptions.map((option) => (
             <button
+              key={option.value}
               onClick={() => setFilter(option.value)}
               className={`px-6 py-2 rounded-lg cursor-pointer font-medium whitespace-nowrap  transition-colors ${
                 filter === option.value

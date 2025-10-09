@@ -1,0 +1,3 @@
+{
+  "text": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    long factorial = 1.0;\n\n    cout << \"Enter a positive integer: \";\n    cin >> n;\n\n    if (n < 0)\n        cout << \"Error! Factorial of a negative number doesn't exist.\";\n    else {\n        for(int i = 1; i <= n; ++i) {\n            factorial *= i;\n        }\n        cout << \"Factorial of \" << n << \" = \" << factorial;\n    }\n\n    return 0;\n}"
+}
