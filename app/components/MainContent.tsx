@@ -1,61 +1,87 @@
 "use client";
+import { FaCheck, FaTimes } from "react-icons/fa";
 
 export default function MainContent() {
   return (
     <div className="w-full flex justify-center px-2 md:px-6 lg:px-0 pt-28 pb-24 md:pb-0">
-      {/* Contenedor principal centrado y limitado a 900px */}
       <div className="w-full max-w-[900px] flex flex-col items-center space-y-6 relative z-10">
         
-        {/* Juegos Disponibles */}
-        <div className="games-container bg-[var(--light-blue)]/20 rounded-xl p-4 shadow-lg w-full border border-gray-400/30 h-32 flex flex-col justify-center">
-          <h2 className="text-white font-bold text-lg mb-2 text-center">Juegos Favoritos</h2>
+        {/* 🎮 Juegos Favoritos */}
+        <div className="favorites-box glass-glow p-6 w-full">
+          <h2 className="text-white font-bold text-lg mb-3 text-left">
+            Juegos favoritos
+          </h2>
 
-          <div className="flex justify-center gap-3">
-            <button
-              onClick={() => alert('Agregar nuevo juego favorito')}
-              className="w-14 h-14 bg-[var(--medium-blue)]/50 hover:bg-[var(--medium-blue)]/70 
-                         text-white text-2xl font-bold rounded-full flex items-center justify-center 
-                         shadow-lg shadow-[var(--shadow-blue)]/40 transition"
-            >
-              ➕
+          <div className="flex justify-start gap-4">
+            <button className="w-20 h-20 rounded-lg border border-[var(--light-blue)] bg-[var(--medium-blue)]/10 text-3xl text-white hover:bg-[var(--medium-blue)]/30 transition">
+              +
             </button>
-
-            <button
-              onClick={() => (window.location.href = '/juego2')}
-              className="w-16 h-16 bg-[var(--medium-blue)]/70 hover:bg-[var(--medium-blue)] 
-                         text-white font-bold rounded-lg flex items-center justify-center 
-                         shadow-md transition"
-            >
-              🎮 2
+            <button className="w-20 h-20 rounded-lg border border-[var(--light-blue)] bg-[var(--medium-blue)]/10 hover:bg-[var(--medium-blue)]/30 transition text-white">
+              🎮
             </button>
-
-            <button
-              onClick={() => (window.location.href = '/juego3')}
-              className="w-16 h-16 bg-[var(--medium-blue)]/70 hover:bg-[var(--medium-blue)] 
-                         text-white font-bold rounded-lg flex items-center justify-center 
-                         shadow-md transition"
-            >
-              🎮 3
+            <button className="w-20 h-20 rounded-lg border border-[var(--light-blue)] bg-[var(--medium-blue)]/10 hover:bg-[var(--medium-blue)]/30 transition text-white">
+              🎲
             </button>
           </div>
         </div>
 
-        {/* Notificaciones y Misiones */}
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="notification-box bg-[var(--light-blue)]/20 rounded-xl p-6 shadow-lg 
-                          text-white border border-gray-400/30 h-48 flex flex-col justify-center">
-            <h2 className="text-lg font-bold mb-2 text-center">Notificaciones</h2>
-            
+        {/* ⚔️ Misiones y Notificaciones */}
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Misiones Diarias */}
+          <div className="glass-glow p-6">
+            <h2 className="text-lg font-bold text-white mb-4 text-left">
+              Misiones diarias
+            </h2>
+
+            <div className="flex flex-col gap-3">
+              <button className="mission-btn">
+                <span>Gana 3 partidas de Tic-Tac-Toe</span>
+                <span className="text-[var(--light-blue)]">(0/3)</span>
+              </button>
+              <button className="mission-btn">
+                <span>Gana 10 partidas de Piedra-Papel-Tijeras</span>
+                <span className="text-[var(--light-blue)]">(5/10)</span>
+              </button>
+              <button className="mission-btn">
+                <span>Desafía a 3 amigos en Tic-Tac-Toe</span>
+                <span className="text-[var(--light-blue)]">(0/3)</span>
+              </button>
+            </div>
           </div>
 
-          <div className="missions-box bg-[var(--light-blue)]/20 rounded-xl p-6 shadow-lg 
-                          text-white border border-gray-400/30 h-48 flex flex-col justify-center">
-            <h2 className="text-lg font-bold mb-2 text-center">Misiones</h2>
-            
+          {/* Notificaciones */}
+          <div className="glass-glow p-6">
+            <h2 className="text-lg font-bold text-white mb-4 text-left">
+              Notificaciones
+            </h2>
+
+            <div className="flex flex-col gap-3">
+              <div className="mission-btn justify-between">
+                <span>Tu amigo Jhon te ha desafiado...</span>
+                <div className="flex gap-2 action-icons">
+                  <button><FaCheck /></button>
+                  <button><FaTimes /></button>
+                </div>
+              </div>
+
+              <div className="mission-btn justify-between">
+                <span>Tienes nuevos mensajes...</span>
+                <div className="flex gap-2 action-icons">
+                  <button><FaCheck /></button>
+                  <button><FaTimes /></button>
+                </div>
+              </div>
+
+              <div className="mission-btn justify-between">
+                <span>¡Subiste de nivel!</span>
+                <div className="flex gap-2 action-icons">
+                  <button><FaCheck /></button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
