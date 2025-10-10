@@ -11,7 +11,7 @@ function CodingWarContent() {
   const { joined } = useSocketContext();
 
   return (
-    <div className="max-h-screen flex flex-col bg-gradient-one text-[var(--font-light)]">
+    <div className="min-h-screen flex flex-col bg-gradient-one text-[var(--font-light)]">
       {/* HEADER */}
       <header className="backdrop-blur-md bg-white/5 border-b border-[var(--transparent-purple)] shadow-[0_0_15px_var(--transparent-blue)]">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -49,9 +49,9 @@ function CodingWarContent() {
 
       {/* MAIN */}
       <main className="">
-        <section className="">
+        <section className="border overflow-auto flex-grow border-[var(--transparent-purple)] shadow-[0_0_15px_var(--transparent-blue)] max-w-7xl mx-auto my-6 rounded-lg">
           {joined ? (
-            <div className="w-full">
+            <div className="">
               <TextViewer />
             </div>
           ) : (

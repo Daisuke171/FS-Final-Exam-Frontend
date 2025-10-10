@@ -9,7 +9,7 @@ export default function TextViewer() {
   const code = jsonData.text;
 
   return (
-    <div className="">
+    <div className="w-full">
       {/* Leave button */}
       <div className="w-full flex justify-end mb-4">
         <button
@@ -24,65 +24,61 @@ export default function TextViewer() {
 
       {/* GAME */}
       <main
-        className="flex flex-row"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start"
       >
         {/* Left Panel - Player 1 */}
-        <section className="">
-          <div className="">
-            <h2 className="">Player 1</h2>
-            <pre className="">
+        <section className="flex flex-col">
+          <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-3">
+            <div className="text-xs text-white/60 mb-2">Player 1</div>
+            <pre className="bg-transparent p-3 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words">
               {code}
             </pre>
-            <input
-              type="text"
-              inputMode="text"
-              autoComplete="off"
-              aria-label="Player 1 input"
-              className=""
-              placeholder="Type your code..."
-            />
           </div>
+
+          <input
+            type="text"
+            inputMode="text"
+            autoComplete="off"
+            aria-label="Player 1 input"
+            className="mt-3 bg-black/40 border border-gray-700 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full"
+          />
         </section>
 
         {/* Center Panel - Scoreboard */}
-        <div
-          className=""
-        >
-          <div className="mb-4">
-            <Dragonhead />
-          </div>
-          <h1 className="">
+        <section className="flex flex-col items-center justify-center bg-gradient-to-b from-gray-900/80 to-black/60 border border-white/10 p-6 rounded-2xl">
+          <Dragonhead />
+          <h1 className="text-indigo-400 text-4xl font-semibold mt-4 mb-2">
             SCORE
           </h1>
 
-          <div className="">
-            <div className="">
-              <span className="">Player 1</span>
-              <span>0</span>
+          <div className="w-48 bg-black/30 rounded-lg p-4 mt-3">
+            <div className="flex justify-between text-sm text-white/60 mb-2">
+              <span>Player 1</span>
+              <span className="text-green-400 font-medium">test</span>
             </div>
-            <div className="">
-              <span className="">Player 2</span>
-              <span>0</span>
+            <div className="flex justify-between text-sm text-white/60">
+              <span>Player 2</span>
+              <span className="text-green-400 font-medium">test</span>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Right Panel - Player 2 */}
-        <section className="">
-          <div className="">
-            <h2 className="">Player 2</h2>
-            <pre className="">
+        <section className="flex flex-col">
+          <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-3">
+            <div className="text-xs text-white/60 mb-2">Player 2</div>
+            <pre className="bg-transparent p-3 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words">
               {code}
             </pre>
-            <input
-              type="text"
-              inputMode="text"
-              autoComplete="off"
-              aria-label="Player 2 input"
-              className=""
-              placeholder="Type your code..."
-            />
           </div>
+
+          <input
+            type="text"
+            inputMode="text"
+            autoComplete="off"
+            aria-label="Player 2 input"
+            className="mt-3 bg-black/40 border border-gray-700 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full"
+          />
         </section>
       </main>
     </div>
