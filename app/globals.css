@@ -111,9 +111,10 @@ body {
 
 /* Fondo total de la página */
 body {
-  background: radial-gradient(circle at top, var(--background-gradient-1) 0%, var(--background-gradient-2) 7%, var(--background-gradient-3) 63%);
+  background: radial-gradient(circle at center, var(--background-gradient-1) 0%, var(--background-gradient-2) 25%, var(--background-gradient-3) 60%);
   min-height: 100vh;
 }
+
 
 /* Navbar fino y centrado con glow funcional */
 .navbar-glass {
@@ -250,4 +251,27 @@ body {
 .action-icons button {
   @apply w-8 h-8 rounded-full flex items-center justify-center bg-[var(--light-blue)]/20 
          hover:bg-[var(--light-blue)]/40 transition;
+}
+
+/* 🌟 Estilo reutilizable de botón con efecto luminoso */
+.btn-glow {
+  background-color: rgba(76, 201, 240, 0.08);
+  border: 1px solid var(--light-blue);
+  color: var(--light-blue);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 6px rgba(76, 201, 240, 0.3);
+}
+
+.btn-glow:hover {
+  background-color: rgba(76, 201, 240, 0.25);
+  color: white;
+  box-shadow: 0 0 12px rgba(76, 201, 240, 0.6);
+  transform: scale(1.05);
+}
+
+.btn-glow:active {
+  background-color: rgba(76, 201, 240, 0.35);
+  transform: scale(0.97);
 }
