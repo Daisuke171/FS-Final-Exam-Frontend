@@ -1,3 +1,4 @@
+// /socket.ts
 import { io, Socket } from "socket.io-client";
 
 let socketInstance: Socket | null = null;
@@ -7,6 +8,14 @@ export const socket = () => {
     socketInstance = io("http://localhost:3010", {
       reconnectionAttempts: 5,
       transports: ["websocket", "polling"],
+    });
+
+    socketInstance.on("connect", () => {
+      console.log("✅ Connected:", socketInstance?.id);
+    });
+
+    socketInstance.on("disconnect", (reason) => {
+      console.log("❌ Disconnected:", reason);
     });
   }
   return socketInstance;
@@ -19,6 +28,7 @@ export function joinRoom(room: string) {
   } else {
     s.emit("joinRoom", { room });
   }
+  console.log(`📡 Joining room: ${room}`);
 }
 
 export function leaveRoom(room: string) {
@@ -28,5 +38,5 @@ export function leaveRoom(room: string) {
   } else {
     s.emit("leaveRoom", { room });
   }
+  console.log(`🚪 Leaving room: ${room}`);
 }
-

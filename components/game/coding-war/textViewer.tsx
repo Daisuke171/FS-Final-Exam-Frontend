@@ -1,13 +1,37 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Dragonhead from "./icons";
 import { useSocketContext } from "@/app/games/coding-war/provider/SocketContext";
 import jsonData from "@/public/textTest.json";
+import { joinRoom, leaveRoom, socket } from "@/app/games/coding-war/socket";
 
 export default function TextViewer() {
   const { leave } = useSocketContext();
   const code = jsonData.text;
+  const [room, setRoom] = useState("coding-war-room-1");
+  const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
+
+  useEffect(() => {
+    const s = socket();
+
+    // Join on mount
+    joinRoom(room);
+
+    // Listen for messages
+    s.on("hello", (msg) => console.log("📩 Message from server:", msg));
+
+    // Example: handle room updates (if you emit them from backend)
+    s.on("roomUsersUpdate", (users: string[]) => {
+      setConnectedUsers(users);
+    });
+
+    return () => {
+      leaveRoom(room);
+      s.off("hello");
+      s.off("roomUsersUpdate");
+    };
+  }, [room]);
 
   // Split code into lines
   const originalLines = useMemo(() => code.split("\n"), [code]);
@@ -43,8 +67,7 @@ export default function TextViewer() {
     player: 1 | 2
   ) => {
     const value = e.target.value;
-    const currentLine =
-      player === 1 ? currentLineP1 : currentLineP2;
+    const currentLine = player === 1 ? currentLineP1 : currentLineP2;
     const fullOriginalLine = originalLines[currentLine];
     const indentLength = getIndentLength(fullOriginalLine);
     const lineWithoutIndent = fullOriginalLine.slice(indentLength);
@@ -76,13 +99,11 @@ export default function TextViewer() {
     if (e.key === "Enter") {
       e.preventDefault();
 
-      const currentLine =
-        player === 1 ? currentLineP1 : currentLineP2;
+      const currentLine = player === 1 ? currentLineP1 : currentLineP2;
       const fullOriginalLine = originalLines[currentLine];
       const indentLength = getIndentLength(fullOriginalLine);
       const expectedLine = fullOriginalLine.slice(indentLength);
-      const inputValue =
-        player === 1 ? inputValueP1 : inputValueP2;
+      const inputValue = player === 1 ? inputValueP1 : inputValueP2;
       const trimmedInput = inputValue.trimEnd();
       let lineScore = 0;
       let hasErrors = false;
@@ -120,14 +141,18 @@ export default function TextViewer() {
           ...prev,
           [currentLine]: newColoredLine,
         }));
-        setCurrentLineP1((prev) => Math.min(prev + 1, originalLines.length - 1));
+        setCurrentLineP1((prev) =>
+          Math.min(prev + 1, originalLines.length - 1)
+        );
         setInputValueP1("");
       } else {
         setColoredLinesP2((prev) => ({
           ...prev,
           [currentLine]: newColoredLine,
         }));
-        setCurrentLineP2((prev) => Math.min(prev + 1, originalLines.length - 1));
+        setCurrentLineP2((prev) =>
+          Math.min(prev + 1, originalLines.length - 1)
+        );
         setInputValueP2("");
       }
     }
@@ -214,7 +239,11 @@ export default function TextViewer() {
   return (
     <div className="w-full">
       {/* Leave button */}
-      <div className="w-full flex justify-end mb-4">
+      <div className="w-full flex justify-around mb-4">
+        <div className="border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-4">
+          Room: <span className="text-indigo-400">{room}</span> · Users:{" "}
+          {connectedUsers.length}
+        </div>
         <button
           onClick={() => leave("main")}
           className="btn-gradient-one text-white font-semibold py-2 px-6 rounded-lg shadow-[0_0_12px_var(--transparent-purple)]
@@ -225,81 +254,97 @@ export default function TextViewer() {
         </button>
       </div>
 
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <main className="grid grid-cols-14 gap-6 items-start">
         {/* Player 1 */}
-        <section className="flex flex-col">
-          <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-3">
-            <div className="text-xs text-white/60 mb-2">Player 1</div>
-            <pre className="bg-transparent p-3 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
-              {renderColoredCode(1, currentLineP1, coloredLinesP1, inputValueP1)}
-            </pre>
-          </div>
+        <div className="col-span-6">
+          <section className="flex flex-col">
+            <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-4">
+              <div className="text-xs text-white/60 mb-2">Player 1</div>
+              <pre className="bg-transparent p-4 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
+                {renderColoredCode(
+                  1,
+                  currentLineP1,
+                  coloredLinesP1,
+                  inputValueP1
+                )}
+              </pre>
+            </div>
 
-          <input
-            type="text"
-            value={inputValueP1}
-            onChange={(e) => handleInputChange(e, 1)}
-            onKeyDown={(e) => handleKeyDown(e, 1)}
-            inputMode="text"
-            autoComplete="off"
-            aria-label="Player 1 input"
-            placeholder="Type the current line..."
-            className="mt-3 bg-black/40 border border-gray-700 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full"
-          />
+            <input
+              type="text"
+              value={inputValueP1}
+              onChange={(e) => handleInputChange(e, 1)}
+              onKeyDown={(e) => handleKeyDown(e, 1)}
+              inputMode="text"
+              autoComplete="off"
+              aria-label="Player 1 input"
+              placeholder="Type the current line..."
+              className="mt-3 bg-black/40 border border-gray-700 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full"
+            />
 
-          <div className="mt-3 text-indigo-400 text-lg font-semibold">
-            Score: {scoreP1.toFixed(2)}
-          </div>
-        </section>
+            <div className="mt-3 text-indigo-400 text-lg font-semibold">
+              Score: {scoreP1.toFixed(2)}
+            </div>
+          </section>
+        </div>
 
         {/* Center scoreboard */}
-        <section className="flex flex-col items-center justify-center bg-gradient-to-b from-gray-900/80 to-black/60 border border-white/10 p-6 rounded-2xl">
-          <Dragonhead />
-          <h1 className="text-indigo-400 text-4xl font-semibold mt-4 mb-2">
-            SCORE
-          </h1>
+        <div className="col-span-2 flex justify-center">
+          <section className="flex flex-col items-center justify-center bg-gradient-to-b from-gray-900/80 to-black/60 border border-white/10 p-3 rounded-2xl mt-3 pt-6">
+            <Dragonhead />
+            <h1 className="text-indigo-400 text-4xl font-semibold mt-4 mb-2">
+              SCORE
+            </h1>
 
-          <div className="w-48 bg-black/30 rounded-lg p-4 mt-3">
-            <div className="flex justify-between text-sm text-white/60 mb-2">
-              <span>Player 1</span>
-              <span className="text-green-400 font-medium">
-                {scoreP1.toFixed(2)}
-              </span>
+            <div className="w-40 bg-black/30 rounded-lg p-4 mt-3">
+              <div className="flex justify-between text-sm text-white/60 mb-2">
+                <span>Player 1</span>
+                <span className="text-green-400 font-medium">
+                  {scoreP1.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm text-white/60">
+                <span>Player 2</span>
+                <span className="text-green-400 font-medium">
+                  {scoreP2.toFixed(2)}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between text-sm text-white/60">
-              <span>Player 2</span>
-              <span className="text-green-400 font-medium">
-                {scoreP2.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
 
         {/* Player 2 */}
-        <section className="flex flex-col">
-          <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-3">
-            <div className="text-xs text-white/60 mb-2">Player 2</div>
-            <pre className="bg-transparent p-3 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
-              {renderColoredCode(2, currentLineP2, coloredLinesP2, inputValueP2)}
-            </pre>
-          </div>
+        <div className="col-span-6">
+          <section className="flex flex-col">
+            <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-3">
+              <div className="text-xs text-white/60 mb-2">Player 2</div>
+              <pre className="bg-transparent p-3 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
+                {renderColoredCode(
+                  2,
+                  currentLineP2,
+                  coloredLinesP2,
+                  inputValueP2
+                )}
+              </pre>
+            </div>
 
-          <input
-            type="text"
-            value={inputValueP2}
-            onChange={(e) => handleInputChange(e, 2)}
-            onKeyDown={(e) => handleKeyDown(e, 2)}
-            inputMode="text"
-            autoComplete="off"
-            aria-label="Player 2 input"
-            placeholder="Type the current line..."
-            className="mt-3 bg-black/40 border border-gray-700 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full"
-          />
+            <input
+              type="text"
+              value={inputValueP2}
+              onChange={(e) => handleInputChange(e, 2)}
+              onKeyDown={(e) => handleKeyDown(e, 2)}
+              inputMode="text"
+              autoComplete="off"
+              aria-label="Player 2 input"
+              placeholder="Type the current line..."
+              className="mt-3 bg-black/40 border border-gray-700 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full"
+            />
 
-          <div className="mt-3 text-indigo-400 text-lg font-semibold">
-            Score: {scoreP2.toFixed(2)}
-          </div>
-        </section>
+            <div className="mt-3 text-indigo-400 text-lg font-semibold">
+              Score: {scoreP2.toFixed(2)}
+            </div>
+          </section>
+        </div>
       </main>
     </div>
   );
