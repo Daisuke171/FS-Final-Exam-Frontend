@@ -4,34 +4,44 @@ import { useState, useMemo, useEffect } from "react";
 import Dragonhead from "./icons";
 import { useSocketContext } from "@/app/games/coding-war/provider/SocketContext";
 import jsonData from "@/public/textTest.json";
-import { joinRoom, leaveRoom, socket } from "@/app/games/coding-war/socket";
+import { getCodingWarSocket } from "@/app/socket";
 
 export default function TextViewer({ roomId }: { roomId?: string }) {
 	const { leave } = useSocketContext();
 	const code = jsonData.text;
-	const [room, setRoom] = useState(roomId ?? "coding-war-room-1");
+	const [room, setRoom] = useState(roomId ?? "");
 	const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
 
 	useEffect(() => {
-		const s = socket();
+		const s = getCodingWarSocket();
 
-		// Join on mount
-		joinRoom(room);
+		if (room) {
+			// Ask server to sync and attach us to the room if needed
+			s.emit("requestGameState", { roomId: room });
+			// Signal readiness so the PlayingState can start when both clients are ready
+			s.emit("playerReadyForMatch", { roomId: room });
+		}
 
-		// Listen for messages
-		s.on("hello", (msg) => console.log("📩 Message from server:", msg));
+		// Optional listeners for timer events (can be wired into UI later)
+		const onTimerStart = (data: { duration: number }) => {
+			console.log("timerStart", data);
+		};
+		const onTimerTick = (data: { remaining: number }) => {
+			// console.log("timerTick", data);
+		};
+		s.on("timerStart", onTimerStart);
+		s.on("timerTick", onTimerTick);
 
-		// Example: handle room updates (if you emit them from backend)
-		s.on("roomUsersUpdate", (users: string[]) => {
-			setConnectedUsers(users);
-		});
+		// Example: handle potential room users broadcast (not currently emitted by backend)
+		const onRoomUsersUpdate = (users: string[]) => setConnectedUsers(users);
+		s.on("roomUsersUpdate", onRoomUsersUpdate);
 
 		return () => {
-			leaveRoom(room);
-			s.off("hello");
-			s.off("roomUsersUpdate");
+			s.off("timerStart", onTimerStart);
+			s.off("timerTick", onTimerTick);
+			s.off("roomUsersUpdate", onRoomUsersUpdate);
 		};
-		}, [room]);
+	}, [room]);
 
 		useEffect(() => {
 			if (roomId && roomId !== room) {

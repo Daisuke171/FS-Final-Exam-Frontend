@@ -1,12 +1,12 @@
 "use client";
 
-import { getSocket } from "@/app/socket";
+import { getCodingWarSocket } from "@/app/socket";
 
-export const socket = () => getSocket();
+export const socket = () => getCodingWarSocket();
 
 export const joinRoom = (room: string) => {
   const s = socket();
-  s.emit("joinRoom", { room });
+  s.emit("joinRoom", { roomId: room });
 };
 
 export const leaveRoom = (room: string) => {

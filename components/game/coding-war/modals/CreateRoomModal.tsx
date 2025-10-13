@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { getSocket } from "@/app/socket";
+import { getCodingWarSocket } from "@/app/socket";
 import { Icon } from "@iconify-icon/react";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
@@ -29,7 +29,7 @@ const formSchema = z
 
 type FormData = z.infer<typeof formSchema>;
 
-const socket = getSocket();
+const socket = getCodingWarSocket();
 
 export default function CreateRoomModal({
   setCloseModal,

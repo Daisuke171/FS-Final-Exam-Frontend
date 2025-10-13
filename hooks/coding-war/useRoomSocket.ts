@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getSocket } from "@/app/socket";
+import { getCodingWarSocket } from "@/app/socket";
 import { useRouter, usePathname } from "next/navigation";
 
 interface RoomInfo {
@@ -18,7 +18,7 @@ export function useRoomSocket(roomId: string | string[]) {
   const [isPrivate, setIsPrivate] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const socketRef = useRef(getSocket());
+  const socketRef = useRef(getCodingWarSocket());
   const router = useRouter();
   const currentPathname = usePathname();
 

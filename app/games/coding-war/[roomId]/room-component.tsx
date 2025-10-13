@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSocket } from "@/app/socket";
+import { getCodingWarSocket } from "@/app/socket";
 import { useParams, useRouter } from "next/navigation";
 import { Icon } from "@iconify-icon/react";
 import PlayersInRoom from "@/components/game/coding-war/general/PlayersInRoom";
@@ -15,7 +15,7 @@ import RoomErrorCard from "@/components/game/coding-war/cards/RoomErrorCard";
 import { useRoomSocket } from "@/hooks/coding-war/useRoomSocket";
 import JoinByPassword from "@/components/game/coding-war/general/JoinByPassword";
 
-const socket = getSocket();
+const socket = getCodingWarSocket();
 
 export default function RoomComponent() {
   const [loading, setLoading] = useState(false);

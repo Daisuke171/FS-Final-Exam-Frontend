@@ -4,12 +4,12 @@ import { AnimatePresence, motion } from "motion/react";
 import CreateRoomModal from "@/components/game/coding-war/modals/CreateRoomModal";
 import { useEffect, useState } from "react";
 import CustomButtonTwo from "@/components/game/coding-war/buttons/CustomButtonTwo";
-import { getSocket } from "@/app/socket";
+import { getCodingWarSocket } from "@/app/socket";
 import CustomTextInput from "@/components/game/coding-war/inputs/text/CustomTextInput";
 import { useRoomSocket } from "@/hooks/coding-war/useRoomSocket";
 import JoinByPassword from "@/components/game/coding-war/general/JoinByPassword";
 
-const socket = getSocket();
+const socket = getCodingWarSocket();
 
 export default function MainCard() {
   const [openModal, setOpenModal] = useState(false);

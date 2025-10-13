@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Icon } from "@iconify/react";
-import { getSocket } from "@/app/socket";
+import { getCodingWarSocket } from "@/app/socket";
 import CustomButtonOne from "@/components/game/coding-war/buttons/CustomButtonOne";
 import { useRouter } from "next/navigation";
 import CreateRoomModal from "@/components/game/coding-war/modals/CreateRoomModal";
@@ -17,7 +17,7 @@ interface RoomData {
 }
 
 export default function PublicRoomsList() {
-  const socket = getSocket();
+  const socket = getCodingWarSocket();
   const [rooms, setRooms] = useState<RoomData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -42,7 +42,7 @@ export default function PublicRoomsList() {
   };
 
   const handleJoinRoom = (roomId: string) => {
-  router.push(`/games/coding-war/${roomId}`);
+    router.push(`/games/coding-war/${roomId}`);
   };
 
   return (
