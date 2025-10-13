@@ -6,8 +6,8 @@ import { getSocket } from "@/app/socket";
 import { Icon } from "@iconify-icon/react";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
-import CustomCheckbox from "@/components/game/rock-paper-scissors/inputs/checkbox/CustomCheckbox";
+import CustomButtonOne from "../buttons/CustomButtonOne";
+import CustomCheckbox from "../inputs/checkbox/CustomCheckbox";
 
 const formSchema = z
   .object({
@@ -47,9 +47,10 @@ export default function CreateRoomModal({
 
   useEffect(() => {
     socket.on("roomCreated", (data: { roomInfo?: unknown; roomId: string }) => {
+      console.log("Sala creada:", data.roomInfo);
       setLoading(false);
       setCloseModal();
-      router.push(`/games/test-game/${data.roomId}`);
+  router.push(`/games/coding-war/${data.roomId}`);
     });
 
     return () => {
