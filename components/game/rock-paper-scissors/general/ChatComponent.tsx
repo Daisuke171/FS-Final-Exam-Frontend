@@ -221,12 +221,12 @@ export default function ChatComponent({
     }
   };
   return (
-    <div className="w-2/7 h-full flex flex-col border-2 border-light-gray rounded-xl">
+    <div className="w-2/7 h-[30rem] flex flex-col border-2 border-light-gray rounded-xl">
       <div className="bg-background rounded-t-xl">
         <h2 className="text-2xl font-bold p-4  text-slate-200">Chat</h2>
       </div>
       <div
-        className=" pb-2 bg-white/7 backdrop-blur-md  relative h-full overflow-y-auto scrollbar-thin [&::-webkit-scrollbar]:w-2
+        className=" pb-2 bg-white/7 backdrop-blur-md  relative flex-1 overflow-y-auto scrollbar-thin [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-slate-300
   [&::-webkit-scrollbar-thumb]:bg-slate-700"
       >
