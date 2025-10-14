@@ -70,6 +70,8 @@
 }
 
 @theme {
+  --breakpoint-xs: 480px;
+
   --color-background: var(--background-gradient-3);
   --color-foreground: var(--foreground);
 
@@ -129,12 +131,27 @@
   @apply bg-white/7 backdrop-blur-md rounded-xl;
 }
 
+.custom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  @media (width < 768px) {
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  }
+}
+
 .custom-scrollbar {
   @apply [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-black/30
   [&::-webkit-scrollbar-track]:rounded-full
   [&::-webkit-scrollbar-thumb]:rounded-full
   [&::-webkit-scrollbar-thumb]:bg-light-gray;
+}
+
+.custom-grid-avatar {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
 }
 
 /* Gradientes */
