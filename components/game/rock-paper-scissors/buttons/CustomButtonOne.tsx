@@ -6,7 +6,7 @@ interface CustomButtonProps {
   icon?: IconifyIcon | string;
   full?: boolean;
   variant?: "filled" | "outlined";
-  color?: "primary" | "secondary";
+  color?: "primary" | "secondary" | "error";
   loading?: boolean;
   type?: "button" | "submit" | "reset";
   size?: "sm" | "md" | "lg";
@@ -36,6 +36,9 @@ export default function CustomButtonOne({
   const outlinedSecondary =
     "border-2 border-medium-blue text-light-blue bg-transparent hover:border-light-blue";
 
+  const outlinedError =
+    "border-2 border-error text-error bg-transparent hover:border-light-error";
+
   const outlinedLoading =
     "border-2 border-light-gray opacity-60 text-light-gray bg-transparent pointer-events-none cursor-not-allowed";
 
@@ -45,19 +48,33 @@ export default function CustomButtonOne({
   const filledSecondary =
     "bg-shadow-blue text-font border-2 border-shadow-blue hover:bg-medium-blue hover:border-medium-blue";
 
+  const filledError =
+    "bg-shadow-error text-font border-2 border-shadow-error hover:bg-dark-error hover:border-dark-error";
+
   const filledLoading =
     "bg-dark-gray text-font border-2 opacity-60 border-dark-gray pointer-events-none cursor-not-allowed";
+
+  const glow = {
+    primary: "bg-shadow-purple",
+    secondary: "bg-shadow-blue",
+    error: "bg-shadow-error",
+  };
 
   const outlined = loading
     ? outlinedLoading
     : color === "primary"
     ? outlinedPrimary
-    : outlinedSecondary;
+    : color === "secondary"
+    ? outlinedSecondary
+    : outlinedError;
+
   const filled = loading
     ? filledLoading
     : color === "primary"
     ? filledPrimary
-    : filledSecondary;
+    : color === "secondary"
+    ? filledSecondary
+    : filledError;
 
   const baseStyles = `${selectedSize} w-fit cursor-pointer rounded-xl font-medium flex items-center gap-2 transition-all truncate`;
   return (
@@ -83,9 +100,7 @@ export default function CustomButtonOne({
       {variant === "outlined" && !loading && (
         <div
           className={`absolute inset-0 rounded-lg transform
-              ${
-                color === "primary" ? "bg-shadow-purple" : "bg-shadow-blue"
-              } blur-2xl duration-500 -z-10 transition-all opacity-0 group-hover:opacity-60`}
+              ${glow[color]} blur-2xl duration-500 -z-10 transition-all opacity-0 group-hover:opacity-60`}
         ></div>
       )}
     </div>
