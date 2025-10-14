@@ -1,7 +1,7 @@
 import ArchievementCard, {
   ArchievementCardProps,
 } from "@/components/ui/cards/profile/ArchievementCard";
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 
 export const achievements: ArchievementCardProps[] = [
   // // 🧠 Code War
@@ -86,12 +86,12 @@ export const achievements: ArchievementCardProps[] = [
 
 export default function AchievementsComponent() {
   return (
-    <article className="w-full bg-white/7 p-8 rounded-2xl">
+    <article className="w-full bg-white/7 p-4 py-6 md:p-6 lg:p-8 rounded-2xl">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl text-font flex items-center gap-2 font-medium">
+        <h2 className="text-xl lg:text-2xl text-font flex items-center gap-2 font-medium">
           <Icon
             icon="ri:medal-fill"
-            width="30"
+            className="text-2xl lg:text-3xl"
           />
           Últimos logros
         </h2>
@@ -106,14 +106,13 @@ export default function AchievementsComponent() {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-3 xl:grid-cols-4 gap-3 mt-10">
+      <div className="custom-grid mt-10">
         {achievements.length == 0 ? (
           <div className="col-span-4 h-60 flex flex-col items-center justify-center">
             <Icon
               icon="fluent:trophy-off-28-filled"
               width="100"
               className="text-font"
-              noobserver
             />
             <h2 className="text-xl text-font font-medium mt-5">
               No tienes logros actualmente
