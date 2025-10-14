@@ -15,15 +15,16 @@
   /* Purple tones */
   --bright-purple: oklch(60.816% 0.27519 306.708);
   --light-purple: oklch(0.4468 0.2282 304.02);
-  --transparent-purple: oklch(44.549% 0.22807 303.598 / 0.24);
+  --transparent-purple: oklch(18.275% 0.09027 307.347 / 0.534);
   --hover-purple: oklch(50.281% 0.2557 303.899);
   --shadow-purple: oklch(0.3589 0.1953 304.02);
 
   /* Blue tones */
   --light-blue: oklch(72.883% 0.1358 252.731);
   --medium-blue: oklch(0.5558 0.2141 269.02);
-  --transparent-blue: oklch(55.766% 0.21303 268.838 / 0.226);
+  --transparent-blue: oklch(15.861% 0.06714 265.068 / 0.678);
   --shadow-blue: oklch(0.4517 0.2153 275.85);
+  --dark-blue: oklch(34.988% 0.13955 279.494);
 
   --box-fill: oklch(0.6843 0.1083 222.73 / 5%);
   --captcha-fill: oklch(0.7824 0.1213 222.46 / 15%);
@@ -37,15 +38,35 @@
   /* Gray tones */
   --light-gray: oklch(65.004% 0.00007 271.152);
   --dark-gray: oklch(42.393% 0.00005 271.152);
+  --shadow-gray: oklch(32.109% 0.00004 271.152);
+  --transparent-gray: oklch(42.393% 0.00005 271.152 / 0.288);
+
+  /* Bronze tones */
+  --light-bronze: oklch(70.532% 0.07578 43.223);
+  --bronze: oklch(52.31% 0.06732 43.218);
+  --dark-bronze: oklch(35.464% 0.06336 43.82);
+  --transparent-bronze: oklch(28.93% 0.05659 44.343 / 0.322);
 
   /* Utility colors */
   --online-user: oklch(0.8693 0.1716 128.44);
   --ranking: oklch(81.221% 0.13758 83.506);
-  --transparent-ranking: oklch(81.221% 0.13758 83.506 / 0.123);
+  --transparent-ranking: oklch(42.892% 0.07683 82.751 / 0.445);
   --medium-ranking: oklch(79.07% 0.15253 81.243);
   --shadow-ranking: oklch(66.329% 0.13566 78.165);
+
+  /* Success tones */
+  --light-success: oklch(81.093% 0.16614 145.614);
   --success: oklch(70.071% 0.16051 145.321);
+  --shadow-success: oklch(53.712% 0.13105 145.294);
+  --dark-success: oklch(39.65% 0.08657 147.461);
+  --transparent-success: oklch(65.081% 0.15962 145.321 / 0.205);
+
+  /* Error tones */
+  --light-error: oklch(65.081% 0.15962 23.426);
   --error: oklch(0.5134 0.1504 24.88);
+  --shadow-error: oklch(43.462% 0.14204 26.215);
+  --dark-error: oklch(23.903% 0.07386 24.652);
+  --transparent-error: oklch(43.462% 0.14204 26.215 / 0.205);
 }
 
 @theme {
@@ -63,14 +84,30 @@
 
   --color-light-gray: var(--light-gray);
   --color-dark-gray: var(--dark-gray);
+  --color-shadow-gray: var(--shadow-gray);
+  --color-transparent-gray: var(--transparent-gray);
+
+  --color-light-bronze: var(--light-bronze);
+  --color-dark-bronze: var(--dark-bronze);
+  --color-transparent-bronze: var(--transparent-bronze);
 
   --color-light-blue: var(--light-blue);
   --color-transparent-blue: var(--transparent-blue);
   --color-medium-blue: var(--medium-blue);
   --color-shadow-blue: var(--shadow-blue);
+  --color-dark-blue: var(--dark-blue);
 
+  --color-light-success: var(--light-success);
+  --color-dark-success: var(--dark-success);
+  --color-shadow-success: var(--shadow-success);
+  --color-transparent-success: var(--transparent-success);
   --color-success: var(--success);
+
+  --color-light-error: var(--light-error);
   --color-error: var(--error);
+  --color-shadow-error: var(--shadow-error);
+  --color-dark-error: var(--dark-error);
+  --color-transparent-error: var(--transparent-error);
   --color-online-user: var(--online-user);
 
   --color-ranking: var(--ranking);
@@ -92,6 +129,14 @@
   @apply bg-white/7 backdrop-blur-md rounded-xl;
 }
 
+.custom-scrollbar {
+  @apply [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-black/30
+  [&::-webkit-scrollbar-track]:rounded-full
+  [&::-webkit-scrollbar-thumb]:rounded-full
+  [&::-webkit-scrollbar-thumb]:bg-light-gray;
+}
+
 /* Gradientes */
 .bg-gradient-one {
   @apply bg-radial from-[var(--background-gradient-1)] from-0% via-[var(--background-gradient-2)] 
@@ -105,27 +150,6 @@
 body {
   @apply text-foreground font-sans antialiased;
 }
-
-/* Animaciones para el rock, paper, scissors */
-
-/* @keyframes changeColorWinner {
-  from {
-    color: var(--color-slate-800);
-  }
-
-  to {
-    color: var(--color-emerald-700);
-  }
-}
-@keyframes damageEffect {
-  from {
-    color: var(--color-slate-200);
-  }
-
-  to {
-    color: var(--color-rose-800);
-  }
-} */
 
 @keyframes vibrate-1 {
   0% {
