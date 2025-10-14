@@ -132,7 +132,7 @@ body {
     transform: translateX(-50%);
   }
 }
- 
+  
 /* ===================== */
 /* Barra inferior móvil */
 .bottom-bar-mobile {
@@ -148,7 +148,9 @@ body {
 }
 
 .bottom-bar-mobile a:hover {
-  text-shadow: 0 0 8px rgba(76, 201, 240, 0.6);
+  /* MODIFICACIÓN: Aplicamos la sombra de texto brillante celeste */
+  text-shadow: 0 0 6px rgba(76, 201, 240, 0.8), 0 0 10px rgba(76, 201, 240, 0.4); 
+  transition: text-shadow 0.3s ease-in-out; 
 }
 
 @media screen and (min-width: 768px) {
@@ -239,8 +241,8 @@ body {
 /* --- Botones de misiones/notificaciones --- */
 .mission-btn {
   @apply flex justify-between items-center w-full px-4 py-2 rounded-lg
-         text-white text-sm font-semibold bg-[var(--medium-blue)]/20
-         border border-[var(--light-blue)]/30 transition-all;
+           text-white text-sm font-semibold bg-[var(--medium-blue)]/20
+           border border-[var(--light-blue)]/30 transition-all;
 }
 
 .mission-btn:hover {
@@ -250,7 +252,7 @@ body {
 /* --- Íconos de acción en notificaciones --- */
 .action-icons button {
   @apply w-8 h-8 rounded-full flex items-center justify-center bg-[var(--light-blue)]/20 
-         hover:bg-[var(--light-blue)]/40 transition;
+           hover:bg-[var(--light-blue)]/40 transition;
 }
 
 /* 🌟 Estilo reutilizable de botón con efecto luminoso */
@@ -261,17 +263,34 @@ body {
   padding: 4px 8px;
   border-radius: 6px;
   transition: all 0.2s ease-in-out;
-  box-shadow: 0 0 6px rgba(76, 201, 240, 0.3);
+  /* El glow base ahora usa la variable celeste */
+  box-shadow: 0 0 6px var(--navbar-glow); 
 }
 
 .btn-glow:hover {
-  background-color: rgba(76, 201, 240, 0.25);
+  /* El fondo se hace más visible */
+  background-color: rgba(76, 201, 240, 0.35); 
   color: white;
-  box-shadow: 0 0 12px rgba(76, 201, 240, 0.6);
+  /* El glow intenso usa un celeste brillante */
+  box-shadow: 0 0 12px rgba(76, 201, 240, 0.8), 0 0 20px rgba(76, 201, 240, 0.4); 
   transform: scale(1.05);
 }
 
 .btn-glow:active {
-  background-color: rgba(76, 201, 240, 0.35);
+  background-color: rgba(76, 201, 240, 0.5);
   transform: scale(0.97);
+}
+
+/* Brillo Celeste para Hover */
+.hover-blue-glow:hover {
+    text-shadow: 0 0 6px rgba(76, 201, 240, 0.8), 0 0 10px rgba(76, 201, 240, 0.4);
+    /* Opcional: para que se vea la transición del brillo */
+    transition: text-shadow 0.3s ease-in-out; 
+}
+
+/* Brillo Dorado para Hover */
+.hover-gold-glow:hover {
+    text-shadow: 0 0 6px rgba(253, 230, 138, 0.8), 0 0 10px rgba(253, 230, 138, 0.4);
+    /* Opcional: para que se vea la transición del brillo */
+    transition: text-shadow 0.3s ease-in-out;
 }
