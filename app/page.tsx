@@ -5,7 +5,7 @@ import BottomBar from "./components/BottomBar";
 export default function Page() {
   return (
     <>
-      <Navbar username="Usuario" avatar="/avatar.png" users={1200} />
+      <Navbar username="Usuario" avatar="/default-pfp.jpg" users={1200} />
       <MainContent />
       <BottomBar />
     </>

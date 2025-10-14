@@ -41,7 +41,7 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
 
           {/* Logo */}
           <div className="flex justify-center">
-            <Image src="/Sanya-logo.jpeg" alt="Logo" width={40} height={40} />
+            <Image src="/Sanya-logo.png" alt="Logo" width={40} height={40} />
           </div>
 
           {/* Conectados */}
@@ -55,7 +55,7 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
         <div className="hidden md:flex w-full items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <Image src="/Sanya-logo.jpeg" alt="Logo" width={45} height={45} />
+            <Image src="/Sanya-logo.png" alt="Logo" width={45} height={45} />
           </div>
 
           {/* Navegación */}
