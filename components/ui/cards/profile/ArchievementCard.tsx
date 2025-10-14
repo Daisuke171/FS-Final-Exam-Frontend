@@ -61,7 +61,7 @@ export default function ArchievementCard({
         background[type]
       } [transform-style:preserve-3d] ${
         flipped ? "[transform:rotateY(180deg)]" : ""
-      } cursor-pointer w-32 h-54 p-4 pb-8 rounded-xl hover:scale-105 flex flex-col transition-transform duration-500 items-center justify-between`}
+      } cursor-pointer w-full max-w-32 md:max-w-40 h-46 md:h-54 p-3 md:p-4 md:pb-8 rounded-xl hover:scale-105 flex flex-col transition-transform duration-500 items-center justify-between`}
     >
       <div className="flex flex-col items-center h-full gap-3 [backface-visibility:hidden]">
         <div className="flex flex-col items-center">
@@ -71,27 +71,26 @@ export default function ArchievementCard({
               <Icon
                 key={index}
                 icon="material-symbols:star-rounded"
-                width="15"
-                className={`${iconColor[type]}`}
+                className={`${iconColor[type]} text-[12px] md:text-[15px]`}
               />
             ))}
           </div>
           <Icon
             icon="heroicons:trophy-20-solid"
-            width="66"
-            className={`${iconColor[type]} mb-2`}
+            className={`${iconColor[type]} mb-2 text-[50px] md:text-[65px]`}
           />
           <div
             className={`border rounded-2xl py-0.5 px-2 ${textColor[type]} bg-black/10 backdrop-blur-md`}
           >
-            <p className="text-sm font-medium">{label[type]}</p>
+            <p className="text-xs md:text-sm font-medium">{label[type]}</p>
           </div>
         </div>
-        <h3 className="text-font font-medium text-center text-sm">{title}</h3>
+        <h3 className="text-font font-medium text-center text-xs md:text-sm">
+          {title}
+        </h3>
         <Icon
           icon="tabler:arrow-back"
-          width="25"
-          className={`absolute ${textColor[type]} bottom-1 right-1`}
+          className={`absolute ${textColor[type]} bottom-1 right-1 text-xl md:text-2xl`}
         />
       </div>
 
@@ -105,7 +104,7 @@ export default function ArchievementCard({
             icon="material-symbols:info-outline"
             width="30"
           />
-          <p className="text-center font-medium text-sm">{desc}</p>
+          <p className="text-center font-medium text-xs md:text-sm">{desc}</p>
         </div>
       </div>
     </div>

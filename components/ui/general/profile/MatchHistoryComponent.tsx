@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon, IconifyIcon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 import Image from "next/image";
 
 export interface MatchHistoryComponentProps {
@@ -52,12 +52,12 @@ export default function MatchHistoryComponent({
 }: MatchHistoryComponentProps) {
   return (
     <div
-      className={`w-full flex items-center justify-between px-5 
-      ${background[result]} backdrop-blur-md rounded-xl
+      className={`w-full flex items-center justify-between px-3 xl:px-5 
+      ${background[result]} backdrop-blur-md rounded-xl gap-2
     `}
     >
-      <div className="gap-5 flex items-center">
-        <div className="h-25 rounded-l-xl w-28 px-2">
+      <div className="gap-3 sm:gap-4 md:gap-5 flex items-center">
+        <div className="h-25 rounded-l-xl w-20 sm:w-24 xl:w-28 px-1 xl:px-2">
           <Image
             src={logo}
             alt="game"
@@ -68,30 +68,32 @@ export default function MatchHistoryComponent({
         </div>
         <div>
           <h3
-            className={`text-font text-lg pb-2 after:rounded-full font-medium after:mt-4 relative after:h-1 after:left-0 after:bottom-0 after:absolute after:w-1/3 ${detailsColor[result]}`}
+            className={`text-font textl-base xl:text-lg pb-2 after:rounded-full font-medium after:mt-4 relative after:h-1 after:left-0 after:bottom-0 after:absolute after:w-1/3 ${detailsColor[result]}`}
           >
             {game}
           </h3>
-          <p className={`text-2xl ${textColor[result]} font-medium`}>
+          <p
+            className={`text-xl w-fit xl:text-2xl ${textColor[result]} font-medium`}
+          >
             {gameResult[result]}
           </p>
         </div>
       </div>
-      <div className="flex flex-col items-end gap-3">
+      <div className="flex flex-col items-end gap-1 lg:gap-3">
         <div
-          className={`flex text-2xl ${textColor[result]} font-medium items-center gap-1`}
+          className={`flex text-xl xl:text-2xl ${textColor[result]} font-medium items-center gap-1`}
         >
           <span className="">{symbol[result]}</span>
           <p className="">{points}</p>
           <Icon
             icon="ix:trophy-filled"
-            width="23"
+            className="text-xl lg:text-2xl"
           />
         </div>
-        <div className="flex items-center gap-3">
-          <p className="text-subtitle text-sm font-medium">{duration}</p>
-          <div className="w-1 h-1 bg-dark-gray rounded-full"></div>
-          <p className="text-subtitle text-sm font-medium">{date}</p>
+        <div className="flex flex-col text-xs xl:text-sm  items-center gap-1 lg:flex-row lg:gap-2 xl:gap-3">
+          <p className="text-subtitle  font-medium">{duration}</p>
+          <div className="w-5 h-0.5 bg-light-gray lg:w-1 lg:h-1  lg:bg-dark-gray lg:rounded-full"></div>
+          <p className="text-subtitle font-medium">{date}</p>
         </div>
       </div>
     </div>

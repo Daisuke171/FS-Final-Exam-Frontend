@@ -1,6 +1,6 @@
 import StatCard from "@/components/ui/cards/profile/StatCard";
 import CircularProgress from "@/components/ui/general/profile/CircularProgress";
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 
 const stats = {
   winRate: 75,
@@ -12,21 +12,25 @@ const stats = {
 
 const games = 10;
 
-export default function StatsComponent() {
+export default function StatsComponent({ margin }: { margin?: boolean }) {
   return (
-    <article className="w-full bg-white/7 p-8 rounded-2xl mt-5">
-      <h2 className="text-2xl flex items-center gap-2 text-font font-medium">
+    <article
+      className={`w-full bg-white/7 p-4 py-6 md:p-6 lg:p-8 rounded-2xl ${
+        margin && "mt-5"
+      }`}
+    >
+      <h2 className="text-xl lg:text-2xl flex items-center gap-2 text-font font-medium">
         <Icon
           icon="gridicons:stats-up"
-          width="30"
+          className="text-2xl lg:text-3xl"
         />
         Estadísticas
       </h2>
-      <div className="mt-10 flex items-start">
+      <div className=" mt-6 md:mt-8 lg:mt-10 flex items-start flex-wrap gap-3 md:gap-4 lg:gap-0 justify-center">
         {games > 0 ? (
           <>
             <div className="flex flex-col items-center">
-              <h3 className="font-medium text-center text-font mb-3 max-w-[15ch]">
+              <h3 className="font-medium text-sm md:text-base text-center text-font mb-3 max-w-[15ch]">
                 Porcentaje de victorias
               </h3>
               <CircularProgress percentage={21} />

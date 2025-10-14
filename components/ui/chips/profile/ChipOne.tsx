@@ -1,4 +1,4 @@
-import { Icon, IconifyIcon } from "@iconify-icon/react";
+import { Icon, IconifyIcon } from "@iconify/react";
 
 interface ChipOneInterface {
   value: string;
@@ -40,13 +40,13 @@ export default function ChipOne({ value, icon, color }: ChipOneInterface) {
       )} w-fit`}
     >
       <p
-        className={`text-lg  gap-1 flex items-center ${getTextColor(
+        className={`text-base xs:text-lg  gap-1 flex items-center ${getTextColor(
           color
         )} font-medium`}
       >
         <Icon
           icon={icon}
-          width="18"
+          className="text-base xs:text-xl"
         />
         {value}
       </p>

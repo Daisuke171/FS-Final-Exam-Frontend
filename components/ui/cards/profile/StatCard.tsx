@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon, IconifyIcon } from "@iconify-icon/react";
+import { Icon, IconifyIcon } from "@iconify/react";
 
 export interface StatCardProps {
   icon: IconifyIcon | string;
@@ -33,13 +33,16 @@ export default function StatCard({
   color,
 }: StatCardProps) {
   return (
-    <div className="flex flex-col items-center w-26 px-2">
+    <div className="flex flex-col items-center w-24 xl:w-26 px-0 xl:px-2">
       <Icon
         icon={icon}
-        width="47"
-        className={getIconColor(color || "neutral")}
+        className={`${getIconColor(
+          color || "neutral"
+        )} text-[40px] md:text-5xl`}
       />
-      <p className="text-font text-lg font-medium mt-3 mb-1">{number}</p>
+      <p className="text-font text-base md:text-lg font-medium mt-3 mb-1">
+        {number}
+      </p>
       <p className="text-subtitle text-center text-sm font-medium">{title}</p>
     </div>
   );
