@@ -38,6 +38,7 @@ const cards: StatCardProps[] = [
 
 export default function ProfileHeader() {
   const [open, setOpen] = useState(false);
+  const [show, setShow] = useState(false);
 
   const handleModalOpen = () => {
     setOpen(!open);
@@ -45,7 +46,7 @@ export default function ProfileHeader() {
   return (
     <>
       <section className="bg-white/7 backdrop-blur-md max-w-350 p-4 py-6 lg:p-8 xl:px-10 xl:py-8 rounded-b-2xl w-[95%]">
-        <div className="md:items-center flex flex-col  md:flex-row gap-y-5 lg:flex lg:flex-row justify-center lg:justify-between max-w-300 mx-auto">
+        <div className="md:items-center flex flex-col  md:flex-row gap-y-5 lg:flex lg:flex-row justify-center lg:justify-between w-full">
           <article className="flex justify-between flex-shrink-0 md:pr-8 xl:pr-0 items-center gap-8">
             <div className="flex items-center gap-5">
               <div className="h-26 w-26 xl:h-30 xl:w-30  cursor-pointer group flex items-center relative justify-center overflow-hidden rounded-full bg-background border border-dark-gray">
@@ -80,11 +81,13 @@ export default function ProfileHeader() {
                       className="text-light-blue"
                     />
                   </h2>
-                  <Icon
+                  {/* Futura función para cambiar el nickname */}
+
+                  {/* <Icon
                     icon="material-symbols:edit-rounded"
                     width="22"
                     className="hover:text-light-blue transition-all cursor-pointer"
-                  />
+                  /> */}
                 </div>
                 <p className="text-subtitle">usuario@usuario.com</p>
                 <div className="[@media(min-width:458px)_and_(max-width:1024px)]:hidden flex items-center gap-2 lg:flex">
@@ -115,7 +118,7 @@ export default function ProfileHeader() {
             </div>
           </article>
           <div className="w-[90%] h-0.5 bg-white/10 mx-auto md:hidden rounded-full"></div>
-          <article className="w-full flex-grow max-w-105 px-3 place-self-center xl:max-w-88 flex flex-col justify-center gap-2 md:border-l border-dark-gray h-23 md:pl-8 xl:pl-5">
+          <article className="w-full flex-grow max-w-105 px-3 place-self-center xl:max-w-90 flex flex-col justify-center gap-2 md:border-l border-dark-gray h-23 md:pl-8 xl:pl-5">
             <div className="flex justify-between items-center">
               <p className="text-font text-base font-medium">Level 28</p>
               <p className="text-font text-sm font-medium">
