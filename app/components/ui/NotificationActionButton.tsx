@@ -11,10 +11,16 @@ export default function NotificationActionButton({ icon, onClick }: ActionButton
   const IconComponent = icon === 'check' ? FaCheck : FaTimes;
   const shapeClasses = "w-8 h-8 rounded-full flex items-center justify-center";
   
+  const forceCircleStyle = {
+      padding: '0',              
+      borderRadius: '50%',     
+  };
+
   return (
     <button 
-        className={`btn-glow btn-force-circle ${shapeClasses} bg-[var(--light-blue)]/20 hover:bg-[var(--light-blue)]/40`} 
+        className={`btn-glow ${shapeClasses} bg-[var(--light-blue)]/20 hover:bg-[var(--light-blue)]/40`} 
         onClick={onClick}
+        style={forceCircleStyle} 
     >
       <IconComponent />
     </button>
