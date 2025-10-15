@@ -18,6 +18,7 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
                      shadow-[0_0_20px_rgba(76,201,240,0.2)]"
       ></div>
 
+      {/* CONTENEDOR CENTRAL (Ancho y Altura final) */}
       <div className="relative w-full 
           max-w-[1024px] 
           lg:max-w-5xl 
@@ -50,18 +51,18 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
           </div>
         </div>
 
-        {/* Versión desktop con "Inicio" agregado */}
+        {/* Versión desktop con centrado simétrico RESTAURADO */}
         <div className="hidden md:flex w-full items-center justify-between">
           
-          {/* Bloque Izquierdo (Logo) */}
+          {/* Bloque Izquierdo (Logo): RESTAURAMOS w-40 para simetría */}
           <div className="flex items-center space-x-2 w-40"> 
             <Image src="/Sanya-logo.png" alt="Logo" width={45} height={45} />
           </div>
 
-          {/* NAVEGACIÓN */}
-          <nav className="flex items-center gap-8 lg:gap-12 xl:gap-16 text-white font-semibold text-xs mx-auto justify-center">
+          {/* NAVEGACIÓN: RESTAURAMOS justify-center, AUMENTAMOS GAPS y limitamos w-auto */}
+          <nav className="flex items-center gap-16 lg:gap-20 xl:gap-24 text-white font-semibold text-xs mx-auto justify-center">
             
-            {/* INICIO: NUEVO ELEMENTO */}
+            {/* INICIO */}
             <a 
               href="#inicio" 
               className="flex items-center gap-2 hover:text-[var(--light-blue)] transition-all hover:scale-105 hover-blue-glow"
@@ -98,7 +99,7 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
             </a>
           </nav>
 
-          {/* Bloque Derecho (Usuario + Conectados) */}
+          {/* Bloque Derecho (Usuario + Conectados): RESTAURAMOS w-40 para simetría */}
           <div className="flex items-center gap-4 w-40 justify-end">
             
             {/* Contador desktop: usa text-xs */}
