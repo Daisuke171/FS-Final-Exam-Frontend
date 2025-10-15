@@ -263,7 +263,7 @@ body {
   padding: 4px 8px;
   border-radius: 6px;
   transition: all 0.2s ease-in-out;
-  /* El glow base ahora usa la variable celeste */
+
   box-shadow: 0 0 6px var(--navbar-glow); 
 }
 
@@ -271,7 +271,6 @@ body {
   /* El fondo se hace más visible */
   background-color: rgba(76, 201, 240, 0.35); 
   color: white;
-  /* El glow intenso usa un celeste brillante */
   box-shadow: 0 0 12px rgba(76, 201, 240, 0.8), 0 0 20px rgba(76, 201, 240, 0.4); 
   transform: scale(1.05);
 }
@@ -284,13 +283,18 @@ body {
 /* Brillo Celeste para Hover */
 .hover-blue-glow:hover {
     text-shadow: 0 0 6px rgba(76, 201, 240, 0.8), 0 0 10px rgba(76, 201, 240, 0.4);
-    /* Opcional: para que se vea la transición del brillo */
     transition: text-shadow 0.3s ease-in-out; 
 }
 
 /* Brillo Dorado para Hover */
 .hover-gold-glow:hover {
     text-shadow: 0 0 6px rgba(253, 230, 138, 0.8), 0 0 10px rgba(253, 230, 138, 0.4);
-    /* Opcional: para que se vea la transición del brillo */
     transition: text-shadow 0.3s ease-in-out;
+}
+
+.btn-force-circle {
+    border-radius: 50% !important; 
+    padding: 4px !important; 
+    width: 32px; 
+    height: 32px; 
 }
