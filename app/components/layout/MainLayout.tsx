@@ -1,11 +1,10 @@
 // src/components/layout/MainLayout.tsx
 "use client";
 import React from 'react';
-// Asume que tus componentes también están en TSX (Navbar.tsx, BottomBar.tsx)
-import Navbar from '../iu/Navbar'; 
-import BottomBar from '../iu/BottomBar'; 
+import Navbar from '../ui/Navbar'; 
+import BottomBar from '../ui/BottomBar'; 
 
-// Define las interfaces para las props
+// Interfaces para las props
 interface NavbarProps {
     username: string;
     avatar: string;
@@ -14,7 +13,6 @@ interface NavbarProps {
 
 interface MainLayoutProps {
   children: React.ReactNode;
-  // Usamos la interfaz definida para las props del Navbar
   navbarProps: NavbarProps; 
 }
 

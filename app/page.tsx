@@ -1,13 +1,20 @@
-import Navbar from "./components/Navbar";
-import MainContent from "./components/MainContent";
-import BottomBar from "./components/BottomBar";
+// app/page.tsx
 
-export default function Page() {
+"use client";
+import MainLayout from './components/layout/MainLayout'; 
+import MainContent from './components/ui/MainContent';   
+
+
+const MOCK_NAV_PROPS = {
+  username: "Nombre", 
+  avatar: "/default-pfp.jpg", 
+  users: 124 
+};
+
+export default function HomePage() {
   return (
-    <>
-      <Navbar username="Usuario" avatar="/default-pfp.jpg" users={1200} />
+    <MainLayout navbarProps={MOCK_NAV_PROPS}>
       <MainContent />
-      <BottomBar />
-    </>
+    </MainLayout>
   );
 }
