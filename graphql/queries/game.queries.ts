@@ -29,9 +29,7 @@ export const GET_LEADERBOARD = gql`
         nickname
         name
         totalScore
-        bestScore
-        wins
-        totalGames
+        level
       }
       generatedAt
     }
@@ -48,9 +46,7 @@ export const GET_GLOBAL_LEADERBOARD = gql`
         nickname
         name
         totalScore
-        bestScore
-        wins
-        totalGames
+        level
       }
       generatedAt
     }
