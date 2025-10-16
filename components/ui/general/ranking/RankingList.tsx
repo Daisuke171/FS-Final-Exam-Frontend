@@ -3,13 +3,10 @@
 import { Icon } from "@iconify-icon/react";
 import { motion } from "motion/react";
 import LvlChip from "../../chips/ranking/LvlChip";
+import { LeaderboardEntry } from "@/types/game.types";
 
 interface RankingListProps {
-  users: {
-    username: string;
-    score: number;
-    lvl: number;
-  }[];
+  users: LeaderboardEntry[];
 }
 
 export default function RankingList({ users }: RankingListProps) {
@@ -26,7 +23,7 @@ export default function RankingList({ users }: RankingListProps) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: (index + 2) * 0.1 }}
-            key={user.username}
+            key={user.nickname}
             className="flex justify-between py-3 sm:py-5 items-center border-b border-dark-gray last:border-none"
           >
             <div className="flex items-center gap-3">
@@ -38,9 +35,9 @@ export default function RankingList({ users }: RankingListProps) {
                 />
               </div>
               <div className="flex flex-col items-start gap-2">
-                <p className="text-sm text-font font-medium">{user.username}</p>
+                <p className="text-sm text-font font-medium">{user.nickname}</p>
                 <LvlChip
-                  lvl={user.lvl}
+                  lvl={user.level}
                   color="top-list"
                   size="sm"
                 />
@@ -52,10 +49,12 @@ export default function RankingList({ users }: RankingListProps) {
                   icon="ix:trophy-filled"
                   width="21"
                 />
-                <p className="text-base sm:text-lg font-medium">{user.score}</p>
+                <p className="text-base sm:text-lg font-medium">
+                  {user.totalScore}
+                </p>
               </div>
               <p className="text-subtitle font-medium text-sm sm:text-base">
-                Rank: #{index + 4}
+                Rank: #{user.rank}
               </p>
             </div>
           </motion.div>
