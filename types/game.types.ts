@@ -20,6 +20,7 @@ export interface LeaderboardEntry {
   bestScore: number;
   wins: number;
   totalGames: number;
+  level: number;
 }
 
 export interface Leaderboard {
