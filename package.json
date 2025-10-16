@@ -11,9 +11,11 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@apollo/client": "^4.0.7",
     "@fontsource/raleway": "^5.2.8",
     "@iconify-icons/game-icons": "^1.2.1",
     "@iconify/react": "^6.0.2",
+    "graphql": "^16.11.0",
     "motion": "^12.23.22",
     "next": "15.5.4",
     "react": "19.1.0",

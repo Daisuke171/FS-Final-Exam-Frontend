@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
+import { ApolloWrapper } from "@/lib/apollo-client";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -22,7 +23,7 @@ export default function RootLayout({
       <body
         className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
       >
-        {children}
+        <ApolloWrapper>{children}</ApolloWrapper>
       </body>
     </html>
   );

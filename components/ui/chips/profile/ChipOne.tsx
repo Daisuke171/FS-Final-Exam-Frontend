@@ -1,7 +1,7 @@
 import { Icon, IconifyIcon } from "@iconify/react";
 
 interface ChipOneInterface {
-  value: string;
+  value: number;
   icon: IconifyIcon | string;
   color: "primary" | "secondary" | "tertiary";
 }
