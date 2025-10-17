@@ -2,10 +2,10 @@
 
 import CustomTextInput from "../inputs/text/CustomTextInput";
 import { useEffect, useState, useRef } from "react";
-import { getSocket } from "@/app/socket";
+import { getCodingWarSocket } from "@/app/socket";
 import { motion } from "motion/react";
 
-const socket = getSocket();
+const socket = getCodingWarSocket();
 
 interface LogsProps {
   id: string;
