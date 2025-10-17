@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import Dragonhead from "./icons";
 import { useSocketContext } from "@/app/games/coding-war/provider/SocketContext";
 import jsonData from "@/public/textTest.json";
@@ -75,6 +76,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const [coloredLinesP1, setColoredLinesP1] = useState<{
     [index: number]: string[];
   }>({});
+  const [perfectLinesP1, setPerfectLinesP1] = useState<Set<number>>(new Set());
+  const [floatersP1, setFloatersP1] = useState<Array<{ id: number; value: number }>>([]);
 
   // Player 2 state
   const [currentLineP2, setCurrentLineP2] = useState(0);
@@ -83,6 +86,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const [coloredLinesP2, setColoredLinesP2] = useState<{
     [index: number]: string[];
   }>({});
+  const [perfectLinesP2, setPerfectLinesP2] = useState<Set<number>>(new Set());
+  const [floatersP2, setFloatersP2] = useState<Array<{ id: number; value: number }>>([]);
 
   // === SHARED LOGIC HANDLERS ===
 
@@ -129,7 +134,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       const expectedLine = fullOriginalLine.slice(indentLength);
       const inputValue = player === 1 ? inputValueP1 : inputValueP2;
       const trimmedInput = inputValue.trimEnd();
-  const isPerfect = trimmedInput === expectedLine;
+      const isPerfect = trimmedInput === expectedLine;
       let lineScore = 0;
       let hasErrors = false;
 
@@ -141,13 +146,25 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         }
       }
 
-  if (isPerfect) lineScore *= 1.5;
+      if (isPerfect) lineScore *= 1.5;
       else if (hasErrors) lineScore *= 1.1;
 
       if (player === 1) {
         setScoreP1((prev) => prev + lineScore);
+        // add floating +points for P1
+        const id = Date.now() + Math.random();
+        setFloatersP1((prev) => [...prev, { id, value: lineScore }]);
+        setTimeout(() => {
+          setFloatersP1((prev) => prev.filter((f) => f.id !== id));
+        }, 750);
       } else {
         setScoreP2((prev) => prev + lineScore);
+        // add floating +points for P2
+        const id = Date.now() + Math.random();
+        setFloatersP2((prev) => [...prev, { id, value: lineScore }]);
+        setTimeout(() => {
+          setFloatersP2((prev) => prev.filter((f) => f.id !== id));
+        }, 750);
       }
 
       const newColoredLine = fullOriginalLine.split("").map((char, i) => {
@@ -167,6 +184,12 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           ...prev,
           [currentLine]: newColoredLine,
         }));
+        setPerfectLinesP1((prev) => {
+          const next = new Set(prev);
+          if (isPerfect) next.add(currentLine);
+          else next.delete(currentLine);
+          return next;
+        });
         setCurrentLineP1((prev) =>
           Math.min(prev + 1, originalLines.length - 1)
         );
@@ -176,6 +199,12 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           ...prev,
           [currentLine]: newColoredLine,
         }));
+        setPerfectLinesP2((prev) => {
+          const next = new Set(prev);
+          if (isPerfect) next.add(currentLine);
+          else next.delete(currentLine);
+          return next;
+        });
         setCurrentLineP2((prev) =>
           Math.min(prev + 1, originalLines.length - 1)
         );
@@ -205,6 +234,9 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         const indentLen = getIndentLength(line);
         const indentCols = getIndentColumns(line);
         const chars = line.split("");
+        const isPerfectLine = (
+          player === 1 ? perfectLinesP1 : perfectLinesP2
+        ).has(i);
         return (
           <div
             key={i}
@@ -212,12 +244,20 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
             style={{ gridTemplateColumns: `${indentCols}ch 1fr` }}
           >
             <div aria-hidden="true" />
-            <div className="whitespace-pre-wrap break-words">
+            <div className="whitespace-pre-wrap break-words relative overflow-hidden">
               {chars.slice(indentLen).map((char, idx) => (
                 <span key={idx} className={coloredLines[i][idx + indentLen]}>
                   {char}
                 </span>
               ))}
+              {isPerfectLine && (
+                <motion.div
+                  initial={{ x: "-100%", opacity: 0.5 }}
+                  animate={{ x: "100%", opacity: [0.5, 0.35, 0] }}
+                  transition={{ duration: 0.55, ease: "easeOut" }}
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-yellow-300/40 to-transparent"
+                />
+              )}
             </div>
           </div>
         );
@@ -234,26 +274,31 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           >
             <div aria-hidden="true" />
             <div className="whitespace-pre-wrap break-words">
-              {line.split("").slice(indentLen).map((char, idx) => {
-                const charIndex = idx;
-                if (charIndex < inputValue.length) {
-                  const isCorrect = inputValue[charIndex] === char;
+              {line
+                .split("")
+                .slice(indentLen)
+                .map((char, idx) => {
+                  const charIndex = idx;
+                  if (charIndex < inputValue.length) {
+                    const isCorrect = inputValue[charIndex] === char;
+                    return (
+                      <span
+                        key={idx}
+                        className={
+                          isCorrect ? "text-green-400" : "text-red-400"
+                        }
+                      >
+                        {char}
+                      </span>
+                    );
+                  }
+
                   return (
-                    <span
-                      key={idx}
-                      className={isCorrect ? "text-green-400" : "text-red-400"}
-                    >
+                    <span key={idx} className="text-white/90">
                       {char}
                     </span>
                   );
-                }
-
-                return (
-                  <span key={idx} className="text-white/90">
-                    {char}
-                  </span>
-                );
-              })}
+                })}
             </div>
           </div>
         );
@@ -268,7 +313,9 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           style={{ gridTemplateColumns: `${indentCols}ch 1fr` }}
         >
           <div aria-hidden="true" />
-          <div className="whitespace-pre-wrap break-words">{line.slice(indentLen)}</div>
+          <div className="whitespace-pre-wrap break-words">
+            {line.slice(indentLen)}
+          </div>
         </div>
       );
     });
@@ -336,18 +383,72 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
               SCORE
             </h1>
 
-            <div className="w-40 bg-black/30 rounded-lg p-4 mt-3">
-              <div className="flex justify-between text-sm text-white/60 mb-2">
+            <div className="w-40 bg-black/30 rounded-lg p-4 mt-3 relative">
+              <div className="flex justify-between text-sm text-white/60 mb-2 relative">
                 <span>Player 1</span>
-                <span className="text-green-400 font-medium">
+                <motion.span
+                  key={scoreP1.toFixed(2)}
+                  initial={{ scale: 1 }}
+                  animate={{ scale: [1.15, 1] }}
+                  transition={{ duration: 0.22, ease: "easeOut" }}
+                  className="text-green-400 font-medium"
+                >
                   {scoreP1.toFixed(2)}
-                </span>
+                </motion.span>
               </div>
-              <div className="flex justify-between text-sm text-white/60">
+              <div className="flex justify-between text-sm text-white/60 relative">
                 <span>Player 2</span>
-                <span className="text-green-400 font-medium">
+                <motion.span
+                  key={scoreP2.toFixed(2)}
+                  initial={{ scale: 1 }}
+                  animate={{ scale: [1.15, 1] }}
+                  transition={{ duration: 0.22, ease: "easeOut" }}
+                  className="text-green-400 font-medium"
+                >
                   {scoreP2.toFixed(2)}
-                </span>
+                </motion.span>
+              </div>
+
+              {/* Floating +points overlays */}
+              <div className="pointer-events-none absolute inset-0">
+                {/* Player 1 floaters (near first row) */}
+                <div className="absolute right-2 top-3">
+                  <AnimatePresence>
+                    {floatersP1.map((f) => (
+                      <motion.div
+                        key={f.id}
+                        initial={{ y: 8, opacity: 0, scale: 0.95 }}
+                        animate={{ y: -10, opacity: 1, scale: 1 }}
+                        exit={{ y: -22, opacity: 0 }}
+                        transition={{ duration: 0.55, ease: "easeOut" }}
+                        className={`text-sm font-semibold text-right ${
+                          f.value >= 0 ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {(f.value >= 0 ? "+" : "") + f.value.toFixed(1)}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+                {/* Player 2 floaters (near second row) */}
+                <div className="absolute right-2 top-12">
+                  <AnimatePresence>
+                    {floatersP2.map((f) => (
+                      <motion.div
+                        key={f.id}
+                        initial={{ y: 8, opacity: 0, scale: 0.95 }}
+                        animate={{ y: -10, opacity: 1, scale: 1 }}
+                        exit={{ y: -22, opacity: 0 }}
+                        transition={{ duration: 0.55, ease: "easeOut" }}
+                        className={`text-sm font-semibold text-right ${
+                          f.value >= 0 ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {(f.value >= 0 ? "+" : "") + f.value.toFixed(1)}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </section>
