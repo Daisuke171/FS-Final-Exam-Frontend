@@ -64,7 +64,7 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
             
             {/* INICIO */}
             <a 
-              href="#inicio" 
+              href="/" 
               className="flex items-center gap-2 hover:text-[var(--light-blue)] transition-all hover:scale-105 hover-blue-glow"
             >
               <Icon icon="mdi:home" width="18" /> 
