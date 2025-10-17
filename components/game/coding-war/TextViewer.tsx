@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useAnimationControls } from "motion/react";
 import Dragonhead from "./icons";
 import { useSocketContext } from "@/app/games/coding-war/provider/SocketContext";
 import jsonData from "@/public/textTest.json";
@@ -78,6 +78,9 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   }>({});
   const [perfectLinesP1, setPerfectLinesP1] = useState<Set<number>>(new Set());
   const [floatersP1, setFloatersP1] = useState<Array<{ id: number; value: number }>>([]);
+  const [lastFeedbackP1, setLastFeedbackP1] = useState<"correct" | "incorrect" | null>(null);
+  const controlsP1 = useAnimationControls();
+  const inputRefP1 = useRef<HTMLInputElement | null>(null);
 
   // Player 2 state
   const [currentLineP2, setCurrentLineP2] = useState(0);
@@ -88,6 +91,9 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   }>({});
   const [perfectLinesP2, setPerfectLinesP2] = useState<Set<number>>(new Set());
   const [floatersP2, setFloatersP2] = useState<Array<{ id: number; value: number }>>([]);
+  const [lastFeedbackP2, setLastFeedbackP2] = useState<"correct" | "incorrect" | null>(null);
+  const controlsP2 = useAnimationControls();
+  const inputRefP2 = useRef<HTMLInputElement | null>(null);
 
   // === SHARED LOGIC HANDLERS ===
 
@@ -100,6 +106,65 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     const fullOriginalLine = originalLines[currentLine];
     const indentLength = getIndentLength(fullOriginalLine);
     const lineWithoutIndent = fullOriginalLine.slice(indentLength);
+
+    // Typing feedback: detect new char correctness
+    const prev = player === 1 ? inputValueP1 : inputValueP2;
+    if (value.length > prev.length) {
+      const idx = prev.length;
+      const typedChar = value[idx];
+      const expectedChar = lineWithoutIndent[idx];
+      const isCorrectChar = typedChar === expectedChar;
+      if (player === 1) {
+        setLastFeedbackP1(isCorrectChar ? "correct" : "incorrect");
+        if (isCorrectChar)
+          void controlsP1.start({
+            boxShadow: [
+              "0 0 0px rgba(34,197,94,0)",
+              "0 0 14px rgba(34,197,94,0.35)",
+              "0 0 0px rgba(34,197,94,0)",
+            ],
+            transition: { duration: 0.22, ease: "easeOut" },
+          });
+        else
+          void controlsP1.start({
+            x: [0, -2, 2, -1, 1, 0],
+            transition: { duration: 0.22, ease: "easeOut" },
+          });
+      } else {
+        setLastFeedbackP2(isCorrectChar ? "correct" : "incorrect");
+        if (isCorrectChar)
+          void controlsP2.start({
+            boxShadow: [
+              "0 0 0px rgba(34,197,94,0)",
+              "0 0 14px rgba(34,197,94,0.35)",
+              "0 0 0px rgba(34,197,94,0)",
+            ],
+            transition: { duration: 0.22, ease: "easeOut" },
+          });
+        else
+          void controlsP2.start({
+            x: [0, -2, 2, -1, 1, 0],
+            transition: { duration: 0.22, ease: "easeOut" },
+          });
+      }
+    } else if (value.length < prev.length) {
+      // on deletion reset to neutral
+      if (player === 1) setLastFeedbackP1(null);
+      else setLastFeedbackP2(null);
+    }
+
+    // Keep input focused even after re-renders
+    requestAnimationFrame(() => {
+      if (player === 1) {
+        if (document.activeElement !== inputRefP1.current) {
+          inputRefP1.current?.focus({ preventScroll: true });
+        }
+      } else {
+        if (document.activeElement !== inputRefP2.current) {
+          inputRefP2.current?.focus({ preventScroll: true });
+        }
+      }
+    });
 
     const newColoredLine = fullOriginalLine.split("").map((char, i) => {
       if (i < indentLength) return "text-white/90";
@@ -357,17 +422,26 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
               </pre>
             </div>
 
-            <input
-              type="text"
-              value={inputValueP1}
-              onChange={(e) => handleInputChange(e, 1)}
-              onKeyDown={(e) => handleKeyDown(e, 1)}
-              inputMode="text"
-              autoComplete="off"
-              aria-label="Player 1 input"
-              placeholder="Type the current line..."
-              className="mt-3 bg-black/40 border border-gray-700 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full"
-            />
+            <motion.div animate={controlsP1}>
+              <input
+                type="text"
+                value={inputValueP1}
+                onChange={(e) => handleInputChange(e, 1)}
+                onKeyDown={(e) => handleKeyDown(e, 1)}
+                ref={inputRefP1}
+                inputMode="text"
+                autoComplete="off"
+                aria-label="Player 1 input"
+                placeholder="Type the current line..."
+                className={`mt-3 bg-black/40 border ${
+                  lastFeedbackP1 === "incorrect"
+                    ? "border-rose-600"
+                    : lastFeedbackP1 === "correct"
+                    ? "border-green-600"
+                    : "border-gray-700"
+                } caret-indigo-400 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full`}
+              />
+            </motion.div>
 
             <div className="mt-3 text-indigo-400 text-lg font-semibold">
               Score: {scoreP1.toFixed(2)}
@@ -468,18 +542,26 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
                 )}
               </pre>
             </div>
-
-            <input
-              type="text"
-              value={inputValueP2}
-              onChange={(e) => handleInputChange(e, 2)}
-              onKeyDown={(e) => handleKeyDown(e, 2)}
-              inputMode="text"
-              autoComplete="off"
-              aria-label="Player 2 input"
-              placeholder="Type the current line..."
-              className="mt-3 bg-black/40 border border-gray-700 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full"
-            />
+            <motion.div animate={controlsP2}>
+              <input
+                type="text"
+                value={inputValueP2}
+                onChange={(e) => handleInputChange(e, 2)}
+                onKeyDown={(e) => handleKeyDown(e, 2)}
+                ref={inputRefP2}
+                inputMode="text"
+                autoComplete="off"
+                aria-label="Player 2 input"
+                placeholder="Type the current line..."
+                className={`mt-3 bg-black/40 border ${
+                  lastFeedbackP2 === "incorrect"
+                    ? "border-rose-600"
+                    : lastFeedbackP2 === "correct"
+                    ? "border-green-600"
+                    : "border-gray-700"
+                } caret-indigo-400 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full`}
+              />
+            </motion.div>
 
             <div className="mt-3 text-indigo-400 text-lg font-semibold">
               Score: {scoreP2.toFixed(2)}
