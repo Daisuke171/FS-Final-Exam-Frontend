@@ -11,6 +11,8 @@ interface RoomInfo {
 }
 
 export function useRoomSocket(roomId: string | string[]) {
+  // Normalize roomId to a single string in case Next.js provides an array
+  const roomIdStr = Array.isArray(roomId) ? roomId[0] : roomId;
   const [players, setPlayers] = useState<{ id: string }[]>([]);
   const [confirmedPlayers, setConfirmedPlayers] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +69,7 @@ export function useRoomSocket(roomId: string | string[]) {
       socket.off("joinRoomError");
       socket.off("joinRoomSuccess");
     };
-  }, [roomId]);
+  }, [roomIdStr]);
 
   const handleJoinRoomById = () => {
     const input = document.querySelector(
@@ -90,7 +92,7 @@ export function useRoomSocket(roomId: string | string[]) {
       setError("El campo no puede estar vacío");
       return;
     }
-    socketRef.current.emit("joinRoom", { roomId, password });
+    socketRef.current.emit("joinRoom", { roomId: roomIdStr, password });
   };
 
   return {

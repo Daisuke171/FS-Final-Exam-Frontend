@@ -51,16 +51,25 @@
 
   /* Utility colors */
   --online-user: oklch(0.8693 0.1716 128.44);
-<<<<<<<<< Temporary merge branch 1
   --ranking: oklch(81.221% 0.13758 83.506);
-  --transparent-ranking: oklch(81.221% 0.13758 83.506 / 0.123);
+  --transparent-ranking: oklch(42.892% 0.07683 82.751 / 0.445);
   --medium-ranking: oklch(79.07% 0.15253 81.243);
   --shadow-ranking: oklch(66.329% 0.13566 78.165);
-  --success: oklch(70.071% 0.16051 145.321);
-  --error: oklch(0.5134 0.1504 24.88);
-=========
-  --ranking: oklch(0.8007 0.1675 75.56);
 
+  /* Success tones */
+  --light-success: oklch(81.093% 0.16614 145.614);
+  --success: oklch(70.071% 0.16051 145.321);
+  --shadow-success: oklch(53.712% 0.13105 145.294);
+  --dark-success: oklch(39.65% 0.08657 147.461);
+  --transparent-success: oklch(65.081% 0.15962 145.321 / 0.205);
+
+  /* Error tones */
+  --light-error: oklch(65.081% 0.15962 23.426);
+  --error: oklch(0.5134 0.1504 24.88);
+  --shadow-error: oklch(43.462% 0.14204 26.215);
+  --dark-error: oklch(23.903% 0.07386 24.652);
+  --transparent-error: oklch(43.462% 0.14204 26.215 / 0.205);
+  
   /* Navbar background */
   --navbar-bg: oklch(0.144 0.061 320.8 / 0.8);
   /* Glow funcional */
@@ -408,11 +417,3 @@ body {
     text-shadow: 0 0 6px rgba(253, 230, 138, 0.8), 0 0 10px rgba(253, 230, 138, 0.4);
     transition: text-shadow 0.3s ease-in-out;
 }
-
-.btn-force-circle {
-    border-radius: 50% !important; 
-    padding: 4px !important; 
-    width: 32px; 
-    height: 32px; 
-}
->>>>>>>>> Temporary merge branch 2

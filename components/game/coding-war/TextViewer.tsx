@@ -6,6 +6,7 @@ import Dragonhead from "./icons";
 import { useSocketContext } from "@/app/games/coding-war/provider/SocketContext";
 import jsonData from "@/public/textTest.json";
 import { getCodingWarSocket } from "@/app/socket";
+import CustomButtonTwo from "./buttons/CustomButtonTwo";
 
 export default function TextViewer({ roomId }: { roomId?: string }) {
   const { leave } = useSocketContext();
@@ -33,6 +34,29 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     s.on("timerStart", onTimerStart);
     s.on("timerTick", onTimerTick);
 
+    // Derive connected users from the canonical gameState broadcast
+    const onGameState = (state: {
+      players?: string[];
+      playerCount?: number;
+      roomInfo?: { id: string };
+    }) => {
+      if (state?.players && Array.isArray(state.players)) {
+        setConnectedUsers(state.players);
+      } else if (typeof state?.playerCount === "number") {
+        // Fallback: maintain an array of the reported size
+        setConnectedUsers((prev) => {
+          const len = state.playerCount ?? 0;
+          if (prev.length === len) return prev;
+          return Array.from({ length: len }, (_, i) => prev[i] ?? `${i}`);
+        });
+      }
+      // Optionally sync room id if server reports canonical value
+      if (state?.roomInfo?.id && state.roomInfo.id !== room) {
+        setRoom(state.roomInfo.id);
+      }
+    };
+    s.on("gameState", onGameState);
+
     // Example: handle potential room users broadcast (not currently emitted by backend)
     const onRoomUsersUpdate = (users: string[]) => setConnectedUsers(users);
     s.on("roomUsersUpdate", onRoomUsersUpdate);
@@ -40,6 +64,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     return () => {
       s.off("timerStart", onTimerStart);
       s.off("timerTick", onTimerTick);
+      s.off("gameState", onGameState);
       s.off("roomUsersUpdate", onRoomUsersUpdate);
     };
   }, [room]);
@@ -77,8 +102,12 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     [index: number]: string[];
   }>({});
   const [perfectLinesP1, setPerfectLinesP1] = useState<Set<number>>(new Set());
-  const [floatersP1, setFloatersP1] = useState<Array<{ id: number; value: number }>>([]);
-  const [lastFeedbackP1, setLastFeedbackP1] = useState<"correct" | "incorrect" | null>(null);
+  const [floatersP1, setFloatersP1] = useState<
+    Array<{ id: number; value: number }>
+  >([]);
+  const [lastFeedbackP1, setLastFeedbackP1] = useState<
+    "correct" | "incorrect" | null
+  >(null);
   const controlsP1 = useAnimationControls();
   const inputRefP1 = useRef<HTMLInputElement | null>(null);
 
@@ -90,8 +119,12 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     [index: number]: string[];
   }>({});
   const [perfectLinesP2, setPerfectLinesP2] = useState<Set<number>>(new Set());
-  const [floatersP2, setFloatersP2] = useState<Array<{ id: number; value: number }>>([]);
-  const [lastFeedbackP2, setLastFeedbackP2] = useState<"correct" | "incorrect" | null>(null);
+  const [floatersP2, setFloatersP2] = useState<
+    Array<{ id: number; value: number }>
+  >([]);
+  const [lastFeedbackP2, setLastFeedbackP2] = useState<
+    "correct" | "incorrect" | null
+  >(null);
   const controlsP2 = useAnimationControls();
   const inputRefP2 = useRef<HTMLInputElement | null>(null);
 
@@ -391,19 +424,21 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   return (
     <div className="w-full">
       {/* Leave button */}
-      <div className="w-full flex justify-around mb-4">
+      <div className="w-full flex justify-between mb-4">
         <div className="border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-4">
           Room: <span className="text-indigo-400">{room}</span> · Users:{" "}
           {connectedUsers.length}
         </div>
-        <button
-          onClick={() => leave("main")}
-          className="btn-gradient-one text-white font-semibold py-2 px-6 rounded-lg shadow-[0_0_12px_var(--transparent-purple)]
-										 transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_0_18px_var(--shadow-purple)]
-										 focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)]"
-        >
-          Leave
-        </button>
+        <div>
+          <CustomButtonTwo
+            color="primary"
+            text="Leave"
+            icon="iconamoon:enter"
+            full
+            size="md"
+            onClick={() => leave("main")}
+          />
+        </div>
       </div>
 
       <main className="grid grid-cols-14 gap-6 items-start">
@@ -531,9 +566,9 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         {/* Player 2 */}
         <div className="col-span-6">
           <section className="flex flex-col">
-            <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-3">
+            <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-4">
               <div className="text-xs text-white/60 mb-2">Player 2</div>
-              <pre className="bg-transparent p-3 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
+              <pre className="bg-transparent p-4 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
                 {renderColoredCode(
                   2,
                   currentLineP2,

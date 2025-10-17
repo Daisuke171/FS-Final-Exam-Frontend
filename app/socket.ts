@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
+let codingWarSocket: Socket | null = null;
 
 export const getSocket = () => {
   if (!socket) {
@@ -36,6 +37,19 @@ export const getSocket = () => {
   }
 
   return socket;
+};
+
+export const getCodingWarSocket = () => {
+  if (!codingWarSocket) {
+    codingWarSocket = io("http://localhost:3010/coding-war", {
+      autoConnect: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      transports: ["websocket", "polling"],
+    });
+  }
+  return codingWarSocket;
 };
 
 export const onGameState = (callback: (data: any) => void) => {

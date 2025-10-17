@@ -91,7 +91,7 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
             
             {/* RANKING */}
             <a 
-              href="#ranking" 
+              href="/ranking" 
               className="flex items-center gap-2 hover:text-yellow-300 transition-all hover:scale-105 hover-gold-glow"
             >
               <Icon icon="mdi:trophy" width="18" />

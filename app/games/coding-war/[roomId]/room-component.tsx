@@ -26,7 +26,7 @@ export default function RoomComponent() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
   const params = useParams();
-  const roomId = params.roomId || "";
+  const roomId = Array.isArray(params.roomId) ? params.roomId[0] : (params.roomId || "");
   console.log(roomId);
 
   const {
@@ -53,7 +53,7 @@ export default function RoomComponent() {
       setPlayerId(socket.id);
     });
 
-    socket.emit("joinRoom", { roomId });
+  socket.emit("joinRoom", { roomId });
 
     return () => {
       socket.off("gameState");

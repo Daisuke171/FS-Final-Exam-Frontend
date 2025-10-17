@@ -1,4 +1,4 @@
-import Navbar from "@/app/components/ui/Navbar";
+import Navbar from "@/components/ui/general/landing-page/Navbar";
 import MainCard from "./main-card";
 
 const MOCK_NAV_PROPS = {
