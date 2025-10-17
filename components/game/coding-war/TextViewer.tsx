@@ -108,6 +108,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const [lastFeedbackP1, setLastFeedbackP1] = useState<
     "correct" | "incorrect" | null
   >(null);
+  // Tracks if a mistake was ever made on a given line (irreversible for 'perfect' status)
+  const [erroredLinesP1, setErroredLinesP1] = useState<Set<number>>(new Set());
   const controlsP1 = useAnimationControls();
   const inputRefP1 = useRef<HTMLInputElement | null>(null);
 
@@ -125,6 +127,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const [lastFeedbackP2, setLastFeedbackP2] = useState<
     "correct" | "incorrect" | null
   >(null);
+  // Tracks if a mistake was ever made on a given line (irreversible for 'perfect' status)
+  const [erroredLinesP2, setErroredLinesP2] = useState<Set<number>>(new Set());
   const controlsP2 = useAnimationControls();
   const inputRefP2 = useRef<HTMLInputElement | null>(null);
 
@@ -149,6 +153,14 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       const isCorrectChar = typedChar === expectedChar;
       if (player === 1) {
         setLastFeedbackP1(isCorrectChar ? "correct" : "incorrect");
+        if (!isCorrectChar) {
+          setErroredLinesP1((prev) => {
+            if (prev.has(currentLine)) return prev;
+            const next = new Set(prev);
+            next.add(currentLine);
+            return next;
+          });
+        }
         if (isCorrectChar)
           void controlsP1.start({
             boxShadow: [
@@ -165,6 +177,14 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           });
       } else {
         setLastFeedbackP2(isCorrectChar ? "correct" : "incorrect");
+        if (!isCorrectChar) {
+          setErroredLinesP2((prev) => {
+            if (prev.has(currentLine)) return prev;
+            const next = new Set(prev);
+            next.add(currentLine);
+            return next;
+          });
+        }
         if (isCorrectChar)
           void controlsP2.start({
             boxShadow: [
@@ -232,7 +252,11 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       const expectedLine = fullOriginalLine.slice(indentLength);
       const inputValue = player === 1 ? inputValueP1 : inputValueP2;
       const trimmedInput = inputValue.trimEnd();
-      const isPerfect = trimmedInput === expectedLine;
+      const madeError = (player === 1
+        ? erroredLinesP1
+        : erroredLinesP2
+      ).has(currentLine);
+      const isPerfect = trimmedInput === expectedLine && !madeError;
       let lineScore = 0;
       let hasErrors = false;
 
