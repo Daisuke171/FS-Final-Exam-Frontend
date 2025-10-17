@@ -5,7 +5,7 @@ import { ApolloProvider } from "@apollo/client/react";
 
 export const apolloClient = new ApolloClient({
   link: new HttpLink({
-    uri: process.env.GRAPHQL_URL,
+    uri: process.env.NEXT_PUBLIC_GRAPHQL_URL,
   }),
   cache: new InMemoryCache(),
 });
