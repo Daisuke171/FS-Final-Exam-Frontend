@@ -19,8 +19,8 @@ export const GET_USER_GAMES = gql`
 `;
 
 export const GET_LEADERBOARD = gql`
-  query GetLeaderboard($gameId: ID!, $limit: Int) {
-    leaderboard(gameId: $gameId, limit: $limit) {
+  query GetLeaderboard($gameId: ID!) {
+    leaderboard(gameId: $gameId) {
       gameId
       gameName
       entries {
@@ -37,8 +37,8 @@ export const GET_LEADERBOARD = gql`
 `;
 
 export const GET_GLOBAL_LEADERBOARD = gql`
-  query GetGlobalLeaderboard($limit: Int) {
-    globalLeaderboard(limit: $limit) {
+  query GetGlobalLeaderboard {
+    globalLeaderboard {
       gameName
       entries {
         rank

@@ -7,14 +7,14 @@ export const GET_ME = gql`
       name
       nickname
       email
-      avatar
       coins
       experience
+      skins
       level {
         id
-        number
+        atomicNumber
         name
-        symbol
+        chemicalSymbol
         experienceRequired
       }
       nextLevelExperience
