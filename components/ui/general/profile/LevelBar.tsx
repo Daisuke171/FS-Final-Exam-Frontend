@@ -30,7 +30,7 @@ export default function LevelBar({
     <article className="w-full flex-grow max-w-105 px-3 place-self-center xl:max-w-90 flex flex-col justify-center gap-2 md:border-l border-dark-gray h-23 md:pl-8 xl:pl-5">
       <div className="flex justify-between items-center">
         <p className="text-font text-base font-medium">
-          Level {user?.level.number}
+          Level {user?.level.atomicNumber}
         </p>
         <p className="text-font text-sm font-medium">
           {user?.experience}{" "}
@@ -45,7 +45,7 @@ export default function LevelBar({
       </div>
       <div className="flex items-center mt-1 gap-1">
         <div className="h-7 w-7 flex items-center justify-center rounded-full border border-medium-blue">
-          <p className="font-medium text-font">{user?.level.symbol}</p>
+          <p className="font-medium text-font">{user?.level.chemicalSymbol}</p>
         </div>
         <p className="text-font text-sm font-medium">{user?.level.name}</p>
       </div>

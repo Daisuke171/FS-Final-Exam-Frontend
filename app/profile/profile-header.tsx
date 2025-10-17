@@ -39,12 +39,12 @@ const cards: StatCardProps[] = [
 ];
 
 export default function ProfileHeader({ userId }: { userId: string }) {
-  const { data, loading, error } = useQuery<{ user: User }>(GET_ME, {
+  const { data, loading, error } = useQuery<{ me: User }>(GET_ME, {
     variables: {
       userId,
     },
   });
-  const user = data?.user;
+  const user = data?.me;
   const [open, setOpen] = useState(false);
 
   const handleModalOpen = () => {

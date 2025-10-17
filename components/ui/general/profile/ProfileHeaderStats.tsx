@@ -35,7 +35,10 @@ export default function ProfileHeaderStats({
           {Array(items)
             .fill(0)
             .map((_, index) => (
-              <div className="w-[94px] h-[132px] flex flex-col items-center gap-3">
+              <div
+                key={index}
+                className="w-[94px] h-[132px] flex flex-col items-center gap-3"
+              >
                 <div className="w-12 h-12 bg-white/10 rounded-lg animate-pulse"></div>
                 <div className="w-8 h-7 bg-white/10 rounded-lg animate-pulse"></div>
                 <div className="flex flex-col gap-2">

@@ -36,9 +36,9 @@ export default function ProfileHeaderInfo({
     <article className="flex justify-between flex-shrink-0 md:pr-8 xl:pr-0 items-center gap-8">
       <div className="flex items-center gap-5">
         <div className="h-26 w-26 xl:h-30 xl:w-30  cursor-pointer group flex items-center relative justify-center overflow-hidden rounded-full bg-background border border-dark-gray">
-          {user?.avatar ? (
+          {user?.skins ? (
             <Image
-              src={user?.avatar}
+              src={user?.skins[0]}
               alt="avatar"
               width={100}
               height={100}
