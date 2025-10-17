@@ -40,12 +40,13 @@
 
   /* Utility colors */
   --online-user: oklch(0.8693 0.1716 128.44);
-  --ranking: oklch(81.221% 0.13758 83.506);
-  --transparent-ranking: oklch(81.221% 0.13758 83.506 / 0.123);
-  --medium-ranking: oklch(79.07% 0.15253 81.243);
-  --shadow-ranking: oklch(66.329% 0.13566 78.165);
-  --success: oklch(70.071% 0.16051 145.321);
-  --error: oklch(0.5134 0.1504 24.88);
+  --ranking: oklch(0.8007 0.1675 75.56);
+
+  /* Navbar background */
+  --navbar-bg: oklch(0.144 0.061 320.8 / 0.8);
+
+  /* Glow funcional */
+  --navbar-glow: rgba(76, 201, 240, 0.3);
 }
 
 @theme {
@@ -81,9 +82,8 @@
   --font-sans: var(--font-raleway);
 }
 
-/* Clases de utilidad */
 
-/* Miscelaneo */
+/* Clases de utilidad y gradientes */
 .glass-box-one {
   @apply p-8 border-2 bg-white/7 backdrop-blur-md border-light-gray rounded-xl;
 }
@@ -92,7 +92,6 @@
   @apply bg-white/7 backdrop-blur-md rounded-xl;
 }
 
-/* Gradientes */
 .bg-gradient-one {
   @apply bg-radial from-[var(--background-gradient-1)] from-0% via-[var(--background-gradient-2)] 
     via-[7%] to-[var(--background-gradient-3)] to-[63%];
@@ -106,100 +105,194 @@ body {
   @apply text-foreground font-sans antialiased;
 }
 
-/* Animaciones para el rock, paper, scissors */
-
-/* @keyframes changeColorWinner {
-  from {
-    color: var(--color-slate-800);
-  }
-
-  to {
-    color: var(--color-emerald-700);
-  }
-}
-@keyframes damageEffect {
-  from {
-    color: var(--color-slate-200);
-  }
-
-  to {
-    color: var(--color-rose-800);
-  }
-} */
-
+/* Animaciones */
 @keyframes vibrate-1 {
-  0% {
-    -webkit-transform: translate(0);
-    transform: translate(0);
-  }
-  20% {
-    -webkit-transform: translate(-2px, 2px);
-    transform: translate(-2px, 2px);
-  }
-  40% {
-    -webkit-transform: translate(-2px, -2px);
-    transform: translate(-2px, -2px);
-  }
-  60% {
-    -webkit-transform: translate(2px, 2px);
-    transform: translate(2px, 2px);
-  }
-  80% {
-    -webkit-transform: translate(2px, -2px);
-    transform: translate(2px, -2px);
-  }
-  100% {
-    -webkit-transform: translate(0);
-    transform: translate(0);
-  }
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
 }
 
 @keyframes vibrate-2 {
-  0% {
-    -webkit-transform: translate(0);
-    transform: translate(0);
-  }
-  20% {
-    -webkit-transform: translate(2px, -2px);
-    transform: translate(2px, -2px);
-  }
-  40% {
-    -webkit-transform: translate(2px, 2px);
-    transform: translate(2px, 2px);
-  }
-  60% {
-    -webkit-transform: translate(-2px, 2px);
-    transform: translate(-2px, 2px);
-  }
-  80% {
-    -webkit-transform: translate(-2px, -2px);
-    transform: translate(-2px, -2px);
-  }
-  100% {
-    -webkit-transform: translate(0);
-    transform: translate(0);
+  0% { transform: translate(0); }
+  20% { transform: translate(2px, -2px); }
+  40% { transform: translate(2px, 2px); }
+  60% { transform: translate(-2px, 2px); }
+  80% { transform: translate(-2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes blink-1 {
+  0%,50%,100% { opacity: 1; }
+  25%,75% { opacity: 0; }
+}
+
+
+/* Fondo total de la página */
+body {
+  background: radial-gradient(circle at center, var(--background-gradient-1) 0%, var(--background-gradient-2) 25%, var(--background-gradient-3) 60%);
+  min-height: 100vh;
+}
+
+
+/* Navbar fino y centrado con glow funcional */
+.navbar-glass {
+  background-color: var(--navbar-bg);
+  border-bottom: solid 0.5px var(--light-gray);
+  border-radius: 0;
+}
+
+/* Desktop >= 992px: centrado y limitado */
+@media screen and (min-width: 992px) {
+  .navbar-glass {
+    width: 90%;
+    max-width: 900px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
-@keyframes blink-1 {
-  0%,
-  50%,
-  100% {
-    opacity: 1;
-  }
-  25%,
-  75% {
-    opacity: 0;
+ 
+/* ===================== */
+/* Barra inferior móvil */
+.bottom-bar-mobile {
+  @apply fixed bottom-0 left-0 w-full flex justify-around p-2 border-t;
+  background-color: var(--navbar-bg);
+  border-color: var(--light-gray);
+  box-shadow: 0 -4px 16px var(--shadow-blue);
+  z-index: 50;
+}
+
+.bottom-bar-mobile a {
+  @apply text-white font-bold transition-all;
+}
+
+.bottom-bar-mobile a:hover {
+  text-shadow: 0 0 8px rgba(76, 201, 240, 0.6);
+}
+
+@media screen and (min-width: 768px) {
+  .bottom-bar-mobile {
+    @apply hidden;
   }
 }
 
-@keyframes glow {
-  100% {
-    filter: drop-shadow(0 0 10px var(--color-ranking));
-  }
-  50% {
-    filter: drop-shadow(0 0 14px var(--color-ranking));
-  }
-  0% {
-    filter: drop-shadow(0 0 10px var(--color-ranking));
-  }
+/* ===================== */
+/* Main Menu central */
+.main-menu {
+  width: 90%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  margin-top: 6rem;
+}
+
+.main-menu .menu-item {
+  @apply flex-1 bg-[var(--light-blue)]/10 rounded-xl p-8 text-center font-semibold text-white transition-transform duration-300;
+}
+
+.main-menu .menu-item:hover {
+  @apply scale-105 shadow-lg;
+}
+
+/* Favoritos - Juegos con glow funcional */
+.favorites-box {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: rgba(76, 201, 240, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow:
+    0 6px 12px var(--navbar-bg),
+    0 4px 8px var(--navbar-glow);
+}
+
+.favorites-box-title {
+  @apply text-white font-bold text-lg mb-3;
+}
+
+.favorites-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.favorites-button {
+  flex: 1;
+  height: 6rem;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================= */
+/* NUEVAS CLASES DE EFECTOS VISUALES */
+/* ============================= */
+
+/* --- Efecto glass brillante --- */
+.glass-glow {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 0 20px rgba(173, 216, 230, 0.25),
+    inset 0 0 10px rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* --- Hover con brillo --- */
+.glass-glow:hover {
+  box-shadow:
+    0 0 20px rgba(76, 201, 240, 0.4),
+    inset 0 0 12px rgba(255, 255, 255, 0.1);
+  transform: scale(1.01);
+}
+
+/* --- Botones de misiones/notificaciones --- */
+.mission-btn {
+  @apply flex justify-between items-center w-full px-4 py-2 rounded-lg
+         text-white text-sm font-semibold bg-[var(--medium-blue)]/20
+         border border-[var(--light-blue)]/30 transition-all;
+}
+
+.mission-btn:hover {
+  @apply bg-[var(--medium-blue)]/40 shadow-[0_0_10px_var(--shadow-blue)];
+}
+
+/* --- Íconos de acción en notificaciones --- */
+.action-icons button {
+  @apply w-8 h-8 rounded-full flex items-center justify-center bg-[var(--light-blue)]/20 
+         hover:bg-[var(--light-blue)]/40 transition;
+}
+
+/* 🌟 Estilo reutilizable de botón con efecto luminoso */
+.btn-glow {
+  background-color: rgba(76, 201, 240, 0.08);
+  border: 1px solid var(--light-blue);
+  color: var(--light-blue);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 6px rgba(76, 201, 240, 0.3);
+}
+
+.btn-glow:hover {
+  background-color: rgba(76, 201, 240, 0.25);
+  color: white;
+  box-shadow: 0 0 12px rgba(76, 201, 240, 0.6);
+  transform: scale(1.05);
+}
+
+.btn-glow:active {
+  background-color: rgba(76, 201, 240, 0.35);
+  transform: scale(0.97);
 }
