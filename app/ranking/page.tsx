@@ -37,7 +37,7 @@ export default function Ranking() {
     data: globalData,
     loading: globalLoading,
     error: globalError,
-  } = useQuery<{ leaderboard: Leaderboard }>(GET_GLOBAL_LEADERBOARD, {
+  } = useQuery<{ globalLeaderboard: Leaderboard }>(GET_GLOBAL_LEADERBOARD, {
     skip: filter !== "general",
     pollInterval: TWO_MINUTES,
   });
@@ -55,7 +55,9 @@ export default function Ranking() {
   const loading = filter === "general" ? globalLoading : gameLoading;
   const error = filter === "general" ? globalError : gameError;
   const leaderboard =
-    filter === "general" ? globalData?.leaderboard : gameData?.leaderboard;
+    filter === "general"
+      ? globalData?.globalLeaderboard
+      : gameData?.leaderboard;
 
   if (loading) {
     return (
@@ -92,6 +94,33 @@ export default function Ranking() {
   }
 
   if (!leaderboard) return null;
+
+  const entries = leaderboard.entries || [];
+
+  if (entries.length < 3) {
+    return (
+      <div className="flex flex-col min-h-screen items-center mb-10">
+        <RankingHeader
+          filter={filter}
+          setFilter={setFilter}
+        />
+        <div className="h-screen w-full flex justify-center items-center max-w-[95%]">
+          <div className="flex flex-col items-center p-6 md:p-8 lg:p-10 bg-white/7  rounded-xl">
+            <Icon
+              icon="solar:ranking-line-duotone"
+              className="text-8xl text-font mb-5"
+            />
+            <h3 className="text-font text-center text-xl font-medium">
+              No hay suficientes jugadores para mostrar el ranking
+            </h3>
+            <p className="text-subtitle text-center text-base font-medium">
+              Al menos 3 jugadores son necesarios
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const firstPlace = leaderboard.entries[0];
   const secondPlace = leaderboard.entries[1];
