@@ -49,15 +49,15 @@ export interface User {
   name: string;
   nickname: string;
   email: string;
-  avatar: string;
   coins: number;
   experience: number;
   totalScore: number;
+  skins: string[];
   level: {
     id: string;
-    number: number;
+    atomicNumber: number;
     name: string;
-    symbol: string;
+    chemicalSymbol: string;
     experienceRequired: number;
   };
   nextLevelExperience: number;
