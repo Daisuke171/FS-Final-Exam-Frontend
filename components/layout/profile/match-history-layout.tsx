@@ -21,8 +21,8 @@ export default function MatchHistoryLayout({
         <CustomSelect
           options={[
             { value: "all", label: "Todos" },
-            { value: "win", label: "Victorias" },
-            { value: "lose", label: "Derrotas" },
+            { value: "won", label: "Victorias" },
+            { value: "lost", label: "Derrotas" },
             { value: "draw", label: "Empates" },
           ]}
           onChange={action}
