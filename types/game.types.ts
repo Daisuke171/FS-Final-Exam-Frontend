@@ -32,8 +32,8 @@ export interface Leaderboard {
 
 export interface GameHistory {
   id: string;
-  duration: string;
-  state: "win" | "lose" | "draw";
+  duration: number;
+  state: "won" | "lost" | "draw";
   score: number;
   totalDamage: number;
   createdAt: string;
@@ -42,25 +42,4 @@ export interface GameHistory {
     name: string;
     gameLogo: string;
   };
-}
-
-export interface User {
-  id: string;
-  name: string;
-  nickname: string;
-  email: string;
-  coins: number;
-  experience: number;
-  totalScore: number;
-  skins: string[];
-  level: {
-    id: string;
-    atomicNumber: number;
-    name: string;
-    chemicalSymbol: string;
-    experienceRequired: number;
-  };
-  nextLevelExperience: number;
-  levelProgress: number;
-  experienceToNextLevel: number;
 }
