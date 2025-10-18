@@ -8,7 +8,7 @@ import ProfileHeaderStats from "@/components/ui/general/profile/ProfileHeaderSta
 import LevelBar from "@/components/ui/general/profile/LevelBar";
 import ProfileHeaderInfo from "@/components/ui/general/profile/ProfileHeaderInfo";
 import { useQuery } from "@apollo/client/react";
-import { User } from "@/types/game.types";
+import { User } from "@/types/user.types";
 import { GET_ME } from "@/graphql/queries/user.queries";
 
 const cards: StatCardProps[] = [
@@ -74,7 +74,12 @@ export default function ProfileHeader({ userId }: { userId: string }) {
         />
       </section>
       <AnimatePresence>
-        {open && <ChangeAvatar closeModal={handleModalOpen} />}
+        {open && (
+          <ChangeAvatar
+            userId={userId}
+            closeModal={handleModalOpen}
+          />
+        )}
       </AnimatePresence>
     </>
   );

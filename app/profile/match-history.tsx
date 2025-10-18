@@ -10,7 +10,7 @@ import { useQuery } from "@apollo/client/react";
 import MatchHistoryLayout from "@/components/layout/profile/match-history-layout";
 import MatchSkeleton from "@/components/ui/skeletons/profile/MatchSkeleton";
 
-type FilterType = "all" | "win" | "lose" | "draw";
+type FilterType = "all" | "won" | "lost" | "draw";
 
 // export const matches: MatchHistoryComponentProps[] = [
 //   {
