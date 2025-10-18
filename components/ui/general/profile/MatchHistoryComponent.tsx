@@ -5,40 +5,40 @@ import Image from "next/image";
 
 export interface MatchHistoryComponentProps {
   logo: string;
-  result: "win" | "lose" | "draw";
+  result: "won" | "lost" | "draw";
   points: number;
   date: string;
-  duration: string;
+  duration: number;
   game?: string;
 }
 
 const gameResult = {
-  win: "Victoria",
-  lose: "Derrota",
+  won: "Victoria",
+  lost: "Derrota",
   draw: "Empate",
 };
 
 const textColor = {
-  win: "text-light-success",
-  lose: "text-light-error",
+  won: "text-light-success",
+  lost: "text-light-error",
   draw: "text-subtitle",
 };
 
 const symbol = {
-  win: "+",
-  lose: "-",
+  won: "+",
+  lost: "-",
   draw: "+",
 };
 
 const detailsColor = {
-  win: "after:bg-success",
-  lose: "after:bg-light-error",
+  won: "after:bg-success",
+  lost: "after:bg-light-error",
   draw: "after:bg-light-gray",
 };
 
 const background = {
-  win: "bg-[linear-gradient(to_right,_var(--color-dark-success)_10%,_var(--color-dark-success)_10%,_var(--color-transparent-success)_100%)]",
-  lose: "bg-[linear-gradient(to_right,_var(--color-dark-error)_10%,_var(--color-dark-error)_10%,_var(--color-transparent-error)_100%)]",
+  won: "bg-[linear-gradient(to_right,_var(--color-dark-success)_10%,_var(--color-dark-success)_10%,_var(--color-transparent-success)_100%)]",
+  lost: "bg-[linear-gradient(to_right,_var(--color-dark-error)_10%,_var(--color-dark-error)_10%,_var(--color-transparent-error)_100%)]",
   draw: "bg-[linear-gradient(to_right,_var(--color-shadow-gray)_10%,_var(--color-shadow-gray)_10%,_var(--color-transparent-gray)_100%)]",
 };
 
@@ -50,6 +50,11 @@ export default function MatchHistoryComponent({
   duration,
   game = "Piedra, papel o tijera",
 }: MatchHistoryComponentProps) {
+  const formatGameTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
   return (
     <div
       className={`w-full flex items-center justify-between px-3 xl:px-5 
@@ -91,7 +96,9 @@ export default function MatchHistoryComponent({
           />
         </div>
         <div className="flex flex-col text-xs xl:text-sm  items-center gap-1 lg:flex-row lg:gap-2 xl:gap-3">
-          <p className="text-subtitle  font-medium">{duration}</p>
+          <p className="text-subtitle  font-medium">
+            {formatGameTime(duration)}
+          </p>
           <div className="w-5 h-0.5 bg-light-gray lg:w-1 lg:h-1  lg:bg-dark-gray lg:rounded-full"></div>
           <p className="text-subtitle font-medium">{date}</p>
         </div>

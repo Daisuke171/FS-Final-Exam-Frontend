@@ -1,4 +1,4 @@
-import { User } from "@/types/game.types";
+import { User } from "@/types/user.types";
 import LevelBarSkeleton from "../../skeletons/profile/LevelBarSkeleton";
 import { Icon } from "@iconify/react";
 
@@ -34,7 +34,7 @@ export default function LevelBar({
         </p>
         <p className="text-font text-sm font-medium">
           {user?.experience}{" "}
-          <span className="text-subtitle">/ ${user?.nextLevelExperience}</span>
+          <span className="text-subtitle">/ {user?.nextLevelExperience}</span>
         </p>
       </div>
       <div className="relative w-full h-3 overflow-hidden rounded-2xl bg-background">
