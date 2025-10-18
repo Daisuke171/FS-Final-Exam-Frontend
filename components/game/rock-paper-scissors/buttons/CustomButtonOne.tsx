@@ -10,6 +10,8 @@ interface CustomButtonProps {
   loading?: boolean;
   type?: "button" | "submit" | "reset";
   size?: "sm" | "md" | "lg";
+  disabled?: boolean;
+  className?: string;
 }
 
 export default function CustomButtonOne({
@@ -22,6 +24,7 @@ export default function CustomButtonOne({
   loading,
   type = "button",
   size = "md",
+  disabled,
 }: CustomButtonProps) {
   const selectedSize =
     size === "sm"
@@ -52,7 +55,7 @@ export default function CustomButtonOne({
     "bg-shadow-error text-font border-2 border-shadow-error hover:bg-dark-error hover:border-dark-error";
 
   const filledLoading =
-    "bg-dark-gray text-font border-2 opacity-60 border-dark-gray pointer-events-none cursor-not-allowed";
+    "bg-dark-gray text-font border-2 opacity-30 border-dark-gray pointer-events-none cursor-not-allowed";
 
   const glow = {
     primary: "bg-shadow-purple",
@@ -60,21 +63,23 @@ export default function CustomButtonOne({
     error: "bg-shadow-error",
   };
 
-  const outlined = loading
-    ? outlinedLoading
-    : color === "primary"
-    ? outlinedPrimary
-    : color === "secondary"
-    ? outlinedSecondary
-    : outlinedError;
+  const outlined =
+    loading || disabled
+      ? outlinedLoading
+      : color === "primary"
+      ? outlinedPrimary
+      : color === "secondary"
+      ? outlinedSecondary
+      : outlinedError;
 
-  const filled = loading
-    ? filledLoading
-    : color === "primary"
-    ? filledPrimary
-    : color === "secondary"
-    ? filledSecondary
-    : filledError;
+  const filled =
+    loading || disabled
+      ? filledLoading
+      : color === "primary"
+      ? filledPrimary
+      : color === "secondary"
+      ? filledSecondary
+      : filledError;
 
   const baseStyles = `${selectedSize} w-fit cursor-pointer rounded-xl font-medium flex items-center gap-2 transition-all truncate`;
   return (

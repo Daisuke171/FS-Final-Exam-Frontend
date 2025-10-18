@@ -14,7 +14,6 @@ interface GameResult {
     styles: string;
   };
   points: {
-    number: number;
     symbol: string;
     styles: string;
   };
@@ -26,6 +25,7 @@ interface GameOverProps {
   players: { id: string }[];
   confirmedPlayers: string[];
   action: () => void;
+  scores: { [id: string]: number };
 }
 
 export default function GameOver({
@@ -34,6 +34,7 @@ export default function GameOver({
   players,
   confirmedPlayers,
   action,
+  scores,
 }: GameOverProps) {
   const router = useRouter();
   const gameResult: GameResult[] = [
@@ -45,7 +46,6 @@ export default function GameOver({
             styles: "text-ranking animate-[glow_1.5s_ease-in-out_infinite]",
           },
           points: {
-            number: 20,
             symbol: "+",
             styles: "text-success",
           },
@@ -58,7 +58,6 @@ export default function GameOver({
             styles: "text-light-gray",
           },
           points: {
-            number: 5,
             symbol: "+",
             styles: "text-slate-500",
           },
@@ -70,12 +69,13 @@ export default function GameOver({
             styles: "text-error",
           },
           points: {
-            number: 20,
-            symbol: "-",
+            symbol: "",
             styles: "text-error",
           },
         },
   ].filter(Boolean);
+
+  const playerScore = playerId ? scores[playerId] ?? 0 : 0;
 
   return (
     <motion.div
@@ -116,7 +116,7 @@ export default function GameOver({
           >
             {r.points.symbol}
             <NumbersAnimation
-              value={r.points.number}
+              value={playerScore}
               delay={1}
             />{" "}
             puntos

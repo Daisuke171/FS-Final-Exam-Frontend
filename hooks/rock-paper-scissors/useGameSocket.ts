@@ -40,6 +40,7 @@ export function useGameSocket(roomId: string | string[]) {
   const [error, setError] = useState<string | null>(null);
   const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [score, setScore] = useState<{ [id: string]: number }>({});
   const [message, setMessage] = useState<string | null>(null);
   const [gameWinner, setGameWinner] = useState<string | null>(null);
   const [showBattleAnimation, setShowBattleAnimation] =
@@ -180,7 +181,7 @@ export function useGameSocket(roomId: string | string[]) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-
+      setScore(data.scores);
       setGameWinner(data.winner);
     });
 
@@ -309,5 +310,6 @@ export function useGameSocket(roomId: string | string[]) {
     message,
     isPrivate,
     roomInfo,
+    score,
   };
 }
