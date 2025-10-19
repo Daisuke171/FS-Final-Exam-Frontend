@@ -69,11 +69,8 @@ export default function MainCard() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: [0, 0.4, 0.6, 1], x: 0 }}
               transition={{
-                type: "spring",
-                duration: 1,
-                stiffness: 100,
-                damping: 10,
-                delay: 0.2,
+                opacity: { duration: 0.8, ease: "easeOut", delay: 0.2 },
+                x: { type: "spring", stiffness: 100, damping: 10, delay: 0.2 },
               }}
               className="w-full"
             >
@@ -90,11 +87,8 @@ export default function MainCard() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: [0, 0.4, 0.6, 1], x: 0 }}
               transition={{
-                type: "spring",
-                duration: 1,
-                stiffness: 100,
-                damping: 10,
-                delay: 0.3,
+                opacity: { duration: 0.8, ease: "easeOut", delay: 0.3 },
+                x: { type: "spring", stiffness: 100, damping: 10, delay: 0.3 },
               }}
               className="w-full"
             >
@@ -112,11 +106,8 @@ export default function MainCard() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: [0, 0.4, 0.6, 1], x: 0 }}
             transition={{
-              type: "spring",
-              duration: 1,
-              stiffness: 100,
-              damping: 10,
-              delay: 0.4,
+              opacity: { duration: 0.8, ease: "easeOut", delay: 0.4 },
+              x: { type: "spring", stiffness: 100, damping: 10, delay: 0.4 },
             }}
             className="flex flex-col gap-2 justify-center w-full items-center"
           >
