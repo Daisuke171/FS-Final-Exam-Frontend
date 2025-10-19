@@ -5,7 +5,7 @@ import ProfileHeader from "./profile-header";
 import StatsComponent from "./stats-component";
 import AchievementsComponent from "./achievements-component";
 
-const userId = "3d0ef120-1a72-460e-b8d5-035344d72674";
+const userId = "f9ee7c60-dfa5-4bc1-a465-1d2c166a5010";
 
 export default function Profile() {
   return (
