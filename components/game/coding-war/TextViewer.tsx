@@ -47,6 +47,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       players?: string[];
       playerCount?: number;
       roomInfo?: { id: string };
+      scores?: Record<string, number>;
     }) => {
       if (state?.players && Array.isArray(state.players)) {
         setConnectedUsers(state.players);
@@ -56,6 +57,13 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           if (idx === 0) setRole('P1');
           else if (idx === 1) setRole('P2');
           else setRole('spectator');
+        }
+        // Map authoritative scores to P1/P2 by players order
+        if (state.scores) {
+          const p1Id = state.players[0];
+          const p2Id = state.players[1];
+          if (p1Id) setScoreP1(state.scores[p1Id] ?? 0);
+          if (p2Id) setScoreP2(state.scores[p2Id] ?? 0);
         }
       } else if (typeof state?.playerCount === "number") {
         // Fallback: maintain an array of the reported size
@@ -307,7 +315,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         }, 750);
         // Broadcast line commit for opponent mirror
         if (localPlayer !== null && localPlayer === player) {
-          getCodingWarSocket().emit('lineCommit', { roomId: room, lineIndex: currentLine, input: trimmedInput, isPerfect });
+          getCodingWarSocket().emit('lineCommit', { roomId: room, lineIndex: currentLine, input: trimmedInput, isPerfect, score: lineScore });
         }
       } else {
         setScoreP2((prev) => prev + lineScore);
@@ -318,7 +326,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           setFloatersP2((prev) => prev.filter((f) => f.id !== id));
         }, 750);
         if (localPlayer !== null && localPlayer === player) {
-          getCodingWarSocket().emit('lineCommit', { roomId: room, lineIndex: currentLine, input: trimmedInput, isPerfect });
+          getCodingWarSocket().emit('lineCommit', { roomId: room, lineIndex: currentLine, input: trimmedInput, isPerfect, score: lineScore });
         }
       }
 
