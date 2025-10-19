@@ -13,6 +13,9 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const code = jsonData.text;
   const [room, setRoom] = useState(roomId ?? "");
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
+  const [selfId, setSelfId] = useState<string | null>(null);
+  const [role, setRole] = useState<'P1' | 'P2' | 'spectator'>('spectator');
+  const localPlayer = useMemo<1 | 2 | null>(() => (role === 'P1' ? 1 : role === 'P2' ? 2 : null), [role]);
 
   useEffect(() => {
     const s = getCodingWarSocket();
@@ -23,6 +26,11 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       // Signal readiness so the PlayingState can start when both clients are ready
       s.emit("playerReadyForMatch", { roomId: room });
     }
+
+    // Track own socket id
+  if (s.id) setSelfId(s.id ?? null);
+  const onConnect = () => setSelfId(s.id ?? null);
+    s.on('connect', onConnect);
 
     // Optional listeners for timer events (can be wired into UI later)
     const onTimerStart = (data: { duration: number }) => {
@@ -42,6 +50,13 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     }) => {
       if (state?.players && Array.isArray(state.players)) {
         setConnectedUsers(state.players);
+        // Determine role based on join order
+        if (selfId) {
+          const idx = state.players.indexOf(selfId);
+          if (idx === 0) setRole('P1');
+          else if (idx === 1) setRole('P2');
+          else setRole('spectator');
+        }
       } else if (typeof state?.playerCount === "number") {
         // Fallback: maintain an array of the reported size
         setConnectedUsers((prev) => {
@@ -66,8 +81,9 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       s.off("timerTick", onTimerTick);
       s.off("gameState", onGameState);
       s.off("roomUsersUpdate", onRoomUsersUpdate);
+      s.off('connect', onConnect);
     };
-  }, [room]);
+  }, [room, selfId]);
 
   useEffect(() => {
     if (roomId && roomId !== room) {
@@ -108,6 +124,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const [lastFeedbackP1, setLastFeedbackP1] = useState<
     "correct" | "incorrect" | null
   >(null);
+  // Tracks if a mistake was ever made on a given line (irreversible for 'perfect' status)
+  const [erroredLinesP1, setErroredLinesP1] = useState<Set<number>>(new Set());
   const controlsP1 = useAnimationControls();
   const inputRefP1 = useRef<HTMLInputElement | null>(null);
 
@@ -125,8 +143,13 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const [lastFeedbackP2, setLastFeedbackP2] = useState<
     "correct" | "incorrect" | null
   >(null);
+  // Tracks if a mistake was ever made on a given line (irreversible for 'perfect' status)
+  const [erroredLinesP2, setErroredLinesP2] = useState<Set<number>>(new Set());
   const controlsP2 = useAnimationControls();
   const inputRefP2 = useRef<HTMLInputElement | null>(null);
+  // Opponent live input mirror
+  const [opponentInput, setOpponentInput] = useState("");
+  const [opponentLine, setOpponentLine] = useState<number>(0);
 
   // === SHARED LOGIC HANDLERS ===
 
@@ -149,6 +172,14 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       const isCorrectChar = typedChar === expectedChar;
       if (player === 1) {
         setLastFeedbackP1(isCorrectChar ? "correct" : "incorrect");
+        if (!isCorrectChar) {
+          setErroredLinesP1((prev) => {
+            if (prev.has(currentLine)) return prev;
+            const next = new Set(prev);
+            next.add(currentLine);
+            return next;
+          });
+        }
         if (isCorrectChar)
           void controlsP1.start({
             boxShadow: [
@@ -165,6 +196,14 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           });
       } else {
         setLastFeedbackP2(isCorrectChar ? "correct" : "incorrect");
+        if (!isCorrectChar) {
+          setErroredLinesP2((prev) => {
+            if (prev.has(currentLine)) return prev;
+            const next = new Set(prev);
+            next.add(currentLine);
+            return next;
+          });
+        }
         if (isCorrectChar)
           void controlsP2.start({
             boxShadow: [
@@ -213,9 +252,16 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     if (player === 1) {
       setColoredLinesP1((prev) => ({ ...prev, [currentLine]: newColoredLine }));
       setInputValueP1(value);
+      // Emit typing progress for P1 when local player is P1
+      if (localPlayer !== null && localPlayer === player) {
+        getCodingWarSocket().emit('typingProgress', { roomId: room, lineIndex: currentLine, input: value });
+      }
     } else {
       setColoredLinesP2((prev) => ({ ...prev, [currentLine]: newColoredLine }));
       setInputValueP2(value);
+      if (localPlayer !== null && localPlayer === player) {
+        getCodingWarSocket().emit('typingProgress', { roomId: room, lineIndex: currentLine, input: value });
+      }
     }
   };
 
@@ -232,7 +278,11 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       const expectedLine = fullOriginalLine.slice(indentLength);
       const inputValue = player === 1 ? inputValueP1 : inputValueP2;
       const trimmedInput = inputValue.trimEnd();
-      const isPerfect = trimmedInput === expectedLine;
+      const madeError = (player === 1
+        ? erroredLinesP1
+        : erroredLinesP2
+      ).has(currentLine);
+      const isPerfect = trimmedInput === expectedLine && !madeError;
       let lineScore = 0;
       let hasErrors = false;
 
@@ -255,6 +305,10 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         setTimeout(() => {
           setFloatersP1((prev) => prev.filter((f) => f.id !== id));
         }, 750);
+        // Broadcast line commit for opponent mirror
+        if (localPlayer !== null && localPlayer === player) {
+          getCodingWarSocket().emit('lineCommit', { roomId: room, lineIndex: currentLine, input: trimmedInput, isPerfect });
+        }
       } else {
         setScoreP2((prev) => prev + lineScore);
         // add floating +points for P2
@@ -263,6 +317,9 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         setTimeout(() => {
           setFloatersP2((prev) => prev.filter((f) => f.id !== id));
         }, 750);
+        if (localPlayer !== null && localPlayer === player) {
+          getCodingWarSocket().emit('lineCommit', { roomId: room, lineIndex: currentLine, input: trimmedInput, isPerfect });
+        }
       }
 
       const newColoredLine = fullOriginalLine.split("").map((char, i) => {
@@ -421,6 +478,62 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
 
   // === RENDER UI ===
 
+  // Listen to opponent updates
+  useEffect(() => {
+    const s = getCodingWarSocket();
+    const onTyping = (data: { playerId: string; lineIndex: number; input: string }) => {
+      // If it's not me, mirror on the opponent panel
+      if (data.input !== undefined && (!selfId || data.playerId !== selfId)) {
+        setOpponentLine(data.lineIndex);
+        setOpponentInput(data.input);
+        // Paint opponent side live (map to the correct player's state slots)
+        const fullOriginalLine = originalLines[data.lineIndex] ?? '';
+        const indentLength = getIndentLength(fullOriginalLine);
+        const lineWithoutIndent = fullOriginalLine.slice(indentLength);
+        const newColoredLine = fullOriginalLine.split("").map((char, i) => {
+          if (i < indentLength) return "text-white/90";
+          const charIndex = i - indentLength;
+          const isCorrect = data.input[charIndex] === lineWithoutIndent[charIndex];
+          return isCorrect ? "text-green-400" : data.input[charIndex] ? "text-red-400" : "text-white/90";
+        });
+        if (role === 'P2') {
+          // Opponent is P1 on my right
+          setColoredLinesP1((prev) => ({ ...prev, [data.lineIndex]: newColoredLine }));
+        } else {
+          // Opponent is P2 on my right
+          setColoredLinesP2((prev) => ({ ...prev, [data.lineIndex]: newColoredLine }));
+        }
+      }
+    };
+    const onLineCommitted = (data: { playerId: string; lineIndex: number; input: string; isPerfect?: boolean }) => {
+      if (selfId && data.playerId === selfId) return; // ignore own echo
+      const fullOriginalLine = originalLines[data.lineIndex] ?? '';
+      const indentLength = getIndentLength(fullOriginalLine);
+      const newColoredLine = fullOriginalLine.split("").map((char, i) => {
+        if (i < indentLength) return "text-white/90";
+        if (data.isPerfect) return "text-yellow-400";
+        const charIndex = i - indentLength;
+        if (charIndex < (data.input?.length ?? 0)) {
+          return data.input[charIndex] === char ? "text-green-400" : "text-red-400";
+        }
+        return "text-white/90";
+      });
+      if (role === 'P2') {
+        setColoredLinesP1((prev) => ({ ...prev, [data.lineIndex]: newColoredLine }));
+        setCurrentLineP1((prev) => (data.lineIndex >= prev ? data.lineIndex + 1 : prev));
+      } else {
+        setColoredLinesP2((prev) => ({ ...prev, [data.lineIndex]: newColoredLine }));
+        setCurrentLineP2((prev) => (data.lineIndex >= prev ? data.lineIndex + 1 : prev));
+      }
+    };
+    s.on('typingUpdate', onTyping);
+    s.on('lineCommitted', onLineCommitted);
+    return () => {
+      s.off('typingUpdate', onTyping);
+      s.off('lineCommitted', onLineCommitted);
+    };
+  }, [role, room, originalLines]);
+
   return (
     <div className="w-full">
       {/* Leave button */}
@@ -442,49 +555,47 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       </div>
 
       <main className="grid grid-cols-14 gap-6 items-start">
-        {/* Player 1 */}
+        {/* Left: Local player */}
         <div className="col-span-6">
           <section className="flex flex-col">
             <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-4">
-              <div className="text-xs text-white/60 mb-2">Player 1</div>
+              <div className="text-xs text-white/60 mb-2">{role === 'P2' ? 'Player 2' : 'Player 1'}</div>
               <pre className="bg-transparent p-4 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
-                {renderColoredCode(
-                  1,
-                  currentLineP1,
-                  coloredLinesP1,
-                  inputValueP1
-                )}
+                {role === 'P2'
+                  ? renderColoredCode(2, currentLineP2, coloredLinesP2, inputValueP2)
+                  : renderColoredCode(1, currentLineP1, coloredLinesP1, inputValueP1)}
               </pre>
             </div>
-
-            <motion.div animate={controlsP1}>
+            {/* Left input is always the local player's input */}
+            <motion.div animate={role === 'P2' ? controlsP2 : controlsP1}>
               <input
                 type="text"
-                value={inputValueP1}
-                onChange={(e) => handleInputChange(e, 1)}
-                onKeyDown={(e) => handleKeyDown(e, 1)}
-                ref={inputRefP1}
+                value={role === 'P2' ? inputValueP2 : inputValueP1}
+                onChange={(e) => handleInputChange(e, role === 'P2' ? 2 : 1)}
+                onKeyDown={(e) => handleKeyDown(e, role === 'P2' ? 2 : 1)}
+                ref={role === 'P2' ? inputRefP2 : inputRefP1}
                 inputMode="text"
                 autoComplete="off"
-                aria-label="Player 1 input"
-                placeholder="Type the current line..."
+                aria-label="Local player input"
+                placeholder={role === 'spectator' ? 'Spectating…' : 'Type the current line...'}
+                disabled={role === 'spectator'}
                 className={`mt-3 bg-black/40 border ${
-                  lastFeedbackP1 === "incorrect"
-                    ? "border-rose-600"
-                    : lastFeedbackP1 === "correct"
-                    ? "border-green-600"
-                    : "border-gray-700"
-                } caret-indigo-400 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full`}
+                  (role === 'P2' ? lastFeedbackP2 : lastFeedbackP1) === 'incorrect'
+                    ? 'border-rose-600'
+                    : (role === 'P2' ? lastFeedbackP2 : lastFeedbackP1) === 'correct'
+                    ? 'border-green-600'
+                    : 'border-gray-700'
+                } caret-indigo-400 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full disabled:opacity-60`}
               />
             </motion.div>
 
             <div className="mt-3 text-indigo-400 text-lg font-semibold">
-              Score: {scoreP1.toFixed(2)}
+              Score: {(role === 'P2' ? scoreP2 : scoreP1).toFixed(2)}
             </div>
           </section>
         </div>
 
-        {/* Center scoreboard */}
+        {/* Center: Scoreboard */}
         <div className="col-span-2 flex justify-center">
           <section className="flex flex-col items-center justify-center bg-gradient-to-b from-gray-900/80 to-black/60 border border-white/10 p-3 rounded-2xl mt-3 pt-6">
             <Dragonhead />
@@ -499,7 +610,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
                   key={scoreP1.toFixed(2)}
                   initial={{ scale: 1 }}
                   animate={{ scale: [1.15, 1] }}
-                  transition={{ duration: 0.22, ease: "easeOut" }}
+                  transition={{ duration: 0.22, ease: 'easeOut' }}
                   className="text-green-400 font-medium"
                 >
                   {scoreP1.toFixed(2)}
@@ -511,7 +622,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
                   key={scoreP2.toFixed(2)}
                   initial={{ scale: 1 }}
                   animate={{ scale: [1.15, 1] }}
-                  transition={{ duration: 0.22, ease: "easeOut" }}
+                  transition={{ duration: 0.22, ease: 'easeOut' }}
                   className="text-green-400 font-medium"
                 >
                   {scoreP2.toFixed(2)}
@@ -529,12 +640,12 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
                         initial={{ y: 8, opacity: 0, scale: 0.95 }}
                         animate={{ y: -10, opacity: 1, scale: 1 }}
                         exit={{ y: -22, opacity: 0 }}
-                        transition={{ duration: 0.55, ease: "easeOut" }}
+                        transition={{ duration: 0.55, ease: 'easeOut' }}
                         className={`text-sm font-semibold text-right ${
-                          f.value >= 0 ? "text-green-400" : "text-red-400"
+                          f.value >= 0 ? 'text-green-400' : 'text-red-400'
                         }`}
                       >
-                        {(f.value >= 0 ? "+" : "") + f.value.toFixed(1)}
+                        {(f.value >= 0 ? '+' : '') + f.value.toFixed(1)}
                       </motion.div>
                     ))}
                   </AnimatePresence>
@@ -548,12 +659,12 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
                         initial={{ y: 8, opacity: 0, scale: 0.95 }}
                         animate={{ y: -10, opacity: 1, scale: 1 }}
                         exit={{ y: -22, opacity: 0 }}
-                        transition={{ duration: 0.55, ease: "easeOut" }}
+                        transition={{ duration: 0.55, ease: 'easeOut' }}
                         className={`text-sm font-semibold text-right ${
-                          f.value >= 0 ? "text-green-400" : "text-red-400"
+                          f.value >= 0 ? 'text-green-400' : 'text-red-400'
                         }`}
                       >
-                        {(f.value >= 0 ? "+" : "") + f.value.toFixed(1)}
+                        {(f.value >= 0 ? '+' : '') + f.value.toFixed(1)}
                       </motion.div>
                     ))}
                   </AnimatePresence>
@@ -563,43 +674,16 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           </section>
         </div>
 
-        {/* Player 2 */}
+        {/* Right: Opponent view (read-only) */}
         <div className="col-span-6">
           <section className="flex flex-col">
-            <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-4">
-              <div className="text-xs text-white/60 mb-2">Player 2</div>
-              <pre className="bg-transparent p-4 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
-                {renderColoredCode(
-                  2,
-                  currentLineP2,
-                  coloredLinesP2,
-                  inputValueP2
-                )}
+            <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-3">
+              <div className="text-xs text-white/60 mb-2">{role === 'P2' ? 'Player 1' : 'Player 2'}</div>
+              <pre className="bg-transparent p-3 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
+                {role === 'P2'
+                  ? renderColoredCode(1, currentLineP1, coloredLinesP1, inputValueP1)
+                  : renderColoredCode(2, currentLineP2, coloredLinesP2, inputValueP2)}
               </pre>
-            </div>
-            <motion.div animate={controlsP2}>
-              <input
-                type="text"
-                value={inputValueP2}
-                onChange={(e) => handleInputChange(e, 2)}
-                onKeyDown={(e) => handleKeyDown(e, 2)}
-                ref={inputRefP2}
-                inputMode="text"
-                autoComplete="off"
-                aria-label="Player 2 input"
-                placeholder="Type the current line..."
-                className={`mt-3 bg-black/40 border ${
-                  lastFeedbackP2 === "incorrect"
-                    ? "border-rose-600"
-                    : lastFeedbackP2 === "correct"
-                    ? "border-green-600"
-                    : "border-gray-700"
-                } caret-indigo-400 text-gray-200 px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition w-full`}
-              />
-            </motion.div>
-
-            <div className="mt-3 text-indigo-400 text-lg font-semibold">
-              Score: {scoreP2.toFixed(2)}
             </div>
           </section>
         </div>
