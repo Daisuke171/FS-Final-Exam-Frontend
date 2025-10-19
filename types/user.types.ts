@@ -37,6 +37,7 @@ export interface User {
     name: string;
     chemicalSymbol: string;
     experienceRequired: number;
+    color: string;
   };
   nextLevelExperience: number;
   levelProgress: number;

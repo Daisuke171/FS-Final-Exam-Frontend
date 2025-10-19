@@ -49,6 +49,9 @@ export default function GameComponent() {
     totalDuration,
     previousHealth,
     score,
+    xpData,
+    showXp,
+    setShowXp,
   } = useGameSocket(roomId);
 
   useEffect(() => {
@@ -90,6 +93,9 @@ export default function GameComponent() {
           confirmedPlayers={confirmedPlayers}
           action={handlePlayAgain}
           scores={score}
+          xpData={xpData}
+          showXp={showXp}
+          setShowXp={setShowXp}
         />
       ) : state === "PlayingState" || state === "RevealingState" ? (
         <motion.div

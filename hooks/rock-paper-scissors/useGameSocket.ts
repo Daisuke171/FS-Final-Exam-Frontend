@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { getSocket } from "@/app/socket";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { XpDataMap, XpDataProps } from "@/types/rock-paper-scissors/CardProps";
 
 interface PlayedMovements {
   id: string;
@@ -42,6 +43,8 @@ export function useGameSocket(roomId: string | string[]) {
   const [isPrivate, setIsPrivate] = useState(false);
   const [score, setScore] = useState<{ [id: string]: number }>({});
   const [message, setMessage] = useState<string | null>(null);
+  const [showXp, setShowXp] = useState(false);
+  const [xpData, setXpData] = useState<XpDataMap | null>(null);
   const [gameWinner, setGameWinner] = useState<string | null>(null);
   const [showBattleAnimation, setShowBattleAnimation] =
     useState<boolean>(false);
@@ -183,6 +186,9 @@ export function useGameSocket(roomId: string | string[]) {
       }
       setScore(data.scores);
       setGameWinner(data.winner);
+
+      setXpData(data.experienceResults);
+      setTimeout(() => setShowXp(true), 2000);
     });
 
     socket.on("timerStart", (data) => {
@@ -311,5 +317,8 @@ export function useGameSocket(roomId: string | string[]) {
     isPrivate,
     roomInfo,
     score,
+    xpData,
+    showXp,
+    setShowXp,
   };
 }
