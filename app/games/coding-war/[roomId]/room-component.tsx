@@ -26,8 +26,12 @@ export default function RoomComponent() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
   const params = useParams();
-  const roomId = Array.isArray(params.roomId) ? params.roomId[0] : (params.roomId || "");
-  console.log(roomId);
+  const roomId = Array.isArray(params.roomId)
+    ? params.roomId[0]
+    : (params.roomId as string | undefined) || "";
+  useEffect(() => {
+    console.log("[RoomComponent] roomId:", roomId);
+  }, [roomId]);
 
   const {
     handleJoinRoomByPassword,
@@ -39,28 +43,39 @@ export default function RoomComponent() {
     confirmedPlayers,
   } = useRoomSocket(roomId || "");
   useEffect(() => {
-    socket.on("countDown", (data) => {
+    if (!roomId) return; // wait until param is available
+
+    const onCountDown = (data: number) => {
       setCountDown(data);
       console.log(`TIMER RECIBIDO: ${data}`);
       if (data === 0) {
         setIsRedirecting(true);
         setCountDown(null);
-  router.push(`/games/coding-war/${roomId}/match`);
+        router.push(`/games/coding-war/${roomId}/match`);
       }
-    });
+    };
+    const onGameState = () => setPlayerId(socket.id);
 
-    socket.on("gameState", () => {
-      setPlayerId(socket.id);
-    });
+    socket.on("countDown", onCountDown);
+    socket.on("gameState", onGameState);
 
-  socket.emit("joinRoom", { roomId });
+  // Always request the current game/room state so the UI can populate
+  socket.emit("requestGameState", { roomId });
+
+    // Join only after we have a valid roomId, and avoid duplicate emits across StrictMode remounts
+    const anySocket = socket as unknown as { _cwJoinedRooms?: Set<string> };
+    if (!anySocket._cwJoinedRooms) anySocket._cwJoinedRooms = new Set<string>();
+    if (!anySocket._cwJoinedRooms.has(roomId)) {
+      socket.emit("joinRoom", { roomId });
+      anySocket._cwJoinedRooms.add(roomId);
+    }
 
     return () => {
-      socket.off("gameState");
+      socket.off("gameState", onGameState);
       socket.off("joinRoomError");
-      socket.off("countDown");
+      socket.off("countDown", onCountDown);
     };
-  }, []);
+  }, [roomId]);
 
   const handleConfirmPlayers = () => {
     socket.emit("confirmReady", { roomId, ready: true });
@@ -198,4 +213,7 @@ export default function RoomComponent() {
       </>
     );
   }
+
+  // Fallback while roomInfo is loading or awaiting server state
+  return <LoaderCard />;
 }
