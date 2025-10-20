@@ -1,19 +1,89 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { getCodingWarSocket } from "@/app/socket";
+import PlayersInRoom from "@/components/game/coding-war/general/PlayersInRoom";
+import CustomButtonOne from "@/components/game/coding-war/buttons/CustomButtonOne";
+import LoaderCard from "@/components/game/coding-war/cards/LoaderCard";
+import CountdownCard from "@/components/game/coding-war/cards/CountdownCard";
 
 export default function ResultPage() {
   const params = useParams();
+  const router = useRouter();
   const roomId = String(params.roomId || "");
   const search = useSearchParams();
   const winner = search.get("winner") || "draw";
   const p1 = search.get("p1") || "0.00";
   const p2 = search.get("p2") || "0.00";
 
+  // Room state for readiness panel
+  const [players, setPlayers] = useState<string[]>([]);
+  const [confirmed, setConfirmed] = useState<string[]>([]);
+  const [playerId, setPlayerId] = useState<string | undefined>(undefined);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [countDown, setCountDown] = useState<number | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const countDownHandledRef = useRef(false);
+
+  useEffect(() => {
+    const s = getCodingWarSocket();
+    const onGS = (data: any) => {
+      if (Array.isArray(data.players)) setPlayers(data.players);
+      if (data?.ready) {
+        const conf = Object.entries(data.ready)
+          .filter(([_, v]) => v)
+          .map(([k]) => k);
+        setConfirmed(conf);
+        // Keep our toggle in sync if server changed it elsewhere
+        if (s.id) setIsReady(conf.includes(s.id));
+      }
+      if (!playerId && s.id) setPlayerId(s.id);
+    };
+    const onCountDown = (n: number) => {
+      setCountDown(n);
+      // mirror room-component: go to match at 0
+      if (n === 0 && !countDownHandledRef.current) {
+        countDownHandledRef.current = true;
+        setIsRedirecting(true);
+        router.push(`/games/coding-war/${roomId}/match`);
+      }
+    };
+    s.on("gameState", onGS);
+    s.on("countDown", onCountDown);
+    // Ask for current state so we can show readiness right away
+    if (roomId) s.emit("requestGameState", { roomId });
+    return () => {
+      s.off("gameState", onGS);
+      s.off("countDown", onCountDown);
+    };
+  }, [roomId, playerId, router]);
+
+  const handleReplayToggle = () => {
+    const s = getCodingWarSocket();
+    const next = !isReady;
+    setIsReady(next);
+    s.emit("confirmReady", { roomId, ready: next });
+  };
+
+  const playersForList = useMemo(
+    () => players.map((id) => ({ id })),
+    [players]
+  );
+
+  if (countDown !== null && countDown > 0) {
+    // Show the big 3-2-1 visual timer centered while waiting to auto-redirect to match
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center px-4">
+        <CountdownCard countDown={countDown} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center px-4">
-      <div className="max-w-xl w-full bg-gradient-to-br from-black/60 to-black/30 border border-white/10 rounded-2xl p-6 text-center">
+      <div className="max-w-3xl w-full bg-gradient-to-br from-black/60 to-black/30 border border-white/10 rounded-2xl p-6 text-center">
         <h1 className="text-3xl font-semibold text-indigo-300 mb-2">
           Match Result
         </h1>
@@ -38,13 +108,25 @@ export default function ResultPage() {
           </span>
         </div>
 
+        {/* Inline readiness panel (stay here, don't route to room) */}
+        <div className="bg-black/30 border border-white/10 rounded-xl p-4 mb-6 text-left">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-white/80 font-medium">Ready up for a rematch</h2>
+            <CustomButtonOne
+              text={isReady ? "Cancel" : "Replay"}
+              action={handleReplayToggle}
+              icon={isReady ? "mage:user-cross" : "mage:user-check"}
+            />
+          </div>
+          <PlayersInRoom
+            players={playersForList}
+            confirmedPlayers={confirmed}
+            playerId={playerId}
+            label
+          />
+        </div>
+
         <div className="flex items-center justify-center gap-3">
-          <Link
-            href={`/games/coding-war/${roomId}/match`}
-            className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition border border-indigo-500"
-          >
-            Replay
-          </Link>
           <Link
             href={`/games/coding-war/${roomId}`}
             className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition border border-white/10"
@@ -52,6 +134,11 @@ export default function ResultPage() {
             Go to Room
           </Link>
         </div>
+        {isRedirecting && (
+          <div className="mt-4">
+            <LoaderCard />
+          </div>
+        )}
       </div>
     </div>
   );
