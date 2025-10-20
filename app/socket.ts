@@ -3,14 +3,25 @@ import { io, Socket } from "socket.io-client";
 let socket: Socket | null = null;
 let codingWarSocket: Socket | null = null;
 
+// Resolve a single base URL for all sockets
+const getBaseUrl = () => {
+  // Prefer an explicit URL (e.g., http://localhost:3059)
+  const explicitUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (explicitUrl) return explicitUrl.replace(/\/$/, "");
+
+  // Else build from host + port
+  const port = process.env.NEXT_PUBLIC_API_PORT || "3059";
+  const host = typeof window !== "undefined" ? window.location.hostname : "localhost";
+  return `http://${host}:${port}`;
+};
+
 export const getSocket = () => {
   if (!socket) {
-    const port = process.env.REACT_APP_API_PORT || "3010";
-    const url = `http://localhost:${port}`;
+    const baseUrl = getBaseUrl();
 
-    console.log("🔌 Intentando conectar a:", url);
+    console.log("🔌 Intentando conectar a:", `${baseUrl}/rps`);
 
-    socket = io(`${url}/rps`, {
+    socket = io(`${baseUrl}/rps`, {
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: 5,
@@ -41,12 +52,27 @@ export const getSocket = () => {
 
 export const getCodingWarSocket = () => {
   if (!codingWarSocket) {
-    codingWarSocket = io("http://localhost:3010/coding-war", {
+    const baseUrl = getBaseUrl();
+    console.log("🔌 Intentando conectar a:", `${baseUrl}/coding-war`);
+    codingWarSocket = io(`${baseUrl}/coding-war`, {
       autoConnect: true,
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       transports: ["websocket", "polling"],
+    });
+
+    codingWarSocket.on("connect", () => {
+      console.log("✅ Conectado al servidor Coding War | Socket ID:", codingWarSocket?.id);
+    });
+
+    codingWarSocket.on("connect_error", (error: any) => {
+      console.error("❌ Error de conexión (Coding War):", error);
+    });
+
+    codingWarSocket.on("disconnect", (reason: string) => {
+      console.warn("⚠️ Desconectado (Coding War):", reason);
+      codingWarSocket = null;
     });
   }
   return codingWarSocket;
