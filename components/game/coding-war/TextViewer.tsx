@@ -9,7 +9,7 @@ import problems from "@/public/textTest.json";
 import { getCodingWarSocket } from "@/app/socket";
 import CustomButtonTwo from "./buttons/CustomButtonTwo";
 
-type Problem = { lang: string; code: string };
+type Problem = { lang: string; code: string; langColor?: string };
 
 export default function TextViewer({ roomId }: { roomId?: string }) {
   const router = useRouter();
@@ -18,12 +18,18 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const [problemIndex, setProblemIndex] = useState(0); // local player's current problem index
   const [code, setCode] = useState<string>(problemList[0]?.code || "");
   const [lang, setLang] = useState<string>(problemList[0]?.lang || "");
+  const [langColor, setLangColor] = useState<string>(
+    problemList[0]?.langColor || "text-green-400"
+  );
   const [opponentProblemIndex, setOpponentProblemIndex] = useState(0);
   const [opponentCode, setOpponentCode] = useState<string>(
     problemList[0]?.code || ""
   );
   const [opponentLang, setOpponentLang] = useState<string>(
     problemList[0]?.lang || ""
+  );
+  const [opponentLangColor, setOpponentLangColor] = useState<string>(
+    problemList[0]?.langColor || "text-green-400"
   );
   const [room, setRoom] = useState(roomId ?? "");
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
@@ -149,6 +155,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
             setProblemIndex(myIdx);
             const p = problemList[myIdx] ?? problemList[problemList.length - 1];
             setLang(p?.lang || "");
+            setLangColor(p?.langColor || "text-green-400");
             setCode(p?.code || "");
             // reset per-problem visuals but keep scores
             setCurrentLineP1(0);
@@ -175,6 +182,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
             const op =
               problemList[oppIdx] ?? problemList[problemList.length - 1];
             setOpponentLang(op?.lang || "");
+            setOpponentLangColor(op?.langColor || "text-green-400");
             setOpponentCode(op?.code || "");
             // reset opponent visuals only
             if (role === "P2") {
@@ -584,11 +592,15 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           >
             <div aria-hidden="true" />
             <div className="whitespace-pre-wrap break-words relative overflow-hidden">
-              {chars.slice(indentLen).map((char, idx) => (
-                <span key={idx} className={coloredLines[i][idx + indentLen]}>
-                  {char}
-                </span>
-              ))}
+              {chars.slice(indentLen).map((char, idx) => {
+                const cls = coloredLines[i][idx + indentLen];
+                const applied = cls === "text-green-400" ? langColor : cls;
+                return (
+                  <span key={idx} className={applied}>
+                    {char}
+                  </span>
+                );
+              })}
               {isPerfectLine && (
                 <motion.div
                   initial={{ x: "-100%", opacity: 0.5 }}
@@ -623,9 +635,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
                     return (
                       <span
                         key={idx}
-                        className={
-                          isCorrect ? "text-green-400" : "text-red-400"
-                        }
+                        className={isCorrect ? langColor : "text-red-400"}
                       >
                         {char}
                       </span>
@@ -692,11 +702,15 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           >
             <div aria-hidden="true" />
             <div className="whitespace-pre-wrap break-words relative overflow-hidden">
-              {chars.slice(indentLen).map((char, idx) => (
-                <span key={idx} className={coloredLines[i][idx + indentLen]}>
-                  {char}
-                </span>
-              ))}
+              {chars.slice(indentLen).map((char, idx) => {
+                const cls = coloredLines[i][idx + indentLen];
+                const applied = cls === "text-green-400" ? opponentLangColor : cls;
+                return (
+                  <span key={idx} className={applied}>
+                    {char}
+                  </span>
+                );
+              })}
               {isPerfectLine && (
                 <motion.div
                   initial={{ x: "-100%", opacity: 0.5 }}
@@ -732,7 +746,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
                       <span
                         key={idx}
                         className={
-                          isCorrect ? "text-green-400" : "text-red-400"
+                          isCorrect ? opponentLangColor : "text-red-400"
                         }
                       >
                         {char}
@@ -859,6 +873,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         problemList[data.problemIndex] ?? problemList[problemList.length - 1];
       setProblemIndex(data.problemIndex);
       setLang(p?.lang || "");
+      setLangColor(p?.langColor || "text-green-400");
       setCode(p?.code || "");
       // reset per-problem visuals
       setCurrentLineP1(0);
@@ -972,7 +987,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
               <div className="text-xs text-white/60 mb-2 justify-between flex">
                 {role === "P2" ? "Player 2" : "Player 1"}
                 <span className="ml-4">
-                  Lang: <span className="text-emerald-400">{lang}</span>
+                  Lang: <span className={`${langColor}`}>{lang}</span>
                 </span>
               </div>
 
@@ -1110,8 +1125,11 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         <div className="col-span-6">
           <section className="flex flex-col">
             <div className="rounded-lg overflow-hidden border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-3">
-              <div className="text-xs text-white/60 mb-2">
+              <div className="text-xs text-white/60 mb-2 flex justify-between">
                 {role === "P2" ? "Player 1" : "Player 2"}
+                <span className="ml-4">
+                  Lang: <span className={`${opponentLangColor}`}>{opponentLang}</span>
+                </span>
               </div>
               <pre className="bg-transparent p-3 rounded-md overflow-auto text-sm whitespace-pre-wrap break-words font-mono">
                 {role === "P2"

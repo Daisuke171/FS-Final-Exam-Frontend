@@ -1,10 +1,32 @@
 [
   {
     "lang": "cpp",
+    "langColor": "text-indigo-400",
     "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    long factorial = 1.0;\n\n    cout << \"Enter a positive integer: \";\n    cin >> n;\n\n    if (n < 0)\n        cout << \"Error! Factorial of a negative number doesn't exist.\";\n    else {\n        for(int i = 1; i <= n; ++i) {\n            factorial *= i;\n        }\n        cout << \"Factorial of \" << n << \" = \" << factorial;\n    }\n\n    return 0;\n}"
   },
   {
     "lang": "js",
+    "langColor": "text-yellow-400",
     "code": "function sum(arr){\n  let s = 0;\n  for(let i=0;i<arr.length;i++){\n    s += arr[i];\n  }\n  return s;\n}\n\nconsole.log(sum([1,2,3,4]));"
+  },
+  {
+    "lang": "ts",
+    "langColor": "text-sky-400",
+    "code": "function sum(arr: number[]): number {\n  let s = 0;\n  for (let i = 0; i < arr.length; i++) {\n    s += arr[i];\n  }\n  return s;\n}\n\nconsole.log(sum([1, 2, 3, 4]));"
+  },
+  {
+    "lang": "java",
+    "langColor": "text-orange-400",
+    "code": "public class Main {\n  public static int sum(int[] arr){\n    int s = 0;\n    for(int i = 0; i < arr.length; i++){\n      s += arr[i];\n    }\n    return s;\n  }\n  public static void main(String[] args){\n    int[] nums = {1,2,3,4};\n    System.out.println(sum(nums));\n  }\n}"
+  },
+  {
+    "lang": "c#",
+    "langColor": "text-purple-400",
+    "code": "using System;\n\nclass Program {\n  static int Sum(int[] arr) {\n    int s = 0;\n    for (int i = 0; i < arr.Length; i++) {\n      s += arr[i];\n    }\n    return s;\n  }\n\n  static void Main() {\n    int[] nums = {1,2,3,4};\n    Console.WriteLine(Sum(nums));\n  }\n}"
+  },
+  {
+    "lang": "c",
+    "langColor": "text-cyan-400",
+    "code": "#include <stdio.h>\n\nint sum(int arr[], int len) {\n  int s = 0;\n  for (int i = 0; i < len; i++) {\n    s += arr[i];\n  }\n  return s;\n}\n\nint main() {\n  int nums[] = {1,2,3,4};\n  int len = sizeof(nums)/sizeof(nums[0]);\n  printf(\"%d\\n\", sum(nums, len));\n  return 0;\n}"
   }
 ]
