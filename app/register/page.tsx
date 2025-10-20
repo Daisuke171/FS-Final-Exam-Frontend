@@ -1,9 +1,6 @@
-import RegisterForm from '@/components/register/RegisterForm'
+"use client";
+import RegisterApp from '../../components/register/RegisterApp';
 
 export default function RegisterPage() {
-  return (
-    <main >
-      <RegisterForm />
-    </main>
-  )
+    return <RegisterApp />;
 }
