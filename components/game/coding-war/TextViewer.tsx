@@ -8,6 +8,7 @@ import { useSocketContext } from "@/app/games/coding-war/provider/SocketContext"
 import problems from "@/public/textTest.json";
 import { getCodingWarSocket } from "@/app/socket";
 import CustomButtonTwo from "./buttons/CustomButtonTwo";
+import OpponentDisconnectedModal from "./modals/OpponentDisconnectedModal";
 
 type Problem = { lang: string; code: string };
 
@@ -27,6 +28,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   );
   const [room, setRoom] = useState(roomId ?? "");
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
+  const prevConnectedRef = useRef<string[]>([]);
+  const [opponentDisconnected, setOpponentDisconnected] = useState(false);
   const [selfId, setSelfId] = useState<string | null>(null);
   const [role, setRole] = useState<"P1" | "P2" | "spectator">("spectator");
   const [opponentId, setOpponentId] = useState<string | null>(null);
@@ -121,7 +124,20 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       result?: any;
     }) => {
       if (state?.players && Array.isArray(state.players)) {
-        setConnectedUsers(state.players);
+        // detect disconnect: if previously had 2 and now less than 2, or opponent missing
+        const prev = prevConnectedRef.current;
+        const now = state.players;
+        setConnectedUsers(now);
+        // compute removed IDs robustly
+        const removed = prev.filter((id) => !now.includes(id));
+        // keep a snapshot, not the same reference
+        prevConnectedRef.current = [...now];
+        if (removed.length > 0) {
+          // trigger when someone other than me left, or if we cannot resolve self yet
+          if (!selfId || removed.some((id) => id !== selfId)) {
+            setOpponentDisconnected(true);
+          }
+        }
         // Determine role based on join order
         if (selfId) {
           const idx = state.players.indexOf(selfId);
@@ -960,6 +976,11 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
 
   return (
     <div className="w-full">
+      <OpponentDisconnectedModal
+        open={opponentDisconnected}
+        onClose={() => setOpponentDisconnected(false)}
+        onGoToRoom={() => router.push(`/games/coding-war/${room}`)}
+      />
       {/* Room info */}
       <div className="w-full flex justify-between mb-4">
         <div className="border border-white/10 bg-gradient-to-br from-black/50 to-black/30 p-4">
