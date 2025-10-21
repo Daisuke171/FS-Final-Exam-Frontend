@@ -77,6 +77,12 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     const onGameOver = (data: { winner?: string | null; finalScores?: Record<string, number> }) => {
       // Authoritative end-of-match signal from server
       setEnded(true);
+      // Stop local fallback and future ticks to pause the clock display
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      s.off("timerTick", onTimerTick);
       // Optional: sync scores from server if provided
       if (data?.finalScores && connectedUsers.length) {
         const [p1Id, p2Id] = connectedUsers;
@@ -136,6 +142,13 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           // trigger when someone other than me left, or if we cannot resolve self yet
           if (!selfId || removed.some((id) => id !== selfId)) {
             setOpponentDisconnected(true);
+            // Pause timer immediately when match ends due to disconnect
+            setEnded(true);
+            if (timerRef.current) {
+              clearInterval(timerRef.current);
+              timerRef.current = null;
+            }
+            s.off("timerTick", onTimerTick);
           }
         }
         // Determine role based on join order
