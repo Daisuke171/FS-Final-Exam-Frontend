@@ -790,6 +790,24 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
 
   // === RENDER UI ===
 
+  // Leave handler: mark not ready, disconnect socket, cleanup timers, navigate out
+  const handleLeave = () => {
+    try {
+      const s = getCodingWarSocket();
+      if (room) s.emit("confirmReady", { roomId: room, ready: false });
+      // Disconnect from Coding War namespace so server cleans up membership
+      s.disconnect();
+    } catch {}
+    // Cleanup local timers
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    if (redirectCountdownRef.current) clearInterval(redirectCountdownRef.current);
+    // Optionally reset context state
+    leave?.("coding-war");
+    // Navigate back to game hub
+    router.push("/games/coding-war");
+  };
+
   // Listen to opponent updates
   useEffect(() => {
     const s = getCodingWarSocket();
@@ -956,7 +974,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
             icon="iconamoon:enter"
             full
             size="md"
-            onClick={() => leave("main")}
+            onClick={handleLeave}
           />
         </div>
       </div>
