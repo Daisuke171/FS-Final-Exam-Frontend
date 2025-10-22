@@ -10,37 +10,31 @@ import { SkinWithStatus } from "@/types/user.types";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { Icon } from "@iconify/react";
 import { motion } from "motion/react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function ChangeAvatar({
   closeModal,
-  userId,
 }: {
   closeModal: () => void;
-  userId: string;
 }) {
+  const { data: session, update } = useSession();
   const [selectedSkinId, setSelectedSkinId] = useState<string | null>(null);
 
   // Esta query trae todas las skins más el status (si esta activa, bloqueada o desbloqueada)
   const { data: skinsData, loading: skinsLoading } = useQuery<{
     userSkinsWithStatus: SkinWithStatus[];
-  }>(GET_USER_SKINS_WITH_STATUS, {
-    variables: {
-      userId,
-    },
-  });
+  }>(GET_USER_SKINS_WITH_STATUS);
 
   // Mutation para cambiar el skin activa
   const [activateSkin, { loading: activating }] = useMutation(ACTIVATE_SKIN, {
     refetchQueries: [
       {
         query: GET_USER_SKINS_WITH_STATUS,
-        variables: { userId },
       },
       {
         query: GET_ME,
-        variables: { userId },
       },
     ],
     awaitRefetchQueries: true,
@@ -50,15 +44,10 @@ export default function ChangeAvatar({
     onError: (error) => {
       alert(error.message);
     },
-    variables: {
-      userId,
-    },
   });
 
   const skins = skinsData?.userSkinsWithStatus;
 
-  // Esto pone el skin activo como skin seleccionado, para que se muestre en el preview apenas
-  // se abre el modal
   useEffect(() => {
     if (skins && !selectedSkinId) {
       const activeSkin = skins.find((s) => s.isActive);
@@ -78,6 +67,24 @@ export default function ChangeAvatar({
 
     try {
       await activateSkin({ variables: { skinId: selectedSkinId } });
+
+      const selectedSkin = skins?.find((skin) => skin.id === selectedSkinId);
+      const newAvatarUrl = `${selectedSkin?.img}?v=${Date.now()}`;
+
+      if (selectedSkin?.img) {
+        await update({
+          user: {
+            avatar: selectedSkin.img,
+          },
+        });
+
+        console.log("✅ Avatar actualizado en sesión:", selectedSkin.img);
+        window.dispatchEvent(
+          new CustomEvent("avatarChanged", {
+            detail: { avatar: selectedSkin.img },
+          })
+        );
+      }
     } catch (error) {
       console.error("Error activating skin:", error);
     }
@@ -96,7 +103,9 @@ export default function ChangeAvatar({
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, y: -20 }}
-        className="fixed top-1/2 w-190 flex max-w-[95%] max-h-[98vh] items-top border border-dark-gray bg-white/7 rounded-2xl pr-2 p-6 md:p-8 lg:p-10 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
+        className="fixed top-1/2 w-190 flex max-w-[95%] max-h-[98vh] items-top border border-dark-gray
+         bg-white/7 rounded-2xl pr-2 p-6 md:p-8 lg:p-10 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+          z-100"
       >
         <div className="w-full flex flex-col sm:flex-row gap-10 sm:gap-15 overflow-y-auto custom-scrollbar pr-4">
           <div className="flex flex-col items-center gap-5">
@@ -255,7 +264,7 @@ export default function ChangeAvatar({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={closeModal}
-        className="fixed w-full h-full top-0 left-0 bg-black/80 backdrop-blur-md z-10"
+        className="fixed w-full h-full top-0 left-0 bg-black/80 backdrop-blur-md z-99"
       ></motion.div>
     </>
   );
