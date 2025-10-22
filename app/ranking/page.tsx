@@ -61,7 +61,7 @@ export default function Ranking() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen items-center mb-10">
+      <div className="flex flex-col min-h-screen items-center mb-10 mt-[75px]">
         <RankingHeader
           filter={filter}
           setFilter={setFilter}
@@ -78,7 +78,7 @@ export default function Ranking() {
 
   if (error) {
     return (
-      <div className="flex flex-col min-h-screen items-center mb-10">
+      <div className="flex flex-col min-h-screen items-center mb-10 mt-[75px]">
         <RankingHeader
           filter={filter}
           setFilter={setFilter}
@@ -99,12 +99,12 @@ export default function Ranking() {
 
   if (entries.length < 3) {
     return (
-      <div className="flex flex-col min-h-screen items-center mb-10">
+      <div className="flex flex-col min-h-screen items-center mb-10 mt-[75px]">
         <RankingHeader
           filter={filter}
           setFilter={setFilter}
         />
-        <div className="h-screen w-full flex justify-center items-center max-w-[95%]">
+        <div className="h-screen w-full flex justify-center items-center max-w-[95%] -mt-12">
           <div className="flex flex-col items-center p-6 md:p-8 lg:p-10 bg-white/7  rounded-xl">
             <Icon
               icon="solar:ranking-line-duotone"
@@ -128,12 +128,12 @@ export default function Ranking() {
   const restOfUsers = leaderboard.entries.slice(3);
 
   return (
-    <div className="flex flex-col min-h-screen items-center mb-10">
+    <div className="flex flex-col min-h-screen items-center mb-10 mt-[75px]">
       <RankingHeader
         filter={filter}
         setFilter={setFilter}
       />
-      <div className="mt-45 w-full flex justify-center">
+      <div className="mt-55 w-full flex justify-center">
         <TopThree
           key={filter}
           firstPlace={firstPlace}
