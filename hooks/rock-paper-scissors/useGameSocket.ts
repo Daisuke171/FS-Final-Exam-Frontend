@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { getSocket } from "@/app/socket";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { XpDataMap, XpDataProps } from "@/types/rock-paper-scissors/CardProps";
+import { XpDataMap } from "@/types/rock-paper-scissors/CardProps";
+import { useSession } from "next-auth/react";
+import { Socket } from "socket.io-client";
 
 interface PlayedMovements {
   id: string;
@@ -46,34 +48,76 @@ export function useGameSocket(roomId: string | string[]) {
   const [showXp, setShowXp] = useState(false);
   const [xpData, setXpData] = useState<XpDataMap | null>(null);
   const [gameWinner, setGameWinner] = useState<string | null>(null);
+  const [playerNickname, setPlayerNickname] = useState<string | null>(null);
   const [showBattleAnimation, setShowBattleAnimation] =
     useState<boolean>(false);
   const [battleStage, setBattleStage] = useState<
     "moves" | "impact" | "damage" | "complete"
   >("moves");
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const socketRef = useRef(getSocket());
+  const socketRef = useRef<Socket | null>(null);
   const isAnimatingHealthRef = useRef(false);
   const previousHealthRef = useRef<PlayerHealth>({});
   const router = useRouter();
   const currentPathname = usePathname();
+  const { data: session, status } = useSession();
 
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
+  useEffect(() => {
+    if (status === "loading") return; // Esperar a que cargue la sesión
+    if (!session?.accessToken) {
+      console.warn("No hay token de autenticación");
+      return;
+    }
+
+    const socket = getSocket(session.accessToken);
+    socketRef.current = socket;
+
+    socket.on("connect", () => {
+      console.log("✅ Socket conectado:", socket.id);
+    });
+
+    socket.on("authenticated", (data) => {
+      console.log("✅ Autenticado como:", data.nickname);
+    });
+
+    return () => {
+      socketRef.current = null;
+    };
+  }, [session?.accessToken, status]);
 
   useEffect(() => {
     const socket = socketRef.current;
 
-    if (roomId) {
+    if (!socket || !roomId) return;
+
+    if (socket.connected) {
       setTimeout(() => {
         socket.emit("playerReadyForMatch", { roomId });
       }, 10);
+    } else {
+      socket.once("connect", () => {
+        setTimeout(() => {
+          socket.emit("playerReadyForMatch", { roomId });
+        }, 10);
+      });
     }
 
-    setPlayerId(socket.id);
+    const handleAuthenticated = (data: {
+      nickname: string;
+      socketId: string;
+    }) => {
+      console.log("✅ Autenticado como:", data.nickname);
+      setPlayerNickname(data.nickname); // ← Guardar el nickname
+      setPlayerId(data.socketId);
+    };
+
+    socket.on("authenticated", handleAuthenticated);
 
     socket.on("gameState", async (data) => {
       setPlayers(data.players.map((id: string) => ({ id })));
+      console.log(`Jugadores en sala: ${data.players}`);
       if (!isAnimatingHealthRef.current) {
         setPlayerHealth(data.hp);
       }
@@ -227,6 +271,7 @@ export function useGameSocket(roomId: string | string[]) {
       socket.off("joinRoomError");
       socket.off("joinRoomSuccess");
       socket.off("isPrivate");
+      socket.off("authenticated");
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -247,7 +292,7 @@ export function useGameSocket(roomId: string | string[]) {
     if (selectedMove === null) return;
     setConfirmed(true);
     setDisableCards(true);
-    socketRef.current.emit("makeMove", {
+    socketRef?.current?.emit("makeMove", {
       roomId,
       move: selectedMove,
     });
@@ -258,7 +303,7 @@ export function useGameSocket(roomId: string | string[]) {
     setConfirmed(false);
     setClicked(null);
     setSelectedMove(null);
-    socketRef.current.emit("confirmReady", { roomId });
+    socketRef?.current?.emit("confirmReady", { roomId });
   };
 
   const handleJoinRoomById = () => {
@@ -270,7 +315,7 @@ export function useGameSocket(roomId: string | string[]) {
       setError("El campo no puede estar vacío");
       return;
     }
-    socketRef.current.emit("joinRoom", { roomId });
+    socketRef?.current?.emit("joinRoom", { roomId });
   };
 
   const handleJoinRoomByPassword = () => {
@@ -282,7 +327,7 @@ export function useGameSocket(roomId: string | string[]) {
       setError("El campo no puede estar vacío");
       return;
     }
-    socketRef.current.emit("joinRoom", { roomId, password });
+    socketRef?.current?.emit("joinRoom", { roomId, password });
   };
 
   return {
@@ -320,5 +365,8 @@ export function useGameSocket(roomId: string | string[]) {
     xpData,
     showXp,
     setShowXp,
+    isLoading: status === "loading",
+    isAuthenticated: !!session,
+    playerNickname,
   };
 }
