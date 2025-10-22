@@ -7,19 +7,12 @@ import StatCard, { StatCardProps } from "../../cards/profile/StatCard";
 import { Icon } from "@iconify/react";
 
 export default function ProfileHeaderStats({
-  userId,
   responsive,
 }: {
-  userId: string;
   responsive?: boolean;
 }) {
   const { loading, error, data } = useQuery<{ userStats: UserStats }>(
-    GET_USER_BASIC_STATS,
-    {
-      variables: {
-        userId,
-      },
-    }
+    GET_USER_BASIC_STATS
   );
 
   const setClasses = responsive

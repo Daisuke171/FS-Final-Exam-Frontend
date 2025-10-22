@@ -8,6 +8,7 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import CustomButtonOne from "../buttons/CustomButtonOne";
 import CustomCheckbox from "../inputs/checkbox/CustomCheckbox";
+import { useSession } from "next-auth/react";
 
 const formSchema = z
   .object({
@@ -29,13 +30,13 @@ const formSchema = z
 
 type FormData = z.infer<typeof formSchema>;
 
-const socket = getSocket();
-
 export default function CreateRoomModal({
   setCloseModal,
 }: {
   setCloseModal: () => void;
 }) {
+  const { data: session } = useSession();
+  const socket = getSocket(session?.user?.accessToken);
   const [formData, setFormData] = useState<FormData>({
     roomName: "",
     isPrivate: false,

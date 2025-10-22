@@ -4,8 +4,7 @@ import CustomTextInput from "../inputs/text/CustomTextInput";
 import { useEffect, useState, useRef } from "react";
 import { getSocket } from "@/app/socket";
 import { motion } from "motion/react";
-
-const socket = getSocket();
+import { useSession } from "next-auth/react";
 
 interface LogsProps {
   id: string;
@@ -27,12 +26,14 @@ interface ChatMessage {
 export default function ChatComponent({
   roomId,
   players,
-  playerId,
+  playerNickname,
 }: {
   roomId: string | string[];
   players: { id: string }[];
-  playerId: string | undefined;
+  playerNickname: string | undefined;
 }) {
+  const { data: session } = useSession();
+  const socket = getSocket(session?.user?.accessToken);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [logs, setLogs] = useState<LogsProps[]>([]);
   const [previousPlayerIds, setPreviousPlayerIds] = useState<Set<string>>(
@@ -40,6 +41,7 @@ export default function ChatComponent({
   );
   const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  console.log(`📦 ChatComponent renderizado: ${players}`);
 
   const allItems: ChatItem[] = [...logs, ...messages].sort((a, b) => {
     const timeA =
@@ -69,6 +71,14 @@ export default function ChatComponent({
   }, [messages, logs]);
 
   useEffect(() => {
+    socket.on("roomChatMessages", (data: ChatMessage) => {
+      console.log("💬 Mensaje recibido:", data);
+    });
+  }, []);
+  useEffect(() => {
+    console.log("🧠 playerNickname en el cliente:", playerNickname);
+  }, [playerNickname]);
+  useEffect(() => {
     const handleRoomChatMessages = (data: ChatMessage) => {
       console.log("Received messages:", data);
       setMessages((prev) => [...prev, data]);
@@ -82,19 +92,20 @@ export default function ChatComponent({
   }, []);
 
   useEffect(() => {
-    if (!isInitialized && playerId) {
+    if (!isInitialized && playerNickname) {
       setLogs([
         {
-          id: `${playerId}-join-${Date.now()}`,
-          playerId: playerId,
+          id: `${playerNickname}-join-${Date.now()}`,
+          playerId: playerNickname,
           type: "join",
           timestamp: Date.now(),
         },
       ]);
       setPreviousPlayerIds(new Set(players.map((p) => p.id)));
+      console.log(`Jugadores previos: ${previousPlayerIds}`);
       setIsInitialized(true);
     }
-  }, [playerId, isInitialized, players]);
+  }, [playerNickname, isInitialized, players]);
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -102,7 +113,7 @@ export default function ChatComponent({
     const currentPlayerIds = new Set(players.map((p) => p.id));
 
     players.forEach((player) => {
-      if (!previousPlayerIds.has(player.id) && player.id !== playerId) {
+      if (!previousPlayerIds.has(player.id) && player.id !== playerNickname) {
         setLogs((prev) => [
           ...prev,
           {
@@ -130,7 +141,7 @@ export default function ChatComponent({
     });
 
     setPreviousPlayerIds(currentPlayerIds);
-  }, [players, isInitialized]);
+  }, [players, isInitialized, playerNickname]);
 
   const handleSendMessage = () => {
     const input = document.querySelector(
@@ -173,12 +184,13 @@ export default function ChatComponent({
   const renderItem = (item: ChatItem, index: number) => {
     if (item.type === "join" || item.type === "leave") {
       const log = item as LogsProps;
+      console.log(`Player ID del LOG: ${log.playerId}`);
       const text =
         log.type === "join"
-          ? log.playerId === playerId
+          ? log.playerId === playerNickname
             ? "Te has unido a la sala"
             : `${log.playerId} se ha unido a la sala`
-          : log.playerId === playerId
+          : log.playerId === playerNickname
           ? "Te has desconectado"
           : `${log.playerId} se ha desconectado`;
 
@@ -186,7 +198,7 @@ export default function ChatComponent({
         <div
           key={log.id}
           className={`px-4 ${
-            log.playerId === playerId
+            log.playerId === playerNickname
               ? "text-hover-purple"
               : log.type === "leave"
               ? "text-error"
@@ -205,7 +217,7 @@ export default function ChatComponent({
           exit={{ opacity: 0, y: -10 }}
           key={`${message.timestamp}-${index}`}
           className={`py-1 rounded-lg flex ${
-            message.playerId === playerId
+            message.playerId === playerNickname
               ? "text-font bg-light-purple rounded-br-none place-self-end"
               : "text-font bg-background rounded-bl-none place-self-start"
           }`}
@@ -221,7 +233,7 @@ export default function ChatComponent({
     }
   };
   return (
-    <div className="w-2/7 h-[30rem] flex flex-col border-2 border-light-gray rounded-xl">
+    <div className="w-2/7  flex flex-col border-2 border-light-gray rounded-xl">
       <div className="bg-background rounded-t-xl">
         <h2 className="text-2xl font-bold p-4  text-slate-200">Chat</h2>
       </div>

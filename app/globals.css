@@ -2,7 +2,7 @@
 
 :root {
   /* -------------------- COLORES -------------------- */
-  
+
   /* Background colors for gradient */
   --background-gradient-1: oklch(0.2088 0.0988 271.67);
   --background-gradient-2: oklch(0.1889 0.087 275.96);
@@ -69,7 +69,7 @@
   --shadow-error: oklch(43.462% 0.14204 26.215);
   --dark-error: oklch(23.903% 0.07386 24.652);
   --transparent-error: oklch(43.462% 0.14204 26.215 / 0.205);
-  
+
   /* Navbar background */
   --navbar-bg: oklch(0.144 0.061 320.8 / 0.8);
   /* Glow funcional */
@@ -258,7 +258,12 @@ body {
 
 /* Fondo total de la página */
 body {
-  background: radial-gradient(circle at center, var(--background-gradient-1) 0%, var(--background-gradient-2) 25%, var(--background-gradient-3) 60%);
+  background: radial-gradient(
+    circle at center,
+    var(--background-gradient-1) 0%,
+    var(--background-gradient-2) 25%,
+    var(--background-gradient-3) 60%
+  );
   min-height: 100vh;
 }
 
@@ -280,14 +285,13 @@ body {
     transform: translateX(-50%);
   }
 }
-  
+
 /* Barra inferior móvil */
 .bottom-bar-mobile {
-  @apply fixed bottom-0 left-0 w-full flex justify-around p-2 border-t;
+  @apply fixed bottom-0 left-0 w-full flex justify-around p-2 border-t backdrop-blur-md;
   background-color: var(--navbar-bg);
   border-color: var(--light-gray);
-  box-shadow: 0 -4px 16px var(--shadow-blue);
-  z-index: 50;
+  z-index: 40;
 }
 
 .bottom-bar-mobile a {
@@ -296,8 +300,8 @@ body {
 
 .bottom-bar-mobile a:hover {
   /* Sombra de texto brillante celeste (modificación final) */
-  text-shadow: 0 0 6px rgba(76, 201, 240, 0.8), 0 0 10px rgba(76, 201, 240, 0.4); 
-  transition: text-shadow 0.3s ease-in-out; 
+  text-shadow: 0 0 6px rgba(76, 201, 240, 0.8), 0 0 10px rgba(76, 201, 240, 0.4);
+  transition: text-shadow 0.3s ease-in-out;
 }
 
 @media screen and (min-width: 768px) {
@@ -317,9 +321,7 @@ body {
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1.5rem;
-  box-shadow:
-    0 6px 12px var(--navbar-bg),
-    0 4px 8px var(--navbar-glow);
+  box-shadow: 0 6px 12px var(--navbar-bg), 0 4px 8px var(--navbar-glow);
 }
 
 .favorites-box-title {
@@ -335,7 +337,7 @@ body {
 .favorites-button {
   flex: 1;
   height: 6rem;
-  background-color: rgba(255,255,255,0.2);
+  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
@@ -348,8 +350,7 @@ body {
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow:
-    0 0 20px rgba(173, 216, 230, 0.25),
+  box-shadow: 0 0 20px rgba(173, 216, 230, 0.25),
     inset 0 0 10px rgba(255, 255, 255, 0.1);
   border-radius: 1rem;
   transition: all 0.3s ease;
@@ -357,8 +358,7 @@ body {
 
 /* Hover con brillo */
 .glass-glow:hover {
-  box-shadow:
-    0 0 20px rgba(76, 201, 240, 0.4),
+  box-shadow: 0 0 20px rgba(76, 201, 240, 0.4),
     inset 0 0 12px rgba(255, 255, 255, 0.1);
   transform: scale(1.01);
 }
@@ -389,15 +389,15 @@ body {
   border-radius: 6px;
   transition: all 0.2s ease-in-out;
   /* El glow base ahora usa la variable celeste */
-  box-shadow: 0 0 6px var(--navbar-glow); 
+  box-shadow: 0 0 6px var(--navbar-glow);
 }
 
 .btn-glow:hover {
   /* El fondo se hace más visible */
-  background-color: rgba(76, 201, 240, 0.35); 
+  background-color: rgba(76, 201, 240, 0.35);
   color: white;
   /* El glow intenso usa un celeste brillante */
-  box-shadow: 0 0 12px rgba(76, 201, 240, 0.8), 0 0 20px rgba(76, 201, 240, 0.4); 
+  box-shadow: 0 0 12px rgba(76, 201, 240, 0.8), 0 0 20px rgba(76, 201, 240, 0.4);
   transform: scale(1.05);
 }
 
@@ -408,12 +408,13 @@ body {
 
 /* Brillo Celeste para Hover */
 .hover-blue-glow:hover {
-    text-shadow: 0 0 6px rgba(76, 201, 240, 0.8), 0 0 10px rgba(76, 201, 240, 0.4);
-    transition: text-shadow 0.3s ease-in-out; 
+  text-shadow: 0 0 6px rgba(76, 201, 240, 0.8), 0 0 10px rgba(76, 201, 240, 0.4);
+  transition: text-shadow 0.3s ease-in-out;
 }
 
 /* Brillo Dorado para Hover */
 .hover-gold-glow:hover {
-    text-shadow: 0 0 6px rgba(253, 230, 138, 0.8), 0 0 10px rgba(253, 230, 138, 0.4);
-    transition: text-shadow 0.3s ease-in-out;
-   }
+  text-shadow: 0 0 6px rgba(253, 230, 138, 0.8),
+    0 0 10px rgba(253, 230, 138, 0.4);
+  transition: text-shadow 0.3s ease-in-out;
+}

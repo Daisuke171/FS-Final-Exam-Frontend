@@ -16,20 +16,10 @@ import StatsLayout from "@/components/layout/profile/stats-layout";
 
 const games = 10;
 
-export default function StatsComponent({
-  margin,
-  userId,
-}: {
-  margin?: boolean;
-  userId: string;
-}) {
+export default function StatsComponent({ margin }: { margin?: boolean }) {
   const { loading, error, data } = useQuery<{ userStats: UserStats }>(
     GET_USER_STATS,
-    {
-      variables: {
-        userId,
-      },
-    }
+    {}
   );
 
   if (loading)

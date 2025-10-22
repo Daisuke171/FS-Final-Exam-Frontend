@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_USER_GAMES = gql`
-  query GetUserGames($userId: ID!, $gameId: ID) {
-    userGames(userId: $userId, gameId: $gameId) {
+  query GetUserGames($gameId: ID) {
+    userGames(gameId: $gameId) {
       id
       duration
       state
@@ -54,8 +54,8 @@ export const GET_GLOBAL_LEADERBOARD = gql`
 `;
 
 export const GET_USER_STATS = gql`
-  query GetUserStats($userId: ID!, $gameId: ID) {
-    userStats(userId: $userId, gameId: $gameId) {
+  query GetUserStats($gameId: ID) {
+    userStats(gameId: $gameId) {
       winRate
       totalTime
       highScore
@@ -71,8 +71,8 @@ export const GET_USER_STATS = gql`
 `;
 
 export const GET_USER_BASIC_STATS = gql`
-  query GetUserStats($userId: ID!, $gameId: ID) {
-    userStats(userId: $userId, gameId: $gameId) {
+  query GetUserStats($gameId: ID) {
+    userStats(gameId: $gameId) {
       totalGames
       totalWins
       totalLosses
@@ -82,8 +82,8 @@ export const GET_USER_BASIC_STATS = gql`
 `;
 
 export const GET_USER_FAVORITES = gql`
-  query GetUserFavorites($userId: ID!) {
-    userFavorites(userId: $userId) {
+  query GetUserFavorites {
+    userFavorites {
       id
       createdAt
       game {

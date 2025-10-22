@@ -2,13 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Navbar from "@/components/ui/general/landing-page/Navbar";
-
-const MOCK_NAV_PROPS = {
-  username: "Nombre",
-  avatar: "/default-pfp.jpg",
-  users: 124,
-};
 
 const games = [
   {
@@ -32,8 +25,7 @@ const games = [
 export default function GamesHub() {
   return (
     <>
-      <Navbar {...MOCK_NAV_PROPS} />
-      <div className="min-h-screen bg-gradient-one pt-20 pb-16">
+      <div className="min-h-screen bg-gradient-one pt-[calc(75px+2.5rem)] pb-16">
         <div className="max-w-6xl mx-auto px-4">
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-font">Juegos</h1>
@@ -69,9 +61,7 @@ export default function GamesHub() {
                   <h2 className="text-lg font-semibold text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]">
                     {g.title}
                   </h2>
-                  <p className="text-sm text-white/80">
-                    {g.description}
-                  </p>
+                  <p className="text-sm text-white/80">{g.description}</p>
                 </div>
               </Link>
             ))}

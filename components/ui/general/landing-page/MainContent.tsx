@@ -5,7 +5,7 @@ import NotificationActionButton from "../../buttons/landing-page/NotificationAct
 
 export default function MainContent() {
   return (
-    <div className="w-full flex justify-center px-2 md:px-6 lg:px-0 pt-20 md:pt-24 lg:pt-20 pb-24 md:pb-0">
+    <div className="w-full flex justify-center mt-10 px-2 md:px-6 lg:px-0 pt-20 md:pt-24 lg:pt-20 pb-24 md:pb-0">
       <div
         className="w-full max-w-[900px] lg:max-w-4xl xl:max-w-6xl 
                    flex flex-col items-center space-y-6 relative z-10"

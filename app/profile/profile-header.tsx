@@ -38,12 +38,8 @@ const cards: StatCardProps[] = [
   },
 ];
 
-export default function ProfileHeader({ userId }: { userId: string }) {
-  const { data, loading, error } = useQuery<{ me: User }>(GET_ME, {
-    variables: {
-      userId,
-    },
-  });
+export default function ProfileHeader() {
+  const { data, loading, error } = useQuery<{ me: User }>(GET_ME, {});
   const user = data?.me;
   const [open, setOpen] = useState(false);
 
@@ -66,20 +62,12 @@ export default function ProfileHeader({ userId }: { userId: string }) {
             error={error}
             loading={loading}
           />
-          <ProfileHeaderStats userId={userId} />
+          <ProfileHeaderStats />
         </div>
-        <ProfileHeaderStats
-          userId={userId}
-          responsive
-        />
+        <ProfileHeaderStats responsive />
       </section>
       <AnimatePresence>
-        {open && (
-          <ChangeAvatar
-            userId={userId}
-            closeModal={handleModalOpen}
-          />
-        )}
+        {open && <ChangeAvatar closeModal={handleModalOpen} />}
       </AnimatePresence>
     </>
   );

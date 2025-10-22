@@ -3,6 +3,7 @@
 import { GameFilter } from "@/app/ranking/page";
 import CustomSelect from "../../inputs/CustomSelect";
 import { motion } from "motion/react";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 
 export default function RankingHeader({
   filter,
@@ -11,6 +12,7 @@ export default function RankingHeader({
   filter: GameFilter;
   setFilter: (filter: GameFilter) => void;
 }) {
+  const { isVisible } = useScrollDirection({ threshold: 80, topOffset: 10 });
   const filterOptions: { label: string; value: GameFilter }[] = [
     { label: "General", value: "general" },
     { label: "Rock Paper Scissors", value: "rockPaperScissors" },
@@ -18,13 +20,18 @@ export default function RankingHeader({
     { label: "Tic Tac Toe", value: "ticTacToe" },
   ];
   return (
-    <header className="bg-white/3 shadow-lg py-3 z-10 sm:p-0 sm:backdrop-blur-md px-8 flex justify-center w-full">
+    <motion.header
+      initial={{ y: 0 }}
+      animate={{ y: isVisible ? 0 : -130 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="bg-white/3 shadow-lg fixed z-10 sm:p-0 sm:backdrop-blur-md px-8 flex justify-center w-full"
+    >
       <div className="hidden sm:flex gap-3">
         {filterOptions.map((option) => (
           <button
             key={option.value}
             onClick={() => setFilter(option.value)}
-            className={`p-5 relative cursor-pointer font-medium whitespace-nowrap  transition-colors ${
+            className={`p-5 py-3 relative cursor-pointer font-medium whitespace-nowrap  transition-colors ${
               filter === option.value
                 ? "text-font"
                 : "text-light-gray hover:bg-white/10"
@@ -49,6 +56,6 @@ export default function RankingHeader({
           defaultValue={filter}
         />
       </div>
-    </header>
+    </motion.header>
   );
 }

@@ -6,12 +6,13 @@ interface CustomButtonProps {
   icon?: IconifyIcon | string;
   full?: boolean;
   variant?: "filled" | "outlined";
-  color?: "primary" | "secondary" | "error";
+  color?: "primary" | "secondary" | "error" | "white";
   loading?: boolean;
   type?: "button" | "submit" | "reset";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
   className?: string;
+  center?: boolean;
 }
 
 export default function CustomButtonOne({
@@ -25,13 +26,14 @@ export default function CustomButtonOne({
   type = "button",
   size = "md",
   disabled,
+  center,
 }: CustomButtonProps) {
   const selectedSize =
     size === "sm"
-      ? "py-2 px-4 text-sm"
+      ? "py-2 px-4 text-sm rounded-lg"
       : size === "md"
-      ? "py-3 px-6 text-base"
-      : "py-4 px-8 text-lg";
+      ? "py-3 px-6 text-base rounded-lg"
+      : "py-4 px-8 text-lg rounded-xl";
 
   const outlinedPrimary =
     "border-2 border-light-purple text-bright-purple bg-transparent hover:border-bright-purple";
@@ -41,6 +43,9 @@ export default function CustomButtonOne({
 
   const outlinedError =
     "border-2 border-error text-error bg-transparent hover:border-light-error";
+
+  const outlinedWhite =
+    "border-2 border-subtitle text-subtitle bg-transparent hover:border-font";
 
   const outlinedLoading =
     "border-2 border-light-gray opacity-60 text-light-gray bg-transparent pointer-events-none cursor-not-allowed";
@@ -54,6 +59,9 @@ export default function CustomButtonOne({
   const filledError =
     "bg-shadow-error text-font border-2 border-shadow-error hover:bg-dark-error hover:border-dark-error";
 
+  const filledWhite =
+    "bg-subtitle text-background border-2 border-subtitle hover:bg-font hover:border-font";
+
   const filledLoading =
     "bg-dark-gray text-font border-2 opacity-30 border-dark-gray pointer-events-none cursor-not-allowed";
 
@@ -61,6 +69,7 @@ export default function CustomButtonOne({
     primary: "bg-shadow-purple",
     secondary: "bg-shadow-blue",
     error: "bg-shadow-error",
+    white: "bg-white/30",
   };
 
   const outlined =
@@ -70,6 +79,8 @@ export default function CustomButtonOne({
       ? outlinedPrimary
       : color === "secondary"
       ? outlinedSecondary
+      : color === "white"
+      ? outlinedWhite
       : outlinedError;
 
   const filled =
@@ -79,9 +90,13 @@ export default function CustomButtonOne({
       ? filledPrimary
       : color === "secondary"
       ? filledSecondary
+      : color === "white"
+      ? filledWhite
       : filledError;
 
-  const baseStyles = `${selectedSize} w-fit cursor-pointer rounded-xl font-medium flex items-center gap-2 transition-all truncate`;
+  const textPosition = center ? "justify-center" : "";
+
+  const baseStyles = `${selectedSize} w-full cursor-pointer font-medium flex items-center ${textPosition} gap-2 transition-all truncate`;
   return (
     <div className={`relative z-1 group ${full ? "w-full" : "w-fit"}`}>
       <button

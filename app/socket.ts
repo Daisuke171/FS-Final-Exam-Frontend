@@ -10,12 +10,13 @@ const getBaseUrl = () => {
   if (explicitUrl) return explicitUrl.replace(/\/$/, "");
 
   // Else build from host + port
-  const port = process.env.NEXT_PUBLIC_API_PORT || "3059";
-  const host = typeof window !== "undefined" ? window.location.hostname : "localhost";
+  const port = process.env.NEXT_PUBLIC_API_PORT || "3010";
+  const host =
+    typeof window !== "undefined" ? window.location.hostname : "localhost";
   return `http://${host}:${port}`;
 };
 
-export const getSocket = () => {
+export const getSocket = (token?: string) => {
   if (!socket) {
     const baseUrl = getBaseUrl();
 
@@ -27,6 +28,9 @@ export const getSocket = () => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
+      auth: {
+        token,
+      },
     });
 
     socket.on("connect", () => {
@@ -50,7 +54,7 @@ export const getSocket = () => {
   return socket;
 };
 
-export const getCodingWarSocket = () => {
+export const getCodingWarSocket = (token?: string) => {
   if (!codingWarSocket) {
     const baseUrl = getBaseUrl();
     console.log("🔌 Intentando conectar a:", `${baseUrl}/coding-war`);
@@ -60,10 +64,16 @@ export const getCodingWarSocket = () => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       transports: ["websocket", "polling"],
+      auth: {
+        token,
+      },
     });
 
     codingWarSocket.on("connect", () => {
-      console.log("✅ Conectado al servidor Coding War | Socket ID:", codingWarSocket?.id);
+      console.log(
+        "✅ Conectado al servidor Coding War | Socket ID:",
+        codingWarSocket?.id
+      );
     });
 
     codingWarSocket.on("connect_error", (error: any) => {
