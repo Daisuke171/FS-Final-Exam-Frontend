@@ -15,6 +15,7 @@ import { getSocket } from "@/app/socket";
 import RenderBattleAnimation from "@/components/game/rock-paper-scissors/general/RenderBattleAnimation";
 import GameOver from "@/components/game/rock-paper-scissors/general/GameOver";
 import HealthBar from "@/components/game/rock-paper-scissors/general/HealthBar";
+import { useSession } from "next-auth/react";
 
 interface ButtonProps {
   title: string;
@@ -23,9 +24,11 @@ interface ButtonProps {
 }
 
 export default function GameComponent() {
+  const { data: session } = useSession();
+  const playerNickname = session?.user?.nickname;
   const params = useParams();
   const roomId = params.roomId || "";
-  const socket = getSocket();
+  const socket = getSocket(session?.user?.accessToken);
   const {
     showBattleAnimation,
     battleStage,
@@ -88,7 +91,7 @@ export default function GameComponent() {
       {state === "FinishedState" ? (
         <GameOver
           gameWinner={gameWinner}
-          playerId={playerId}
+          playerId={playerNickname}
           players={players}
           confirmedPlayers={confirmedPlayers}
           action={handlePlayAgain}
@@ -103,7 +106,7 @@ export default function GameComponent() {
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.5 }}
-          className="flex flex-col items-center  w-150 m-auto rounded-xl border-2 border-subtitle"
+          className="flex flex-col items-center mt-[calc(72px+2.5rem)] mb-10 w-150 m-auto rounded-xl border-2 border-subtitle"
         >
           <div className="rounded-t-xl h-80 w-full flex flex-col">
             <div className="relative w-full">
@@ -114,7 +117,7 @@ export default function GameComponent() {
                   players={players}
                   playerHealth={playerHealth}
                   previousHealth={previousHealth}
-                  playerId={playerId}
+                  playerId={playerNickname}
                   battleStage={battleStage}
                   winner={winner}
                   healthDamage={healthDamage}
@@ -124,7 +127,7 @@ export default function GameComponent() {
                     <RenderBattleAnimation
                       showBattleAnimation={showBattleAnimation}
                       playedMovements={playedMovements}
-                      playerId={playerId}
+                      playerId={playerNickname}
                       battleStage={battleStage}
                       winner={winner}
                     />

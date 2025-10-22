@@ -8,10 +8,13 @@ import { getSocket } from "@/app/socket";
 import CustomTextInput from "@/components/game/rock-paper-scissors/inputs/text/CustomTextInput";
 import { useGameSocket } from "@/hooks/rock-paper-scissors/useGameSocket";
 import JoinByPassword from "@/components/game/rock-paper-scissors/general/JoinByPassword";
-
-const socket = getSocket();
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function MainCard() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const socket = getSocket(session?.user?.accessToken);
   const [openModal, setOpenModal] = useState(false);
   const [roomId, setRoomId] = useState<string | null>(null);
   const {
@@ -78,7 +81,7 @@ export default function MainCard() {
                 text="Ver salas"
                 icon="lucide-lab:houses"
                 onClick={() => {
-                  window.location.href = "/games/rock-paper-scissors/rooms";
+                  router.push("/games/rock-paper-scissors/rooms");
                 }}
                 full
               />

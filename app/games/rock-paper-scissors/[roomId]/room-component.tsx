@@ -14,10 +14,12 @@ import CountdownCard from "@/components/game/rock-paper-scissors/cards/Countdown
 import RoomErrorCard from "@/components/game/rock-paper-scissors/cards/RoomErrorCard";
 import { useGameSocket } from "@/hooks/rock-paper-scissors/useGameSocket";
 import JoinByPassword from "@/components/game/rock-paper-scissors/general/JoinByPassword";
-
-const socket = getSocket();
+import { useSession } from "next-auth/react";
 
 export default function RoomComponent() {
+  const { data: session } = useSession();
+  const playerNickname = session?.user?.nickname;
+  const socket = getSocket(session?.user?.accessToken);
   const [loading, setLoading] = useState(false);
   const [clicked, setClicked] = useState<boolean>(false);
   const [countDown, setCountDown] = useState<number | null>(null);
@@ -155,7 +157,7 @@ export default function RoomComponent() {
                 <PlayersInRoom
                   players={players}
                   confirmedPlayers={confirmedPlayers}
-                  playerId={playerId}
+                  playerId={playerNickname!}
                   label
                 />
               </div>
@@ -190,8 +192,8 @@ export default function RoomComponent() {
             {modalOpen && <CopiedLinkModal />}
           </AnimatePresence>
           <ChatComponent
+            playerNickname={playerNickname}
             roomId={roomId}
-            playerId={playerId}
             players={players}
           />
         </motion.div>

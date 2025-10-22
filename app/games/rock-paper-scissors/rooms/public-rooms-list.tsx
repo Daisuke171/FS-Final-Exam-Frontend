@@ -7,6 +7,7 @@ import { getSocket } from "@/app/socket";
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
 import { useRouter } from "next/navigation";
 import CreateRoomModal from "@/components/game/rock-paper-scissors/modals/CreateRoomModal";
+import { useSession } from "next-auth/react";
 
 interface RoomData {
   id: string;
@@ -17,7 +18,8 @@ interface RoomData {
 }
 
 export default function PublicRoomsList() {
-  const socket = getSocket();
+  const { data: session } = useSession();
+  const socket = getSocket(session?.user?.accessToken);
   const [rooms, setRooms] = useState<RoomData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
