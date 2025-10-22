@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import Link from 'next/link';
 import { Mail, Lock, User, LoaderCircle, Cake, UserPlus, ArrowLeft } from 'lucide-react'; // Añadimos ArrowLeft
 
 
@@ -24,13 +25,13 @@ export default function RegisterApp() {
           
             <div className="relative w-full max-w-sm md:max-w-lg mt-6 p-4 sm:p-5 md:p-6 rounded-2xl bg-gray-800/60 shadow-[0_0_40px_rgba(0,0,0,0.5),_0_0_80px_rgba(50,100,250,0.3)] border border-indigo-700/50">
 
-                <a 
+                <Link 
                     href="/"
                     className="absolute top-4 left-4 p-2 rounded-full text-indigo-400 hover:text-cyan-400 transition hover:bg-white/5"
                     aria-label="Volver a la página principal"
                 >
                     <ArrowLeft size={24} />
-                </a>
+                </Link>
                 
 
                 <FormTitle title="REGISTRATE" />
@@ -97,9 +98,9 @@ export default function RegisterApp() {
                         {success && <p className="text-green-400 text-center mb-1">{success}</p>}
                         
                         <span className="text-gray-500">¿Ya tienes una cuenta? </span>
-                        <a href="#" className="font-bold text-indigo-400 hover:text-indigo-300 transition-colors">
+                        <Link href="/login" className="font-bold text-indigo-400 hover:text-indigo-300 transition-colors">
                             INICIA SESIÓN
-                        </a>
+                        </Link>
                     </div>
                 </form>
             </div>

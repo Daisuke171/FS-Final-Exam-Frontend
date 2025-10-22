@@ -44,9 +44,9 @@ export default function GameOver({
   showXp,
   setShowXp,
 }: GameOverProps) {
+  const router = useRouter();
   if (!playerId || !xpData) return null;
   const myXp = xpData[playerId];
-  const router = useRouter();
   const gameResult: GameResult[] = [
     gameWinner === playerId
       ? {

@@ -29,11 +29,15 @@ export default function ResultPage() {
 
   useEffect(() => {
     const s = getCodingWarSocket();
-    const onGS = (data: any) => {
+    type GameStatePayload = {
+      players?: string[];
+      ready?: Record<string, boolean>;
+    };
+    const onGS = (data: GameStatePayload) => {
       if (Array.isArray(data.players)) setPlayers(data.players);
       if (data?.ready) {
         const conf = Object.entries(data.ready)
-          .filter(([_, v]) => v)
+          .filter(([, v]) => v)
           .map(([k]) => k);
         setConfirmed(conf);
         // Keep our toggle in sync if server changed it elsewhere

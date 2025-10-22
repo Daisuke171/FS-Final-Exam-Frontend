@@ -37,7 +37,7 @@ export const getSocket = (token?: string) => {
       console.log("✅ Conectado al servidor RPS | Socket ID:", socket?.id);
     });
 
-    socket.on("connect_error", (error: any) => {
+    socket.on("connect_error", (error: Error) => {
       console.error("❌ Error de conexión:", error);
     });
 
@@ -46,7 +46,7 @@ export const getSocket = (token?: string) => {
       socket = null; // Reset para reconectar
     });
 
-    socket.on("error", (error: any) => {
+    socket.on("error", (error: unknown) => {
       console.error("❌ Error de Socket:", error);
     });
   }
@@ -76,7 +76,7 @@ export const getCodingWarSocket = (token?: string) => {
       );
     });
 
-    codingWarSocket.on("connect_error", (error: any) => {
+    codingWarSocket.on("connect_error", (error: Error) => {
       console.error("❌ Error de conexión (Coding War):", error);
     });
 
@@ -88,7 +88,7 @@ export const getCodingWarSocket = (token?: string) => {
   return codingWarSocket;
 };
 
-export const onGameState = (callback: (data: any) => void) => {
+export const onGameState = <T = unknown>(callback: (data: T) => void) => {
   const s = getSocket();
   s?.on("gameState", callback);
 
@@ -97,7 +97,7 @@ export const onGameState = (callback: (data: any) => void) => {
   };
 };
 
-export const emitEvent = (event: string, data: any) => {
+export const emitEvent = (event: string, data: unknown) => {
   const s = getSocket();
   if (s?.connected) {
     s.emit(event, data);

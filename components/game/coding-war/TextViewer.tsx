@@ -127,7 +127,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       roomInfo?: { id: string };
       scores?: Record<string, number>;
       problemIndex?: Record<string, number>;
-      result?: any;
+      result?: unknown;
     }) => {
       if (state?.players && Array.isArray(state.players)) {
         // detect disconnect: if previously had 2 and now less than 2, or opponent missing
