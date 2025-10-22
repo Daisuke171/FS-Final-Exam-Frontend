@@ -26,7 +26,7 @@ const textColor = {
 
 const symbol = {
   won: "+",
-  lost: "-",
+  lost: "",
   draw: "+",
 };
 

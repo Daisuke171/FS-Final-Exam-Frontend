@@ -87,13 +87,10 @@ type FilterType = "all" | "won" | "lost" | "draw";
 //   },
 // ];
 
-export default function MatchHistory({ userId }: { userId: string }) {
+export default function MatchHistory() {
   const [filter, setFilter] = useState<FilterType>("all");
   const { data, loading, error } = useQuery<{ userGames: GameHistory[] }>(
-    GET_USER_GAMES,
-    {
-      variables: { userId },
-    }
+    GET_USER_GAMES
   );
 
   const matches = data?.userGames || [];
