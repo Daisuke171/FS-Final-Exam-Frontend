@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_ME = gql`
-  query GetMe($userId: ID!) {
-    me(userId: $userId) {
+  query GetMe {
+    me {
       id
       name
       nickname
@@ -35,8 +35,8 @@ export const GET_ME = gql`
 `;
 
 export const GET_USER_SKINS_WITH_STATUS = gql`
-  query GetUserSkinsWithStatus($userId: ID!) {
-    userSkinsWithStatus(userId: $userId) {
+  query GetUserSkinsWithStatus {
+    userSkinsWithStatus {
       id
       name
       img
@@ -50,8 +50,8 @@ export const GET_USER_SKINS_WITH_STATUS = gql`
 `;
 
 export const ACTIVATE_SKIN = gql`
-  mutation ActivateSkin($skinId: ID!, $userId: ID!) {
-    activateSkin(skinId: $skinId, userId: $userId) {
+  mutation ActivateSkin($skinId: ID!) {
+    activateSkin(skinId: $skinId) {
       id
       active
       skin {
