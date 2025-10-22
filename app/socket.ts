@@ -3,7 +3,7 @@ import { io, Socket } from "socket.io-client";
 let socket: Socket | null = null;
 let codingWarSocket: Socket | null = null;
 
-export const getSocket = () => {
+export const getSocket = (token?: string) => {
   if (!socket) {
     const port = process.env.REACT_APP_API_PORT || "3010";
     const url = `http://localhost:${port}`;
@@ -16,6 +16,9 @@ export const getSocket = () => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
+      auth: {
+        token,
+      },
     });
 
     socket.on("connect", () => {
@@ -39,7 +42,7 @@ export const getSocket = () => {
   return socket;
 };
 
-export const getCodingWarSocket = () => {
+export const getCodingWarSocket = (token?: string) => {
   if (!codingWarSocket) {
     codingWarSocket = io("http://localhost:3010/coding-war", {
       autoConnect: true,
@@ -47,6 +50,9 @@ export const getCodingWarSocket = () => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       transports: ["websocket", "polling"],
+      auth: {
+        token,
+      },
     });
   }
   return codingWarSocket;
