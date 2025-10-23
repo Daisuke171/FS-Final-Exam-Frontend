@@ -16,6 +16,7 @@ import RenderBattleAnimation from "@/components/game/rock-paper-scissors/general
 import GameOver from "@/components/game/rock-paper-scissors/general/GameOver";
 import HealthBar from "@/components/game/rock-paper-scissors/general/HealthBar";
 import { useSession } from "next-auth/react";
+import ReconnectionModal from "@/components/game/rock-paper-scissors/modals/ReconnectionModal";
 
 interface ButtonProps {
   title: string;
@@ -28,7 +29,7 @@ export default function GameComponent() {
   const playerNickname = session?.user?.nickname;
   const params = useParams();
   const roomId = params.roomId || "";
-  const socket = getSocket(session?.user?.accessToken);
+  const socket = getSocket(session?.accessToken);
   const {
     showBattleAnimation,
     battleStage,
@@ -42,7 +43,6 @@ export default function GameComponent() {
     confirmed,
     clicked,
     timeLeft,
-    playerId,
     players,
     handlePlayAgain,
     handleConfirmMove,
@@ -55,6 +55,7 @@ export default function GameComponent() {
     xpData,
     showXp,
     setShowXp,
+    reconnectiontTimer,
   } = useGameSocket(roomId);
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export default function GameComponent() {
     return () => {
       socket.off("requestGameState");
     };
-  }, []);
+  }, [socket, roomId]);
 
   const Buttons: ButtonProps[] = [
     {
@@ -101,85 +102,93 @@ export default function GameComponent() {
           setShowXp={setShowXp}
         />
       ) : state === "PlayingState" || state === "RevealingState" ? (
-        <motion.div
-          key="game"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.5 }}
-          className="flex flex-col items-center mt-[calc(72px+2.5rem)] mb-10 w-150 m-auto rounded-xl border-2 border-subtitle"
-        >
-          <div className="rounded-t-xl h-80 w-full flex flex-col">
-            <div className="relative w-full">
-              <div className="bg-white/5 backdrop-blur-md h-60 w-full rounded-t-xl"></div>
-              <div className="bg-white/10 backdrop-blur-md h-20 w-full"></div>
-              <div className="absolute top-5 flex justify-between w-full px-5">
-                <HealthBar
-                  players={players}
-                  playerHealth={playerHealth}
-                  previousHealth={previousHealth}
-                  playerId={playerNickname}
-                  battleStage={battleStage}
-                  winner={winner}
-                  healthDamage={healthDamage}
-                />
-                <div className="flex items-center">
-                  {showBattleAnimation && (
-                    <RenderBattleAnimation
-                      showBattleAnimation={showBattleAnimation}
-                      playedMovements={playedMovements}
-                      playerId={playerNickname}
-                      battleStage={battleStage}
-                      winner={winner}
-                    />
-                  )}
+        <>
+          <motion.div
+            key="game"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            className="flex flex-col items-center mt-[calc(72px+2.5rem)] mb-10 w-150 m-auto rounded-xl border-2 border-subtitle"
+          >
+            <div className="rounded-t-xl h-80 w-full flex flex-col">
+              <div className="relative w-full">
+                <div className="bg-white/5 backdrop-blur-md h-60 w-full rounded-t-xl"></div>
+                <div className="bg-white/10 backdrop-blur-md h-20 w-full"></div>
+                <div className="absolute top-5 flex justify-between w-full px-5">
+                  <HealthBar
+                    players={players}
+                    playerHealth={playerHealth}
+                    previousHealth={previousHealth}
+                    playerId={playerNickname}
+                    battleStage={battleStage}
+                    winner={winner}
+                    healthDamage={healthDamage}
+                  />
+                  <div className="flex items-center">
+                    {showBattleAnimation && (
+                      <RenderBattleAnimation
+                        showBattleAnimation={showBattleAnimation}
+                        playedMovements={playedMovements}
+                        playerId={playerNickname}
+                        battleStage={battleStage}
+                        winner={winner}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="p-8 bg-background z-8 w-full rounded-b-xl">
-            <AnimatePresence mode="wait">
-              {timeLeft !== null && timeLeft >= 0 && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="w-full flex flex-col items-center "
-                >
-                  <p className="text-2xl mt-2 text-font">
-                    Tiempo restante: {timeLeft}s
-                  </p>
-                  <div className="w-full h-2 rounded-full mt-2 bg-light-gray relative overflow-hidden">
-                    <motion.div
-                      animate={{ scaleX: timeLeft / totalDuration }}
-                      transition={{ duration: 0.1, ease: "linear" }}
-                      className="absolute top-0 left-0 h-2 bg-hover-purple rounded-full"
-                      style={{ width: "100%", transformOrigin: "left" }}
-                    ></motion.div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <div className="flex gap-5 w-full items-center justify-center z-10 my-10">
-              {Buttons.map((b) => (
-                <Card
-                  key={b.title}
-                  title={b.title}
-                  img={b.img}
-                  isClicked={clicked === b.move}
-                  onClick={() => handlePlayerMove(b.move)}
-                  disableCards={disableCards}
-                />
-              ))}
+            <div className="p-8 bg-background z-8 w-full rounded-b-xl">
+              <AnimatePresence mode="wait">
+                {timeLeft !== null && timeLeft >= 0 && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="w-full flex flex-col items-center "
+                  >
+                    <p className="text-2xl mt-2 text-font">
+                      Tiempo restante: {timeLeft}s
+                    </p>
+                    <div className="w-full h-2 rounded-full mt-2 bg-light-gray relative overflow-hidden">
+                      <motion.div
+                        animate={{ scaleX: timeLeft / totalDuration }}
+                        transition={{ duration: 0.1, ease: "linear" }}
+                        className="absolute top-0 left-0 h-2 bg-hover-purple rounded-full"
+                        style={{ width: "100%", transformOrigin: "left" }}
+                      ></motion.div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <div className="flex gap-5 w-full items-center justify-center z-10 my-10">
+                {Buttons.map((b) => (
+                  <Card
+                    key={b.title}
+                    title={b.title}
+                    img={b.img}
+                    isClicked={clicked === b.move}
+                    onClick={() => handlePlayerMove(b.move)}
+                    disableCards={disableCards}
+                  />
+                ))}
+              </div>
+              <CustomButton
+                text="Confirmar"
+                onClick={handleConfirmMove}
+                clicked={clicked}
+                confirmed={confirmed}
+                icon="game-icons:confirmed"
+              />
             </div>
-            <CustomButton
-              text="Confirmar"
-              onClick={handleConfirmMove}
-              clicked={clicked}
-              confirmed={confirmed}
-              icon="game-icons:confirmed"
+          </motion.div>
+          {reconnectiontTimer !== null && reconnectiontTimer.timeLeft > 0 && (
+            <ReconnectionModal
+              countdown={reconnectiontTimer.timeLeft}
+              player={reconnectiontTimer.player}
             />
-          </div>
-        </motion.div>
+          )}
+        </>
       ) : null}
     </AnimatePresence>
   );
