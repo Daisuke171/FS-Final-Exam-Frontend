@@ -3,7 +3,7 @@ import CircularProgress from "@/components/ui/general/profile/CircularProgress";
 import { Icon } from "@iconify/react";
 import { useQuery } from "@apollo/client/react";
 import { UserStats } from "@/types/game.types";
-import { GET_USER_STATS } from "@/graphql/queries/game.queries";
+import { GET_USER_STATS } from "@/shared/graphql/queries/game.queries";
 import StatsLayout from "@/components/layout/profile/stats-layout";
 
 // const stats = {

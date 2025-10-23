@@ -1,5 +1,3 @@
-// app/page.tsx
-
 "use client";
 import MainLayout from "../components/layout/MainLayout";
 import MainContent from "../components/ui/general/landing-page/MainContent";
