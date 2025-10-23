@@ -1,6 +1,5 @@
 "use client";
 
-import { StatCardProps } from "@/components/ui/cards/profile/StatCard";
 import ChangeAvatar from "@/components/ui/modals/profile/ChangeAvatar";
 import { useState } from "react";
 import { AnimatePresence } from "motion/react";
@@ -10,33 +9,6 @@ import ProfileHeaderInfo from "@/components/ui/general/profile/ProfileHeaderInfo
 import { useQuery } from "@apollo/client/react";
 import { User } from "@/types/user.types";
 import { GET_ME } from "@/graphql/queries/user.queries";
-
-const cards: StatCardProps[] = [
-  {
-    title: "Partidas jugadas",
-    number: 53,
-    color: "neutral",
-    icon: "famicons:game-controller",
-  },
-  {
-    title: "Partidas ganadas",
-    number: 25,
-    color: "victory",
-    icon: "mdi:crown",
-  },
-  {
-    title: "Partidas perdidas",
-    number: 20,
-    color: "defeat",
-    icon: "game-icons:dead-head",
-  },
-  {
-    title: "Partidas empatadas",
-    number: 8,
-    color: "draw",
-    icon: "material-symbols-light:swords-rounded",
-  },
-];
 
 export default function ProfileHeader() {
   const { data, loading, error } = useQuery<{ me: User }>(GET_ME, {});

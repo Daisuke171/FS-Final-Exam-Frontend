@@ -15,7 +15,10 @@ type Problem = { lang: string; code: string };
 export default function TextViewer({ roomId }: { roomId?: string }) {
   const router = useRouter();
   const { leave } = useSocketContext();
-  const problemList = (problems as unknown as Problem[]) ?? [];
+  const problemList = useMemo<Problem[]>(
+    () => (problems as unknown as Problem[]) ?? [],
+    []
+  );
   const [problemIndex, setProblemIndex] = useState(0); // local player's current problem index
   const [code, setCode] = useState<string>(problemList[0]?.code || "");
   const [lang, setLang] = useState<string>(problemList[0]?.lang || "");
@@ -23,9 +26,9 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const [opponentCode, setOpponentCode] = useState<string>(
     problemList[0]?.code || ""
   );
-  const [opponentLang, setOpponentLang] = useState<string>(
-    problemList[0]?.lang || ""
-  );
+  // const [opponentLang, setOpponentLang] = useState<string>(
+  //   problemList[0]?.lang || ""
+  // );
   const [room, setRoom] = useState(roomId ?? "");
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
   const prevConnectedRef = useRef<string[]>([]);
@@ -44,6 +47,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const redirectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const redirectCountdownRef = useRef<NodeJS.Timeout | null>(null);
   const [redirectRemaining, setRedirectRemaining] = useState<number>(0);
+  const [scoreP1, setScoreP1] = useState(0);
+  const [scoreP2, setScoreP2] = useState(0);
 
   useEffect(() => {
     const s = getCodingWarSocket();
@@ -74,7 +79,10 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       setRemaining(secs);
       if (secs <= 0) setEnded(true);
     };
-    const onGameOver = (data: { winner?: string | null; finalScores?: Record<string, number> }) => {
+    const onGameOver = (data: {
+      winner?: string | null;
+      finalScores?: Record<string, number>;
+    }) => {
       // Authoritative end-of-match signal from server
       setEnded(true);
       // Stop local fallback and future ticks to pause the clock display
@@ -102,8 +110,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         let p2 = scoreP2;
         if (data?.finalScores && connectedUsers.length) {
           const [p1Id, p2Id] = connectedUsers;
-          p1 = p1Id ? (data.finalScores[p1Id] ?? p1) : p1;
-          p2 = p2Id ? (data.finalScores[p2Id] ?? p2) : p2;
+          p1 = p1Id ? data.finalScores[p1Id] ?? p1 : p1;
+          p2 = p2Id ? data.finalScores[p2Id] ?? p2 : p2;
         }
         const w = p1 === p2 ? "draw" : p1 > p2 ? "P1" : "P2";
         if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
@@ -127,7 +135,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       roomInfo?: { id: string };
       scores?: Record<string, number>;
       problemIndex?: Record<string, number>;
-      result?: any;
+      result?: unknown;
     }) => {
       if (state?.players && Array.isArray(state.players)) {
         // detect disconnect: if previously had 2 and now less than 2, or opponent missing
@@ -203,7 +211,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
             setOpponentProblemIndex(oppIdx);
             const op =
               problemList[oppIdx] ?? problemList[problemList.length - 1];
-            setOpponentLang(op?.lang || "");
+            // setOpponentLang(op?.lang || "");
             setOpponentCode(op?.code || "");
             // reset opponent visuals only
             if (role === "P2") {
@@ -248,13 +256,25 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       s.off("connect", onConnect);
       s.off("gameOver", onGameOver);
     };
-  }, [room, selfId]);
+  }, [
+    room,
+    selfId,
+    opponentId,
+    connectedUsers,
+    opponentProblemIndex,
+    problemIndex,
+    problemList,
+    role,
+    router,
+    scoreP1,
+    scoreP2,
+  ]);
 
   useEffect(() => {
     if (roomId && roomId !== room) {
       setRoom(roomId);
     }
-  }, [roomId]);
+  }, [roomId, room]);
 
   // Start a local fallback timer only if server doesn't provide timer events
   useEffect(() => {
@@ -275,15 +295,13 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     };
   }, [room]);
 
-  
-
   // Split code into lines
   const originalLines = useMemo(() => code.split("\n"), [code]);
   const opponentLines = useMemo(() => opponentCode.split("\n"), [opponentCode]);
-  const trimmedLines = useMemo(
-    () => originalLines.map((line) => line.trim()),
-    [originalLines]
-  );
+  // const trimmedLines = useMemo(
+  //   () => originalLines.map((line) => line.trim()),
+  //   [originalLines]
+  // );
 
   // Helpers
   const getIndentLength = (line: string) =>
@@ -300,7 +318,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   // Player 1 state
   const [currentLineP1, setCurrentLineP1] = useState(0);
   const [inputValueP1, setInputValueP1] = useState("");
-  const [scoreP1, setScoreP1] = useState(0);
+
   const [coloredLinesP1, setColoredLinesP1] = useState<{
     [index: number]: string[];
   }>({});
@@ -319,7 +337,6 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   // Player 2 state
   const [currentLineP2, setCurrentLineP2] = useState(0);
   const [inputValueP2, setInputValueP2] = useState("");
-  const [scoreP2, setScoreP2] = useState(0);
   const [coloredLinesP2, setColoredLinesP2] = useState<{
     [index: number]: string[];
   }>({});
@@ -592,7 +609,10 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     return originalLines.map((line, i) => {
       if (line.trim() === "") {
         return (
-          <div key={i} className="leading-relaxed font-mono h-5">
+          <div
+            key={i}
+            className="leading-relaxed font-mono h-5"
+          >
             {""}
           </div>
         );
@@ -615,7 +635,10 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
                 const charIndex = idx;
                 const beforeCaret = charIndex === caretIndex;
                 return (
-                  <span key={`char-${idx}`} className="relative">
+                  <span
+                    key={`char-${idx}`}
+                    className="relative"
+                  >
                     {beforeCaret && (
                       <span
                         className="inline-block w-0.5 h-[1em] align-[-0.15em] bg-amber-400 animate-pulse mr-0.5"
@@ -665,7 +688,10 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
             <div aria-hidden="true" />
             <div className="whitespace-pre-wrap break-words relative overflow-hidden">
               {chars.slice(indentLen).map((char, idx) => (
-                <span key={idx} className={coloredLines[i][idx + indentLen]}>
+                <span
+                  key={idx}
+                  className={coloredLines[i][idx + indentLen]}
+                >
                   {char}
                 </span>
               ))}
@@ -710,7 +736,10 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     return lines.map((line, i) => {
       if (line.trim() === "") {
         return (
-          <div key={i} className="leading-relaxed font-mono h-5">
+          <div
+            key={i}
+            className="leading-relaxed font-mono h-5"
+          >
             {""}
           </div>
         );
@@ -733,7 +762,10 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
                 const charIndex = idx;
                 const beforeCaret = charIndex === caretIndex;
                 return (
-                  <span key={`char-${i}-${idx}`} className="relative">
+                  <span
+                    key={`char-${i}-${idx}`}
+                    className="relative"
+                  >
                     {beforeCaret && (
                       <span
                         className="inline-block w-0.5 h-[1em] align-[-0.15em] bg-amber-400 animate-pulse mr-0.5"
@@ -783,7 +815,10 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
             <div aria-hidden="true" />
             <div className="whitespace-pre-wrap break-words relative overflow-hidden">
               {chars.slice(indentLen).map((char, idx) => (
-                <span key={idx} className={coloredLines[i][idx + indentLen]}>
+                <span
+                  key={idx}
+                  className={coloredLines[i][idx + indentLen]}
+                >
                   {char}
                 </span>
               ))}
@@ -830,7 +865,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     // Cleanup local timers
     if (timerRef.current) clearInterval(timerRef.current);
     if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
-    if (redirectCountdownRef.current) clearInterval(redirectCountdownRef.current);
+    if (redirectCountdownRef.current)
+      clearInterval(redirectCountdownRef.current);
     // Optionally reset context state
     leave?.("coding-war");
     // Navigate back to game hub
@@ -947,7 +983,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       s.off("lineCommitted", onLineCommitted);
       s.off("problemIndexUpdate", onProblemIndexUpdate);
     };
-  }, [role, room, originalLines]);
+  }, [role, room, originalLines, opponentLines, selfId, problemList]);
 
   // Winner display helper
   const winner: "P1" | "P2" | "draw" | null = useMemo(() => {
@@ -967,7 +1003,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     const p2Num = scoreP2;
     const w = p1Num === p2Num ? "draw" : p1Num > p2Num ? "P1" : "P2";
     setRedirectRemaining(4);
-    if (redirectCountdownRef.current) clearInterval(redirectCountdownRef.current);
+    if (redirectCountdownRef.current)
+      clearInterval(redirectCountdownRef.current);
     redirectCountdownRef.current = setInterval(() => {
       setRedirectRemaining((r) => Math.max(0, r - 1));
     }, 1000);
@@ -983,9 +1020,10 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     }, 4000);
     return () => {
       if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
-      if (redirectCountdownRef.current) clearInterval(redirectCountdownRef.current);
+      if (redirectCountdownRef.current)
+        clearInterval(redirectCountdownRef.current);
     };
-  }, [ended, room, router]);
+  }, [ended, room, router, scoreP1, scoreP2]);
 
   return (
     <div className="w-full">

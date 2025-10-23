@@ -50,13 +50,13 @@ export default function CreateRoomModal({
       console.log("Sala creada:", data.roomInfo);
       setLoading(false);
       setCloseModal();
-  router.push(`/games/coding-war/${data.roomId}`);
+      router.push(`/games/coding-war/${data.roomId}`);
     });
 
     return () => {
       socket.off("roomCreated");
     };
-  }, []);
+  }, [router, setCloseModal]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

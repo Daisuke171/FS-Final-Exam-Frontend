@@ -16,7 +16,7 @@ export default function NumbersAnimation({
   useEffect(() => {
     const controls = animate(count, value, { duration: 1, delay });
     return controls.stop;
-  }, [value, count]);
+  }, [value, count, delay]);
 
   return <motion.span>{rounded}</motion.span>;
 }

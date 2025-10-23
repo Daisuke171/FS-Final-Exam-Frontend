@@ -1,3 +1,5 @@
+"use client";
+
 import StatCard from "@/components/ui/cards/profile/StatCard";
 import CircularProgress from "@/components/ui/general/profile/CircularProgress";
 import { Icon } from "@iconify/react";
@@ -5,16 +7,6 @@ import { useQuery } from "@apollo/client/react";
 import { UserStats } from "@/types/game.types";
 import { GET_USER_STATS } from "@/graphql/queries/game.queries";
 import StatsLayout from "@/components/layout/profile/stats-layout";
-
-// const stats = {
-//   winRate: 75,
-//   totalTime: "5h 32m",
-//   highScore: 12800,
-//   bestStreak: 9,
-//   avgPerDay: 3.4,
-// };
-
-const games = 10;
 
 export default function StatsComponent({ margin }: { margin?: boolean }) {
   const { loading, error, data } = useQuery<{ userStats: UserStats }>(

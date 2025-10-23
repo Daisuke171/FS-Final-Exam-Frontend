@@ -2,10 +2,7 @@
 
 import RankingList from "@/components/ui/general/ranking/RankingList";
 import TopThree from "@/components/ui/general/ranking/TopThree";
-import CustomSelect from "@/components/ui/inputs/CustomSelect";
-import data from "@/users.json";
 import { useState } from "react";
-import { motion } from "motion/react";
 import {
   GET_GLOBAL_LEADERBOARD,
   GET_LEADERBOARD,

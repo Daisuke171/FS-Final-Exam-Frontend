@@ -6,7 +6,6 @@ interface CustomTextInputProps {
   name?: string;
   icon?: string;
   size?: "sm" | "md" | "lg";
-  color?: "primary" | "secondary";
   type?: "text" | "password";
 }
 
@@ -17,7 +16,6 @@ export default function CustomTextInput({
   icon,
   type = "text",
   size = "md",
-  color = "primary",
 }: CustomTextInputProps) {
   const SelectedSize =
     size === "sm" ? "py-2 px-3" : size === "md" ? "py-3 px-4" : "py-4 px-5";

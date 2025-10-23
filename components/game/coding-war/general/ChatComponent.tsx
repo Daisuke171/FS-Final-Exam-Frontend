@@ -1,7 +1,7 @@
 "use client";
 
 import CustomTextInput from "../inputs/text/CustomTextInput";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { getCodingWarSocket } from "@/app/socket";
 import { motion } from "motion/react";
 
@@ -130,9 +130,9 @@ export default function ChatComponent({
     });
 
     setPreviousPlayerIds(currentPlayerIds);
-  }, [players, isInitialized]);
+  }, [players, isInitialized, playerId, previousPlayerIds]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = useCallback(() => {
     const input = document.querySelector(
       'input[name="message"]'
     ) as HTMLInputElement;
@@ -140,14 +140,7 @@ export default function ChatComponent({
     if (message.length === 0) return;
     socket.emit("roomChat", { roomId, message });
     input.value = "";
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  }, [roomId]);
 
   useEffect(() => {
     const input = document.querySelector(
@@ -168,7 +161,7 @@ export default function ChatComponent({
         input.removeEventListener("keydown", handleKeyDown);
       };
     }
-  }, [roomId]);
+  }, [roomId, handleSendMessage]);
 
   const renderItem = (item: ChatItem, index: number) => {
     if (item.type === "join" || item.type === "leave") {

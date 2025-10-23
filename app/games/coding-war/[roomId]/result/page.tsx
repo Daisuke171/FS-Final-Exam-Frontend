@@ -9,6 +9,11 @@ import CustomButtonOne from "@/components/game/coding-war/buttons/CustomButtonOn
 import LoaderCard from "@/components/game/coding-war/cards/LoaderCard";
 import CountdownCard from "@/components/game/coding-war/cards/CountdownCard";
 
+interface GameStateData {
+  players: string[];
+  ready: Record<string, boolean>;
+}
+
 export default function ResultPage() {
   const params = useParams();
   const router = useRouter();
@@ -29,11 +34,11 @@ export default function ResultPage() {
 
   useEffect(() => {
     const s = getCodingWarSocket();
-    const onGS = (data: any) => {
+    const onGS = (data: Partial<GameStateData>) => {
       if (Array.isArray(data.players)) setPlayers(data.players);
       if (data?.ready) {
         const conf = Object.entries(data.ready)
-          .filter(([_, v]) => v)
+          .filter(([, v]) => v)
           .map(([k]) => k);
         setConfirmed(conf);
         // Keep our toggle in sync if server changed it elsewhere
@@ -111,7 +116,9 @@ export default function ResultPage() {
         {/* Inline readiness panel (stay here, don't route to room) */}
         <div className="bg-black/30 border border-white/10 rounded-xl p-4 mb-6 text-left">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-white/80 font-medium">Ready up for a rematch</h2>
+            <h2 className="text-white/80 font-medium">
+              Ready up for a rematch
+            </h2>
             <CustomButtonOne
               text={isReady ? "Cancel" : "Replay"}
               action={handleReplayToggle}

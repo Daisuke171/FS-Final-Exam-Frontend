@@ -18,7 +18,6 @@ import JoinByPassword from "@/components/game/coding-war/general/JoinByPassword"
 const socket = getCodingWarSocket();
 
 export default function RoomComponent() {
-  const [loading, setLoading] = useState(false);
   const [clicked, setClicked] = useState<boolean>(false);
   const [countDown, setCountDown] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -59,8 +58,8 @@ export default function RoomComponent() {
     socket.on("countDown", onCountDown);
     socket.on("gameState", onGameState);
 
-  // Always request the current game/room state so the UI can populate
-  socket.emit("requestGameState", { roomId });
+    // Always request the current game/room state so the UI can populate
+    socket.emit("requestGameState", { roomId });
 
     // Join only after we have a valid roomId, and avoid duplicate emits across StrictMode remounts
     const anySocket = socket as unknown as { _cwJoinedRooms?: Set<string> };
@@ -75,23 +74,23 @@ export default function RoomComponent() {
       socket.off("joinRoomError");
       socket.off("countDown", onCountDown);
     };
-  }, [roomId]);
+  }, [roomId, router]);
 
   const handleConfirmPlayers = () => {
     socket.emit("confirmReady", { roomId, ready: true });
-    setLoading(true);
+
     setClicked(true);
     if (clicked) {
       setTimeout(() => {
         socket.emit("confirmReady", { roomId, ready: false });
-        setLoading(false);
+
         setClicked(false);
       }, 100);
     }
   };
 
   const shareRoomLink = () => {
-  const roomUrl = `${window.location.origin}/games/coding-war/${roomId}`;
+    const roomUrl = `${window.location.origin}/games/coding-war/${roomId}`;
     navigator.clipboard.writeText(roomUrl);
     setModalOpen(true);
     setTimeout(() => setModalOpen(false), 2000);
@@ -121,7 +120,7 @@ export default function RoomComponent() {
         error="La sala no existe"
         subtitle="Redireccionando..."
         icon="streamline-freehand:help-question-circle"
-  action={() => router.push("/games/coding-war")}
+        action={() => router.push("/games/coding-war")}
       />
     );
   }
@@ -132,7 +131,7 @@ export default function RoomComponent() {
         error={error}
         subtitle="Redireccionando..."
         icon="ph:users-four-light"
-  action={() => router.push("/games/coding-war")}
+        action={() => router.push("/games/coding-war")}
       />
     );
   }
