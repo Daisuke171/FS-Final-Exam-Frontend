@@ -17,6 +17,10 @@ const getBaseUrl = () => {
 };
 
 export const getSocket = (token?: string) => {
+  if (socket && socket.disconnected) {
+    socket.offAny();
+    socket = null;
+  }
   if (!socket) {
     const baseUrl = getBaseUrl();
 
@@ -37,17 +41,20 @@ export const getSocket = (token?: string) => {
       console.log("✅ Conectado al servidor RPS | Socket ID:", socket?.id);
     });
 
-    socket.on("connect_error", (error: any) => {
+    socket.on("connect_error", (error: Error) => {
       console.error("❌ Error de conexión:", error);
     });
 
     socket.on("disconnect", (reason: string) => {
       console.warn("⚠️ Desconectado:", reason);
-      socket = null; // Reset para reconectar
     });
 
-    socket.on("error", (error: any) => {
+    socket.on("error", (error: Error) => {
       console.error("❌ Error de Socket:", error);
+      console.error(
+        "❌ Detalles del Error (JSON):",
+        JSON.stringify(error, null, 2)
+      );
     });
   }
 
@@ -76,7 +83,7 @@ export const getCodingWarSocket = (token?: string) => {
       );
     });
 
-    codingWarSocket.on("connect_error", (error: any) => {
+    codingWarSocket.on("connect_error", (error: Error) => {
       console.error("❌ Error de conexión (Coding War):", error);
     });
 
@@ -88,7 +95,7 @@ export const getCodingWarSocket = (token?: string) => {
   return codingWarSocket;
 };
 
-export const onGameState = (callback: (data: any) => void) => {
+export const onGameState = (callback: (data: unknown) => void) => {
   const s = getSocket();
   s?.on("gameState", callback);
 
@@ -97,7 +104,7 @@ export const onGameState = (callback: (data: any) => void) => {
   };
 };
 
-export const emitEvent = (event: string, data: any) => {
+export const emitEvent = (event: string, data: unknown) => {
   const s = getSocket();
   if (s?.connected) {
     s.emit(event, data);
@@ -108,8 +115,14 @@ export const emitEvent = (event: string, data: any) => {
 
 export const disconnectSocket = () => {
   if (socket) {
+    socket.offAny();
     socket.disconnect();
     socket = null;
+  }
+  if (codingWarSocket) {
+    codingWarSocket.offAny();
+    codingWarSocket.disconnect();
+    codingWarSocket = null;
   }
 };
 
