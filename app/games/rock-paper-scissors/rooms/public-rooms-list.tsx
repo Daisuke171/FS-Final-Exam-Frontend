@@ -18,15 +18,21 @@ interface RoomData {
 }
 
 export default function PublicRoomsList() {
-  const { data: session } = useSession();
-  const socket = getSocket(session?.user?.accessToken);
+  const { data: session, status } = useSession();
+  const socket = getSocket(session?.accessToken);
   const [rooms, setRooms] = useState<RoomData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Escuchar la lista de salas públicas
+    if (status === "loading") return;
+
+    if (status !== "authenticated" || !session?.accessToken) {
+      console.warn("No hay token de autenticación disponible");
+      setIsLoading(false);
+      return;
+    }
     socket.on("publicRoomsList", (data: RoomData[]) => {
       setRooms(data);
       setIsLoading(false);

@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 export default function MainCard() {
   const router = useRouter();
   const { data: session } = useSession();
-  const socket = getSocket(session?.user?.accessToken);
+  const socket = getSocket(session?.accessToken);
   const [openModal, setOpenModal] = useState(false);
   const [roomId, setRoomId] = useState<string | null>(null);
   const {
@@ -33,7 +33,7 @@ export default function MainCard() {
     return () => {
       socket.off("isPrivate");
     };
-  }, []);
+  }, [socket]);
 
   const handleOpenModal = () => {
     setOpenModal(!openModal);
