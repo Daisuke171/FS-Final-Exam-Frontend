@@ -31,8 +31,13 @@ export const apolloClient = new ApolloClient({
   link: ApolloLink.from([
     authLink,
     new HttpLink({
-      uri:
-        process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3010/graphql",
+      uri: (() => {
+        const explicit = process.env.NEXT_PUBLIC_GRAPHQL_URL;
+        if (explicit) return explicit;
+        const base = process.env.NEXT_PUBLIC_API_URL;
+        if (base) return `${base.replace(/\/$/, "")}/graphql`;
+        return "http://localhost:3010/graphql";
+      })(),
     }),
   ]),
   cache: new InMemoryCache(),
