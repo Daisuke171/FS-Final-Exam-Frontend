@@ -7,7 +7,7 @@ export default function CopiedLinkModal() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className="flex fixed bottom-5 border-2 border-light-purple gap-3 py-4 px-6 items-center bg-shadow-purple rounded-xl"
+      className="flex z-90 fixed bottom-5 border-2 border-light-purple gap-3 py-4 px-6 items-center bg-shadow-purple rounded-xl"
     >
       <Icon
         icon="material-symbols:check-circle-outline"

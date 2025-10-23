@@ -36,7 +36,7 @@ export default function CreateRoomModal({
   setCloseModal: () => void;
 }) {
   const { data: session } = useSession();
-  const socket = getSocket(session?.user?.accessToken);
+  const socket = getSocket(session?.accessToken);
   const [formData, setFormData] = useState<FormData>({
     roomName: "",
     isPrivate: false,
@@ -57,7 +57,7 @@ export default function CreateRoomModal({
     return () => {
       socket.off("roomCreated");
     };
-  }, []);
+  }, [router, setCloseModal, socket]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
