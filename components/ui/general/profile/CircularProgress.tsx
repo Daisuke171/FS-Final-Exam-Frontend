@@ -1,19 +1,21 @@
+"use client";
+
 type CircularProgressProps = {
   percentage: number;
   size?: number;
 };
 
 const getPrimaryColor = (percentage: number) => {
-  if (percentage > 70) return "var(--color-success)";
+  if (percentage > 60) return "var(--color-success)";
   if (percentage > 45) return "var(--color-medium-ranking)";
-  if (percentage > 25) return "var(--color-medium-blue)";
+  if (percentage > 25) return "var(--color-error)";
   return "var(--color-error)";
 };
 
 const getSecondaryColor = (percentage: number) => {
   if (percentage > 60) return "var(--color-dark-success)";
   if (percentage > 45) return "var(--color-shadow-ranking)";
-  if (percentage > 25) return "var(--color-shadow-blue)";
+  if (percentage > 25) return "var(--color-shadow-error)";
   return "var(--color-dark-error)";
 };
 
