@@ -1,7 +1,7 @@
 "use client";
 
 import CustomTextInput from "../inputs/text/CustomTextInput";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { getSocket } from "@/app/socket";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
@@ -33,7 +33,7 @@ export default function ChatComponent({
   playerNickname: string | undefined;
 }) {
   const { data: session } = useSession();
-  const socket = getSocket(session?.user?.accessToken);
+  const socket = getSocket(session?.accessToken);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [logs, setLogs] = useState<LogsProps[]>([]);
   const [previousPlayerIds, setPreviousPlayerIds] = useState<Set<string>>(
@@ -42,6 +42,7 @@ export default function ChatComponent({
   const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   console.log(`📦 ChatComponent renderizado: ${players}`);
+  console.log(`Nickname enviado por props: ${playerNickname}`);
 
   const allItems: ChatItem[] = [...logs, ...messages].sort((a, b) => {
     const timeA =
@@ -71,11 +72,6 @@ export default function ChatComponent({
   }, [messages, logs]);
 
   useEffect(() => {
-    socket.on("roomChatMessages", (data: ChatMessage) => {
-      console.log("💬 Mensaje recibido:", data);
-    });
-  }, []);
-  useEffect(() => {
     console.log("🧠 playerNickname en el cliente:", playerNickname);
   }, [playerNickname]);
   useEffect(() => {
@@ -89,7 +85,7 @@ export default function ChatComponent({
     return () => {
       socket.off("roomChatMessages", handleRoomChatMessages);
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     if (!isInitialized && playerNickname) {
@@ -105,45 +101,47 @@ export default function ChatComponent({
       console.log(`Jugadores previos: ${previousPlayerIds}`);
       setIsInitialized(true);
     }
-  }, [playerNickname, isInitialized, players]);
+  }, [playerNickname, isInitialized, players, previousPlayerIds]);
 
   useEffect(() => {
     if (!isInitialized) return;
 
     const currentPlayerIds = new Set(players.map((p) => p.id));
 
-    players.forEach((player) => {
-      if (!previousPlayerIds.has(player.id) && player.id !== playerNickname) {
-        setLogs((prev) => [
-          ...prev,
-          {
-            id: `${player.id}-join-${Date.now()}`,
-            playerId: player.id,
-            type: "join",
-            timestamp: Date.now(),
-          },
-        ]);
-      }
-    });
+    setPreviousPlayerIds((prevIds) => {
+      players.forEach((player) => {
+        if (!prevIds.has(player.id) && player.id !== playerNickname) {
+          setLogs((prev) => [
+            ...prev,
+            {
+              id: `${player.id}-join-${Date.now()}`,
+              playerId: player.id,
+              type: "join",
+              timestamp: Date.now(),
+            },
+          ]);
+        }
+      });
+      prevIds.forEach((oldPlayerId) => {
+        if (!currentPlayerIds.has(oldPlayerId)) {
+          setLogs((prev) => [
+            ...prev,
+            {
+              id: `${oldPlayerId}-leave-${Date.now()}`,
+              playerId: oldPlayerId,
+              type: "leave",
+              timestamp: Date.now(),
+            },
+          ]);
+        }
+      });
 
-    previousPlayerIds.forEach((oldPlayerId) => {
-      if (!currentPlayerIds.has(oldPlayerId)) {
-        setLogs((prev) => [
-          ...prev,
-          {
-            id: `${oldPlayerId}-leave-${Date.now()}`,
-            playerId: oldPlayerId,
-            type: "leave",
-            timestamp: Date.now(),
-          },
-        ]);
-      }
+      // Retorna el nuevo estado
+      return currentPlayerIds;
     });
-
-    setPreviousPlayerIds(currentPlayerIds);
   }, [players, isInitialized, playerNickname]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = useCallback(() => {
     const input = document.querySelector(
       'input[name="message"]'
     ) as HTMLInputElement;
@@ -151,14 +149,7 @@ export default function ChatComponent({
     if (message.length === 0) return;
     socket.emit("roomChat", { roomId, message });
     input.value = "";
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  }, [roomId, socket]);
 
   useEffect(() => {
     const input = document.querySelector(
@@ -179,7 +170,7 @@ export default function ChatComponent({
         input.removeEventListener("keydown", handleKeyDown);
       };
     }
-  }, [roomId]);
+  }, [roomId, handleSendMessage]);
 
   const renderItem = (item: ChatItem, index: number) => {
     if (item.type === "join" || item.type === "leave") {

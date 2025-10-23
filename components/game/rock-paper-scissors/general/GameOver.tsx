@@ -44,9 +44,9 @@ export default function GameOver({
   showXp,
   setShowXp,
 }: GameOverProps) {
+  const router = useRouter();
   if (!playerId || !xpData) return null;
   const myXp = xpData[playerId];
-  const router = useRouter();
   const gameResult: GameResult[] = [
     gameWinner === playerId
       ? {
@@ -134,7 +134,7 @@ export default function GameOver({
                   className="text-xl lg:text-2xl"
                 />
               </motion.p>
-              <motion.p
+              <motion.div
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1, transition: { delay: 1.5 } }}
                 className={`text-2xl font-bold text-light-blue flex gap-1 items-center`}
@@ -147,7 +147,7 @@ export default function GameOver({
                 <div className="text-sm text-center h-7 w-7 rounded-full border-2 border-medium-blue flex items-center justify-center">
                   <p>XP</p>
                 </div>
-              </motion.p>
+              </motion.div>
             </div>
           </div>
         ))}
