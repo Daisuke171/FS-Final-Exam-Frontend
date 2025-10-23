@@ -12,7 +12,7 @@ export default function ProfileHeaderInfo({
 }: {
   action: () => void;
   user: User | undefined;
-  error: any;
+  error: Error | undefined;
   loading: boolean;
 }) {
   const activeSkin = user?.skins?.find((userSkin) => userSkin.active);

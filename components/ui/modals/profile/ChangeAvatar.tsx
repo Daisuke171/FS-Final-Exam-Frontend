@@ -19,7 +19,7 @@ export default function ChangeAvatar({
 }: {
   closeModal: () => void;
 }) {
-  const { data: session, update } = useSession();
+  const { update } = useSession();
   const [selectedSkinId, setSelectedSkinId] = useState<string | null>(null);
 
   // Esta query trae todas las skins más el status (si esta activa, bloqueada o desbloqueada)
@@ -69,7 +69,6 @@ export default function ChangeAvatar({
       await activateSkin({ variables: { skinId: selectedSkinId } });
 
       const selectedSkin = skins?.find((skin) => skin.id === selectedSkinId);
-      const newAvatarUrl = `${selectedSkin?.img}?v=${Date.now()}`;
 
       if (selectedSkin?.img) {
         await update({

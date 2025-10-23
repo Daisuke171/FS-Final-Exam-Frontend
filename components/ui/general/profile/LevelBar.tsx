@@ -8,7 +8,7 @@ export default function LevelBar({
   loading,
 }: {
   user?: User;
-  error: any;
+  error: Error | undefined;
   loading: boolean;
 }) {
   console.log(user?.levelProgress);
