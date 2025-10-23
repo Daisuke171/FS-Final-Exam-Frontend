@@ -22,9 +22,13 @@ export default function LevelBar({
           className="text-font"
         />
         <h3 className="text-font text-lg font-medium">
-          No se ha podido obeter tu experiencia
+          No se ha podido obtener tu experiencia
         </h3>
-        <p className="text-subtitle ">{error.message}</p>
+        <p className="text-subtitle ">{
+          typeof error === "string"
+            ? error
+            : (error as { message?: string })?.message ?? "Error desconocido"
+        }</p>
       </article>
     );
   const currentLevelXp = user?.level?.experienceRequired || 0;

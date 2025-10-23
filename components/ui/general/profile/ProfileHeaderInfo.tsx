@@ -29,7 +29,11 @@ export default function ProfileHeaderInfo({
           <h2 className="text-lg text-font font-medium">
             No se ha podido cargar tu información
           </h2>
-          <p className="text-subtitle">{error.message}</p>
+          <p className="text-subtitle">{
+            typeof error === "string"
+              ? error
+              : (error as { message?: string })?.message ?? "Error desconocido"
+          }</p>
         </div>
       </article>
     );

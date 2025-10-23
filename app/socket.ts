@@ -49,7 +49,7 @@ export const getSocket = (token?: string) => {
       console.warn("⚠️ Desconectado:", reason);
     });
 
-    socket.on("error", (error: Error) => {
+    socket.on("error", (error: unknown) => {
       console.error("❌ Error de Socket:", error);
       console.error(
         "❌ Detalles del Error (JSON):",
@@ -95,7 +95,7 @@ export const getCodingWarSocket = (token?: string) => {
   return codingWarSocket;
 };
 
-export const onGameState = (callback: (data: unknown) => void) => {
+export const onGameState = <T = unknown>(callback: (data: T) => void) => {
   const s = getSocket();
   s?.on("gameState", callback);
 
