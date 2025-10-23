@@ -1,7 +1,7 @@
 import { Skin } from "@/types/user.types";
 import { Icon } from "@iconify/react";
-import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 
 interface XpBarAnimationProps {
   xpGained: number;
@@ -55,6 +55,34 @@ export default function XpBarAnimation({
     "xp-gain"
   );
 
+  const animPropsRef = useRef({
+    xpGained,
+    leveledUp,
+    xpInCurrentLevelBefore,
+    xpNeededForLevelBefore,
+    progressBefore,
+    xpInCurrentLevelAfter,
+    xpNeededForLevelAfter,
+    progressAfter,
+    unlockedSkins,
+    onComplete,
+  });
+
+  useEffect(() => {
+    animPropsRef.current = {
+      xpGained,
+      leveledUp,
+      xpInCurrentLevelBefore,
+      xpNeededForLevelBefore,
+      progressBefore,
+      xpInCurrentLevelAfter,
+      xpNeededForLevelAfter,
+      progressAfter,
+      unlockedSkins,
+      onComplete,
+    };
+  });
+
   const currentLevelName = showLevelUp ? newLevelName : oldLevelName;
   const currentLevelSymbol = showLevelUp ? newLevelSymbol : oldLevelSymbol;
   const currentLevelColor = showLevelUp ? newLevelColor : oldLevelColor;
@@ -63,10 +91,21 @@ export default function XpBarAnimation({
   useEffect(() => {
     const duration = 2000;
     const startTime = Date.now();
+    let animationFrameId: number;
 
     const animateXp = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
+      const {
+        leveledUp,
+        xpInCurrentLevelBefore,
+        xpNeededForLevelBefore,
+        progressBefore,
+        xpInCurrentLevelAfter,
+        progressAfter,
+        unlockedSkins,
+        onComplete,
+      } = animPropsRef.current;
 
       if (leveledUp) {
         if (progress < 0.5) {
@@ -79,18 +118,24 @@ export default function XpBarAnimation({
             progressBefore + (100 - progressBefore) * halfProgress
           );
         } else {
-          if (!showLevelUp) {
-            setShowLevelUp(true);
-            setPhase("level-up");
-          }
+          setShowLevelUp((prev) => {
+            if (!prev) {
+              setPhase("level-up");
+              return true;
+            }
+            return prev;
+          });
+
           const secondHalfProgress = (progress - 0.5) * 2;
           setAnimatedXp(xpInCurrentLevelAfter * secondHalfProgress);
           setAnimatedProgress(progressAfter * secondHalfProgress);
         }
       }
       if (progress < 1) {
-        requestAnimationFrame(animateXp);
+        animationFrameId = requestAnimationFrame(animateXp);
       } else {
+        setAnimatedXp(xpInCurrentLevelAfter);
+        setAnimatedProgress(progressAfter);
         if (unlockedSkins.length > 0) {
           setTimeout(() => {
             setPhase("skins");
@@ -102,7 +147,11 @@ export default function XpBarAnimation({
       }
     };
 
-    animateXp();
+    animationFrameId = requestAnimationFrame(animateXp);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   return (
