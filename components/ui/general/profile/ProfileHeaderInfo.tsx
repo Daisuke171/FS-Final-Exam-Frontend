@@ -86,7 +86,9 @@ export default function ProfileHeaderInfo({
                           className="hover:text-light-blue transition-all cursor-pointer"
                         /> */}
             </div>
-            <p className="text-subtitle">{user?.email}</p>
+            <p className="text-subtitle truncate max-w-[23ch] md:max-w-full">
+              {user?.email}
+            </p>
           </div>
           <div className="flex items-center gap-2 [@media(min-width:458px)_and_(max-width:1024px)]:gap-0 [@media(min-width:458px)_and_(max-width:1024px)]:flex-col">
             <ChipOne
