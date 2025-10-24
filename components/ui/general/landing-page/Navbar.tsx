@@ -70,13 +70,13 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
           {/* NAVEGACIÓN: RESTAURAMOS justify-center, AUMENTAMOS GAPS y limitamos w-auto */}
           <nav className="flex items-center gap-16 lg:gap-20 xl:gap-24 text-white font-semibold text-xs mx-auto justify-center">
             {/* INICIO */}
-            <a
+            <Link
               href="/"
               className="flex items-center gap-2 hover:text-[var(--light-blue)] transition-all hover:scale-105 hover-blue-glow"
             >
               <Icon icon="mdi:home" width="18" />
               Inicio
-            </a>
+            </Link>
 
             {/* AMIGOS */}
             <a
@@ -88,22 +88,22 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
             </a>
 
             {/* JUEGOS */}
-            <a
+            <Link
               href="/games"
               className="flex items-center gap-2 hover:text-[var(--light-blue)] transition-all hover:scale-105 hover-blue-glow"
             >
               <Icon icon="mdi:gamepad-variant" width="18" />
               Juegos
-            </a>
+            </Link>
 
             {/* RANKING */}
-            <a
+            <Link
               href="/ranking"
               className="flex items-center gap-2 hover:text-yellow-300 transition-all hover:scale-105 hover-gold-glow"
             >
               <Icon icon="mdi:trophy" width="18" />
               Ranking
-            </a>
+            </Link>
           </nav>
 
           {/* Bloque Derecho (Usuario + Conectados): RESTAURAMOS w-40 para simetría */}

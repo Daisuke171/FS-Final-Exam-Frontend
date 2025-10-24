@@ -42,7 +42,7 @@ export default function PublicRoomsList() {
     return () => {
       socket.off("publicRoomsList");
     };
-  }, [socket]);
+  }, [socket, status, session?.accessToken]);
 
   const handleRefreshRooms = () => {
     setIsLoading(true);

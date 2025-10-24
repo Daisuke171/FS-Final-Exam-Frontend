@@ -13,8 +13,8 @@ const raleway = Raleway({
 });
 
 export const metadata: Metadata = {
-	title: "Sanya Games",
-	description: "Juegos de mesa y tablero para jugar con amigos",
+  title: "Sanya Games",
+  description: "Welcome to Sanya Games - Your Ultimate Gaming Hub!",
 };
 
 export default function RootLayout({
