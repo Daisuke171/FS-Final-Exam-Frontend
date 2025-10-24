@@ -69,7 +69,6 @@ export default function LoginForm() {
         placeholder="Usuario o Correo"
         type="text"
         icon={"mdi:user"}
-        name="identifier"
         error={errors.identifier?.message}
         register={register("identifier")}
         isTouched={touchedFields.identifier}
@@ -79,7 +78,6 @@ export default function LoginForm() {
         placeholder="Contraseña"
         type="password"
         icon={"mdi:password"}
-        name="password"
         error={errors.password?.message}
         register={register("password")}
         isTouched={touchedFields.password}

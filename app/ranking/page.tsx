@@ -58,7 +58,7 @@ export default function Ranking() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen items-center mb-10 mt-[75px]">
+      <div className="flex flex-col min-h-screen items-center mb-[calc(57px+2.5rem)] md:mb-10 mt-[75px]">
         <RankingHeader
           filter={filter}
           setFilter={setFilter}
@@ -75,7 +75,7 @@ export default function Ranking() {
 
   if (error) {
     return (
-      <div className="flex flex-col min-h-screen items-center mb-10 mt-[75px]">
+      <div className="flex flex-col min-h-screen items-center mb-[calc(57px+2.5rem)] md:mb-10 mt-[75px]">
         <RankingHeader
           filter={filter}
           setFilter={setFilter}
@@ -96,7 +96,7 @@ export default function Ranking() {
 
   if (entries.length < 3) {
     return (
-      <div className="flex flex-col min-h-screen items-center mb-10 mt-[75px]">
+      <div className="flex flex-col min-h-screen items-center mb-[calc(57px+2.5rem)] md:mb-10 mt-[75px]">
         <RankingHeader
           filter={filter}
           setFilter={setFilter}

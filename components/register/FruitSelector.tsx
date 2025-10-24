@@ -110,12 +110,12 @@ export default function FruitSelector({
       let borderColor = "border-white/10";
 
       if (isVerified && isSelected) {
-        borderColor = "border-green-500 ring-2 ring-green-500";
+        borderColor = "border-success ring-2 ring-success";
       } else if (selectedItems.length === 2 && !isVerified && isSelected) {
-        borderColor = "border-red-500 ring-2 ring-red-500";
+        borderColor = "border-light-error ring-2 ring-light-error";
       } else if (isSelected) {
         // Sky-200 para selección
-        borderColor = "border-sky-200 ring-2 ring-sky-200/80";
+        borderColor = "border-subtitle ring-2 ring-subtitle";
       }
 
       return (
@@ -138,13 +138,13 @@ export default function FruitSelector({
   return (
     <div
       className="w-full my-4 flex flex-col items-center p-3 rounded-2xl 
-                    bg-blue-900/30 border border-sky-100/50 
+                    bg-black/25 border border-light-gray
                      shadow-sky-500/10 
                     shadow-[0_0_40px_theme(colors.cyan.400/80)] transition duration-500"
     >
-      <p className="text-gray-400 text-xs mb-3 text-center font-semibold">
+      <p className="text-gray-400 text-sm mb-3 text-center font-semibold">
         {isVerified ? (
-          <span className="text-green-400 flex items-center justify-center hover-blue-glow">
+          <span className="text-success flex items-center justify-center hover-blue-glow">
             <CheckCircle
               size={16}
               className="mr-1"
@@ -155,7 +155,7 @@ export default function FruitSelector({
           `Para registrarte, selecciona el par de frutas iguales.`
         )}
       </p>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 mx-auto">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 mx-auto">
         {FRUIT_OPTIONS.map((fruit) => (
           <FruitItem
             key={fruit.id}
