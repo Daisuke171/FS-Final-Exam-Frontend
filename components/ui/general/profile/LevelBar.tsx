@@ -1,4 +1,4 @@
-import { User } from "@/types/game.types";
+import { User } from "@/types/user.types";
 import LevelBarSkeleton from "../../skeletons/profile/LevelBarSkeleton";
 import { Icon } from "@iconify/react";
 
@@ -8,9 +8,10 @@ export default function LevelBar({
   loading,
 }: {
   user?: User;
-  error: any;
+  error: Error | undefined;
   loading: boolean;
 }) {
+  console.log(user?.levelProgress);
   if (loading) return <LevelBarSkeleton />;
   if (error)
     return (
@@ -21,20 +22,28 @@ export default function LevelBar({
           className="text-font"
         />
         <h3 className="text-font text-lg font-medium">
-          No se ha podido obeter tu experiencia
+          No se ha podido obtener tu experiencia
         </h3>
-        <p className="text-subtitle ">{error.message}</p>
+        <p className="text-subtitle ">{
+          typeof error === "string"
+            ? error
+            : (error as { message?: string })?.message ?? "Error desconocido"
+        }</p>
       </article>
     );
+  const currentLevelXp = user?.level?.experienceRequired || 0;
+  const nextLevelXp = user?.nextLevelExperience || 0;
+  const xpInCurrentLevel = (user?.experience || 0) - currentLevelXp;
+  const xpNeededForLevel = nextLevelXp - currentLevelXp;
   return (
     <article className="w-full flex-grow max-w-105 px-3 place-self-center xl:max-w-90 flex flex-col justify-center gap-2 md:border-l border-dark-gray h-23 md:pl-8 xl:pl-5">
       <div className="flex justify-between items-center">
         <p className="text-font text-base font-medium">
-          Level {user?.level.number}
+          Level {user?.level.atomicNumber}
         </p>
         <p className="text-font text-sm font-medium">
-          {user?.experience}{" "}
-          <span className="text-subtitle">/ ${user?.nextLevelExperience}</span>
+          {xpInCurrentLevel}{" "}
+          <span className="text-subtitle">/ {xpNeededForLevel}</span>
         </p>
       </div>
       <div className="relative w-full h-3 overflow-hidden rounded-2xl bg-background">
@@ -44,10 +53,15 @@ export default function LevelBar({
         ></div>
       </div>
       <div className="flex items-center mt-1 gap-1">
-        <div className="h-7 w-7 flex items-center justify-center rounded-full border border-medium-blue">
-          <p className="font-medium text-font">{user?.level.symbol}</p>
+        <div
+          style={{ borderColor: `${user?.level.color}` }}
+          className="h-7.5 w-7.5 flex items-center justify-center rounded-full border-2"
+        >
+          <p className="font-medium text-font text-sm">
+            {user?.level.chemicalSymbol}
+          </p>
         </div>
-        <p className="text-font text-sm font-medium">{user?.level.name}</p>
+        <p className="text-font font-medium">{user?.level.name}</p>
       </div>
     </article>
   );

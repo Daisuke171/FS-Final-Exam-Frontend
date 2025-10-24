@@ -1,25 +1,64 @@
 import { gql } from "@apollo/client";
 
 export const GET_ME = gql`
-  query GetMe($userId: ID!) {
-    me(userId: $userId) {
+  query GetMe {
+    me {
       id
       name
       nickname
       email
-      avatar
       coins
       experience
+      skins {
+        id
+        active
+        skin {
+          id
+          name
+          img
+        }
+      }
       level {
         id
-        number
+        atomicNumber
         name
-        symbol
+        chemicalSymbol
         experienceRequired
+        color
       }
       nextLevelExperience
       levelProgress
       experienceToNextLevel
+      totalScore
+    }
+  }
+`;
+
+export const GET_USER_SKINS_WITH_STATUS = gql`
+  query GetUserSkinsWithStatus {
+    userSkinsWithStatus {
+      id
+      name
+      img
+      level
+      isUnlocked
+      isOwned
+      isActive
+      userSkinId
+    }
+  }
+`;
+
+export const ACTIVATE_SKIN = gql`
+  mutation ActivateSkin($skinId: ID!) {
+    activateSkin(skinId: $skinId) {
+      id
+      active
+      skin {
+        id
+        name
+        img
+      }
     }
   }
 `;

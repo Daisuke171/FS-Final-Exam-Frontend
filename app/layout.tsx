@@ -4,6 +4,8 @@ import { Raleway } from "next/font/google";
 // import { ApolloWrapper } from "@/lib/apollo-client";
 import { Providers } from "@/app/providers";
 import "./globals.css";
+//import { Providers } from "@/components/ui/general/Providers";
+import NavbarServer from "@/components/ui/general/NabvarServer";
 
 const raleway = Raleway({
 	variable: "--font-raleway",
@@ -15,22 +17,22 @@ export const metadata: Metadata = {
 	description: "Juegos de mesa y tablero para jugar con amigos",
 };
 
-interface RootLayoutProps {
-	children: ReactNode;
-}
-
 export default function RootLayout({
-	children,
+  children,
 }: Readonly<{
-	children: RootLayoutProps;
+  children: ReactNode;
 }>) {
-	return (
-		<html lang="en">
-			<body
-				className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
-			>
-				<Providers>{children}</Providers>
-			</body>
-		</html>
-	);
+  return (
+    <html lang="en">
+      <body
+        className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
+      >
+        <Providers>
+          <NavbarServer />
+          {children}
+          <BottomBar />
+        </Providers>
+      </body>
+    </html>
+  );
 }

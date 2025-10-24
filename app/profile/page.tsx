@@ -4,36 +4,28 @@ import MatchHistory from "./match-history";
 import ProfileHeader from "./profile-header";
 import StatsComponent from "./stats-component";
 import AchievementsComponent from "./achievements-component";
-
-const userId = "1";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 export default function Profile() {
+  const breakpoint = useBreakpoint();
   return (
-    <div className="flex flex-col gap-5 items-center my-10">
+    <div className="flex flex-col gap-5 items-center my-10 mt-[calc(72px+2.5rem)]">
       <div className="flex flex-col w-full items-center">
         <div className="w-[95%] max-w-350 h-30 bg-dark-blue rounded-t-xl border-b-2 border-dark-gray"></div>
-        <ProfileHeader userId={userId} />
+        <ProfileHeader />
       </div>
       <div className="flex flex-col w-[95%] lg:hidden">
         <AchievementsComponent />
-        <div className="block md:hidden">
-          <StatsComponent
-            margin
-            userId={userId}
-          />
-        </div>
+        {breakpoint === "mobile" && <StatsComponent margin />}
       </div>
       <div className="flex w-[95%]  gap-5 items-stretch max-w-350">
-        <MatchHistory userId={userId} />
+        <MatchHistory />
         <div className="hidden md:block lg:hidden w-[30%]">
-          <StatsComponent userId={userId} />
+          {breakpoint === "tablet" && <StatsComponent margin />}
         </div>
         <section className="w-[48%] hidden lg:block">
-          <AchievementsComponent />
-          <StatsComponent
-            margin
-            userId={userId}
-          />
+          {breakpoint === "desktop" && <AchievementsComponent />}
+          {breakpoint === "desktop" && <StatsComponent margin />}
         </section>
       </div>
     </div>

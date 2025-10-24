@@ -3,30 +3,19 @@
 import { Icon } from "@iconify/react";
 import LvlChip from "../../chips/ranking/LvlChip";
 import { motion } from "motion/react";
+import { LeaderboardEntry } from "@/types/game.types";
 
-interface RankingListProps {
-  firstPlace: {
-    username: string;
-    score: number;
-    lvl: number;
-  };
-  secondPlace: {
-    username: string;
-    score: number;
-    lvl: number;
-  };
-  thirdPlace: {
-    username: string;
-    score: number;
-    lvl: number;
-  };
+interface TopThreeProps {
+  firstPlace: LeaderboardEntry;
+  secondPlace: LeaderboardEntry;
+  thirdPlace: LeaderboardEntry;
 }
 
 export default function TopThree({
   firstPlace,
   secondPlace,
   thirdPlace,
-}: RankingListProps) {
+}: TopThreeProps) {
   return (
     /* Ranking component */
     <div className="flex items-end z-9 w-full justify-center">
@@ -52,10 +41,10 @@ export default function TopThree({
           </div>
         </div>
         <h3 className="text-sm sm:text-md font-medium text-font">
-          {secondPlace.username}
+          {secondPlace.nickname}
         </h3>
         <LvlChip
-          lvl={secondPlace.lvl}
+          lvl={secondPlace.level}
           color="top-two"
           size="md"
         />
@@ -64,7 +53,9 @@ export default function TopThree({
             icon="ix:trophy-filled"
             width="21"
           />
-          <p className="text-lg sm:text-xl font-bold ">{secondPlace.score}</p>
+          <p className="text-lg sm:text-xl font-bold ">
+            {secondPlace.totalScore}
+          </p>
         </div>
       </motion.div>
       {/* Ranking component */}
@@ -94,10 +85,10 @@ export default function TopThree({
           </div>
         </div>
         <h3 className="text-base sm:text-lg font-medium text-font">
-          {firstPlace.username}
+          {firstPlace.nickname}
         </h3>
         <LvlChip
-          lvl={firstPlace.lvl}
+          lvl={firstPlace.level}
           color="top-one"
           size="lg"
         />
@@ -106,7 +97,9 @@ export default function TopThree({
             icon="ix:trophy-filled"
             width="26"
           />
-          <p className="text-xl sm:text-2xl font-bold ">{firstPlace.score}</p>
+          <p className="text-xl sm:text-2xl font-bold ">
+            {firstPlace.totalScore}
+          </p>
         </div>
       </motion.div>
       {/* Ranking component */}
@@ -132,10 +125,10 @@ export default function TopThree({
           </div>
         </div>
         <h3 className="text-sm sm:text-md font-medium text-font">
-          {thirdPlace.username}
+          {thirdPlace.nickname}
         </h3>
         <LvlChip
-          lvl={thirdPlace.lvl}
+          lvl={thirdPlace.level}
           color="top-three"
           size="md"
         />
@@ -144,7 +137,9 @@ export default function TopThree({
             icon="ix:trophy-filled"
             width="21"
           />
-          <p className="text-lg sm:text-xl font-bold ">{thirdPlace.score}</p>
+          <p className="text-lg sm:text-xl font-bold ">
+            {thirdPlace.totalScore}
+          </p>
         </div>
       </motion.div>
     </div>

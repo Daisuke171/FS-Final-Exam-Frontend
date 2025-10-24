@@ -258,13 +258,13 @@ body {
 
 /* Fondo total de la página */
 body {
-	background: radial-gradient(
-		circle at center,
-		var(--background-gradient-1) 0%,
-		var(--background-gradient-2) 25%,
-		var(--background-gradient-3) 60%
-	);
-	min-height: 100vh;
+  background: radial-gradient(
+    circle at center,
+    var(--background-gradient-1) 0%,
+    var(--background-gradient-2) 25%,
+    var(--background-gradient-3) 60%
+  );
+  min-height: 100vh;
 }
 
 /* -------------------- NAV & FOOTER -------------------- */
@@ -288,11 +288,10 @@ body {
 
 /* Barra inferior móvil */
 .bottom-bar-mobile {
-	@apply fixed bottom-0 left-0 w-full flex justify-around p-2 border-t;
-	background-color: var(--navbar-bg);
-	border-color: var(--light-gray);
-	box-shadow: 0 -4px 16px var(--shadow-blue);
-	z-index: 50;
+  @apply fixed bottom-0 left-0 w-full flex justify-around p-2 border-t backdrop-blur-md;
+  background-color: var(--navbar-bg);
+  border-color: var(--light-gray);
+  z-index: 40;
 }
 
 .bottom-bar-mobile a {
@@ -300,10 +299,9 @@ body {
 }
 
 .bottom-bar-mobile a:hover {
-	/* Sombra de texto brillante celeste (modificación final) */
-	text-shadow: 0 0 6px rgba(76, 201, 240, 0.8),
-		0 0 10px rgba(76, 201, 240, 0.4);
-	transition: text-shadow 0.3s ease-in-out;
+  /* Sombra de texto brillante celeste (modificación final) */
+  text-shadow: 0 0 6px rgba(76, 201, 240, 0.8), 0 0 10px rgba(76, 201, 240, 0.4);
+  transition: text-shadow 0.3s ease-in-out;
 }
 
 @media screen and (min-width: 768px) {
@@ -316,14 +314,14 @@ body {
 
 /* Favoritos - Juegos con glow funcional (Legacy / Example) */
 .favorites-box {
-	width: 100%;
-	max-width: 1200px;
-	margin: 0 auto;
-	background-color: rgba(76, 201, 240, 0.1);
-	border-radius: 0.5rem;
-	padding: 1rem;
-	margin-bottom: 1.5rem;
-	box-shadow: 0 6px 12px var(--navbar-bg), 0 4px 8px var(--navbar-glow);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: rgba(76, 201, 240, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 6px 12px var(--navbar-bg), 0 4px 8px var(--navbar-glow);
 }
 
 .favorites-box-title {
@@ -337,32 +335,32 @@ body {
 }
 
 .favorites-button {
-	flex: 1;
-	height: 6rem;
-	background-color: rgba(255, 255, 255, 0.2);
-	border-radius: 0.5rem;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  flex: 1;
+  height: 6rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Estilo glass brillante */
 .glass-glow {
-	background: rgba(255, 255, 255, 0.12);
-	backdrop-filter: blur(24px) saturate(180%);
-	-webkit-backdrop-filter: blur(24px) saturate(180%);
-	border: 1px solid rgba(255, 255, 255, 0.25);
-	box-shadow: 0 0 20px rgba(173, 216, 230, 0.25),
-		inset 0 0 10px rgba(255, 255, 255, 0.1);
-	border-radius: 1rem;
-	transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 20px rgba(173, 216, 230, 0.25),
+    inset 0 0 10px rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
 }
 
 /* Hover con brillo */
 .glass-glow:hover {
-	box-shadow: 0 0 20px rgba(76, 201, 240, 0.4),
-		inset 0 0 12px rgba(255, 255, 255, 0.1);
-	transform: scale(1.01);
+  box-shadow: 0 0 20px rgba(76, 201, 240, 0.4),
+    inset 0 0 12px rgba(255, 255, 255, 0.1);
+  transform: scale(1.01);
 }
 
 /* Botones de misiones/notificaciones (Contenedor) */
@@ -384,24 +382,23 @@ body {
 
 /* Estilo reutilizable de botón con efecto luminoso */
 .btn-glow {
-	background-color: rgba(76, 201, 240, 0.08);
-	border: 1px solid var(--light-blue);
-	color: var(--light-blue);
-	padding: 4px 8px;
-	border-radius: 6px;
-	transition: all 0.2s ease-in-out;
-	/* El glow base ahora usa la variable celeste */
-	box-shadow: 0 0 6px var(--navbar-glow);
+  background-color: rgba(76, 201, 240, 0.08);
+  border: 1px solid var(--light-blue);
+  color: var(--light-blue);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+  /* El glow base ahora usa la variable celeste */
+  box-shadow: 0 0 6px var(--navbar-glow);
 }
 
 .btn-glow:hover {
-	/* El fondo se hace más visible */
-	background-color: rgba(76, 201, 240, 0.35);
-	color: white;
-	/* El glow intenso usa un celeste brillante */
-	box-shadow: 0 0 12px rgba(76, 201, 240, 0.8),
-		0 0 20px rgba(76, 201, 240, 0.4);
-	transform: scale(1.05);
+  /* El fondo se hace más visible */
+  background-color: rgba(76, 201, 240, 0.35);
+  color: white;
+  /* El glow intenso usa un celeste brillante */
+  box-shadow: 0 0 12px rgba(76, 201, 240, 0.8), 0 0 20px rgba(76, 201, 240, 0.4);
+  transform: scale(1.05);
 }
 
 .btn-glow:active {
@@ -411,9 +408,8 @@ body {
 
 /* Brillo Celeste para Hover */
 .hover-blue-glow:hover {
-	text-shadow: 0 0 6px rgba(76, 201, 240, 0.8),
-		0 0 10px rgba(76, 201, 240, 0.4);
-	transition: text-shadow 0.3s ease-in-out;
+  text-shadow: 0 0 6px rgba(76, 201, 240, 0.8), 0 0 10px rgba(76, 201, 240, 0.4);
+  transition: text-shadow 0.3s ease-in-out;
 }
 
 /* Brillo Dorado para Hover */

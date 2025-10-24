@@ -8,6 +8,7 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import CustomButtonOne from "../buttons/CustomButtonOne";
 import CustomCheckbox from "../inputs/checkbox/CustomCheckbox";
+import { useSession } from "next-auth/react";
 
 const formSchema = z
   .object({
@@ -29,13 +30,13 @@ const formSchema = z
 
 type FormData = z.infer<typeof formSchema>;
 
-const socket = getSocket();
-
 export default function CreateRoomModal({
   setCloseModal,
 }: {
   setCloseModal: () => void;
 }) {
+  const { data: session } = useSession();
+  const socket = getSocket(session?.accessToken);
   const [formData, setFormData] = useState<FormData>({
     roomName: "",
     isPrivate: false,
@@ -46,7 +47,7 @@ export default function CreateRoomModal({
   const router = useRouter();
 
   useEffect(() => {
-    socket.on("roomCreated", (data) => {
+    socket.on("roomCreated", (data: { roomInfo?: unknown; roomId: string }) => {
       console.log("Sala creada:", data.roomInfo);
       setLoading(false);
       setCloseModal();
@@ -56,7 +57,7 @@ export default function CreateRoomModal({
     return () => {
       socket.off("roomCreated");
     };
-  }, []);
+  }, [router, setCloseModal, socket]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,8 +82,11 @@ export default function CreateRoomModal({
     }
   };
 
-  const handleInputChange = (field: any, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleInputChange = (
+    field: keyof FormData | string,
+    value: string | boolean | undefined
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value } as FormData));
   };
   return (
     <>

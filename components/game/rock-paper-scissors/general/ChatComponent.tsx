@@ -1,11 +1,10 @@
 "use client";
 
 import CustomTextInput from "../inputs/text/CustomTextInput";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { getSocket } from "@/app/socket";
 import { motion } from "motion/react";
-
-const socket = getSocket();
+import { useSession } from "next-auth/react";
 
 interface LogsProps {
   id: string;
@@ -27,12 +26,14 @@ interface ChatMessage {
 export default function ChatComponent({
   roomId,
   players,
-  playerId,
+  playerNickname,
 }: {
   roomId: string | string[];
   players: { id: string }[];
-  playerId: string | undefined;
+  playerNickname: string | undefined;
 }) {
+  const { data: session } = useSession();
+  const socket = getSocket(session?.accessToken);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [logs, setLogs] = useState<LogsProps[]>([]);
   const [previousPlayerIds, setPreviousPlayerIds] = useState<Set<string>>(
@@ -40,6 +41,8 @@ export default function ChatComponent({
   );
   const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  console.log(`📦 ChatComponent renderizado: ${players}`);
+  console.log(`Nickname enviado por props: ${playerNickname}`);
 
   const allItems: ChatItem[] = [...logs, ...messages].sort((a, b) => {
     const timeA =
@@ -69,6 +72,9 @@ export default function ChatComponent({
   }, [messages, logs]);
 
   useEffect(() => {
+    console.log("🧠 playerNickname en el cliente:", playerNickname);
+  }, [playerNickname]);
+  useEffect(() => {
     const handleRoomChatMessages = (data: ChatMessage) => {
       console.log("Received messages:", data);
       setMessages((prev) => [...prev, data]);
@@ -79,60 +85,63 @@ export default function ChatComponent({
     return () => {
       socket.off("roomChatMessages", handleRoomChatMessages);
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
-    if (!isInitialized && playerId) {
+    if (!isInitialized && playerNickname) {
       setLogs([
         {
-          id: `${playerId}-join-${Date.now()}`,
-          playerId: playerId,
+          id: `${playerNickname}-join-${Date.now()}`,
+          playerId: playerNickname,
           type: "join",
           timestamp: Date.now(),
         },
       ]);
       setPreviousPlayerIds(new Set(players.map((p) => p.id)));
+      console.log(`Jugadores previos: ${previousPlayerIds}`);
       setIsInitialized(true);
     }
-  }, [playerId, isInitialized, players]);
+  }, [playerNickname, isInitialized, players, previousPlayerIds]);
 
   useEffect(() => {
     if (!isInitialized) return;
 
     const currentPlayerIds = new Set(players.map((p) => p.id));
 
-    players.forEach((player) => {
-      if (!previousPlayerIds.has(player.id) && player.id !== playerId) {
-        setLogs((prev) => [
-          ...prev,
-          {
-            id: `${player.id}-join-${Date.now()}`,
-            playerId: player.id,
-            type: "join",
-            timestamp: Date.now(),
-          },
-        ]);
-      }
+    setPreviousPlayerIds((prevIds) => {
+      players.forEach((player) => {
+        if (!prevIds.has(player.id) && player.id !== playerNickname) {
+          setLogs((prev) => [
+            ...prev,
+            {
+              id: `${player.id}-join-${Date.now()}`,
+              playerId: player.id,
+              type: "join",
+              timestamp: Date.now(),
+            },
+          ]);
+        }
+      });
+      prevIds.forEach((oldPlayerId) => {
+        if (!currentPlayerIds.has(oldPlayerId)) {
+          setLogs((prev) => [
+            ...prev,
+            {
+              id: `${oldPlayerId}-leave-${Date.now()}`,
+              playerId: oldPlayerId,
+              type: "leave",
+              timestamp: Date.now(),
+            },
+          ]);
+        }
+      });
+
+      // Retorna el nuevo estado
+      return currentPlayerIds;
     });
+  }, [players, isInitialized, playerNickname]);
 
-    previousPlayerIds.forEach((oldPlayerId) => {
-      if (!currentPlayerIds.has(oldPlayerId)) {
-        setLogs((prev) => [
-          ...prev,
-          {
-            id: `${oldPlayerId}-leave-${Date.now()}`,
-            playerId: oldPlayerId,
-            type: "leave",
-            timestamp: Date.now(),
-          },
-        ]);
-      }
-    });
-
-    setPreviousPlayerIds(currentPlayerIds);
-  }, [players, isInitialized]);
-
-  const handleSendMessage = () => {
+  const handleSendMessage = useCallback(() => {
     const input = document.querySelector(
       'input[name="message"]'
     ) as HTMLInputElement;
@@ -140,14 +149,7 @@ export default function ChatComponent({
     if (message.length === 0) return;
     socket.emit("roomChat", { roomId, message });
     input.value = "";
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  }, [roomId, socket]);
 
   useEffect(() => {
     const input = document.querySelector(
@@ -168,17 +170,18 @@ export default function ChatComponent({
         input.removeEventListener("keydown", handleKeyDown);
       };
     }
-  }, [roomId]);
+  }, [roomId, handleSendMessage]);
 
   const renderItem = (item: ChatItem, index: number) => {
     if (item.type === "join" || item.type === "leave") {
       const log = item as LogsProps;
+      console.log(`Player ID del LOG: ${log.playerId}`);
       const text =
         log.type === "join"
-          ? log.playerId === playerId
+          ? log.playerId === playerNickname
             ? "Te has unido a la sala"
             : `${log.playerId} se ha unido a la sala`
-          : log.playerId === playerId
+          : log.playerId === playerNickname
           ? "Te has desconectado"
           : `${log.playerId} se ha desconectado`;
 
@@ -186,7 +189,7 @@ export default function ChatComponent({
         <div
           key={log.id}
           className={`px-4 ${
-            log.playerId === playerId
+            log.playerId === playerNickname
               ? "text-hover-purple"
               : log.type === "leave"
               ? "text-error"
@@ -205,7 +208,7 @@ export default function ChatComponent({
           exit={{ opacity: 0, y: -10 }}
           key={`${message.timestamp}-${index}`}
           className={`py-1 rounded-lg flex ${
-            message.playerId === playerId
+            message.playerId === playerNickname
               ? "text-font bg-light-purple rounded-br-none place-self-end"
               : "text-font bg-background rounded-bl-none place-self-start"
           }`}
@@ -221,12 +224,12 @@ export default function ChatComponent({
     }
   };
   return (
-    <div className="w-2/7 h-full flex flex-col border-2 border-light-gray rounded-xl">
+    <div className="w-2/7  flex flex-col border-2 border-light-gray rounded-xl">
       <div className="bg-background rounded-t-xl">
         <h2 className="text-2xl font-bold p-4  text-slate-200">Chat</h2>
       </div>
       <div
-        className=" pb-2 bg-white/7 backdrop-blur-md  relative h-full overflow-y-auto scrollbar-thin [&::-webkit-scrollbar]:w-2
+        className=" pb-2 bg-white/7 backdrop-blur-md  relative flex-1 overflow-y-auto scrollbar-thin [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-slate-300
   [&::-webkit-scrollbar-thumb]:bg-slate-700"
       >

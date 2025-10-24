@@ -8,10 +8,13 @@ import { getSocket } from "@/app/socket";
 import CustomTextInput from "@/components/game/rock-paper-scissors/inputs/text/CustomTextInput";
 import { useGameSocket } from "@/hooks/rock-paper-scissors/useGameSocket";
 import JoinByPassword from "@/components/game/rock-paper-scissors/general/JoinByPassword";
-
-const socket = getSocket();
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function MainCard() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const socket = getSocket(session?.accessToken);
   const [openModal, setOpenModal] = useState(false);
   const [roomId, setRoomId] = useState<string | null>(null);
   const {
@@ -30,7 +33,7 @@ export default function MainCard() {
     return () => {
       socket.off("isPrivate");
     };
-  }, []);
+  }, [socket]);
 
   const handleOpenModal = () => {
     setOpenModal(!openModal);
@@ -69,11 +72,8 @@ export default function MainCard() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: [0, 0.4, 0.6, 1], x: 0 }}
               transition={{
-                type: "spring",
-                duration: 1,
-                stiffness: 100,
-                damping: 10,
-                delay: 0.2,
+                opacity: { duration: 0.8, ease: "easeOut", delay: 0.2 },
+                x: { type: "spring", stiffness: 100, damping: 10, delay: 0.2 },
               }}
               className="w-full"
             >
@@ -81,7 +81,7 @@ export default function MainCard() {
                 text="Ver salas"
                 icon="lucide-lab:houses"
                 onClick={() => {
-                  window.location.href = "/games/rock-paper-scissors/rooms";
+                  router.push("/games/rock-paper-scissors/rooms");
                 }}
                 full
               />
@@ -90,11 +90,8 @@ export default function MainCard() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: [0, 0.4, 0.6, 1], x: 0 }}
               transition={{
-                type: "spring",
-                duration: 1,
-                stiffness: 100,
-                damping: 10,
-                delay: 0.3,
+                opacity: { duration: 0.8, ease: "easeOut", delay: 0.3 },
+                x: { type: "spring", stiffness: 100, damping: 10, delay: 0.3 },
               }}
               className="w-full"
             >
@@ -112,11 +109,8 @@ export default function MainCard() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: [0, 0.4, 0.6, 1], x: 0 }}
             transition={{
-              type: "spring",
-              duration: 1,
-              stiffness: 100,
-              damping: 10,
-              delay: 0.4,
+              opacity: { duration: 0.8, ease: "easeOut", delay: 0.4 },
+              x: { type: "spring", stiffness: 100, damping: 10, delay: 0.4 },
             }}
             className="flex flex-col gap-2 justify-center w-full items-center"
           >

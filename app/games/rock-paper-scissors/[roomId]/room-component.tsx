@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSocket } from "@/app/socket";
 import { useParams, useRouter } from "next/navigation";
 import { Icon } from "@iconify-icon/react";
 import PlayersInRoom from "@/components/game/rock-paper-scissors/general/PlayersInRoom";
@@ -14,65 +13,48 @@ import CountdownCard from "@/components/game/rock-paper-scissors/cards/Countdown
 import RoomErrorCard from "@/components/game/rock-paper-scissors/cards/RoomErrorCard";
 import { useGameSocket } from "@/hooks/rock-paper-scissors/useGameSocket";
 import JoinByPassword from "@/components/game/rock-paper-scissors/general/JoinByPassword";
-
-const socket = getSocket();
+import { useSession } from "next-auth/react";
+import { getSocket } from "@/app/socket";
 
 export default function RoomComponent() {
-  const [loading, setLoading] = useState(false);
+  const { data: session, status } = useSession();
   const [clicked, setClicked] = useState<boolean>(false);
   const [countDown, setCountDown] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [playerId, setPlayerId] = useState<string | undefined>(undefined);
+  const playerNickname = session?.user?.nickname;
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
   const params = useParams();
   const roomId = params.roomId || "";
-  console.log(roomId);
 
   const {
     handleJoinRoomByPassword,
+    handleConfirmReady,
     message,
     isPrivate,
     error,
     roomInfo,
     players,
     confirmedPlayers,
+    countDown: hookCountDown,
   } = useGameSocket(roomId || "");
+
   useEffect(() => {
-    socket.on("countDown", (data) => {
-      setCountDown(data);
-      console.log(`TIMER RECIBIDO: ${data}`);
-      if (data === 0) {
+    if (hookCountDown !== null) {
+      setCountDown(hookCountDown);
+      if (hookCountDown === 0) {
         setIsRedirecting(true);
         setCountDown(null);
-        router.push(`/games/rock-paper-scissors/${roomId}/match`);
+        setTimeout(() => {
+          router.push(`/games/rock-paper-scissors/${roomId}/match`);
+        }, 100);
       }
-    });
-
-    socket.on("gameState", () => {
-      setPlayerId(socket.id);
-    });
-
-    socket.emit("joinRoom", { roomId });
-
-    return () => {
-      socket.off("gameState");
-      socket.off("joinRoomError");
-      socket.off("countDown");
-    };
-  }, []);
+    }
+  }, [hookCountDown, roomId, router]);
 
   const handleConfirmPlayers = () => {
-    socket.emit("confirmReady", { roomId, ready: true });
-    setLoading(true);
-    setClicked(true);
-    if (clicked) {
-      setTimeout(() => {
-        socket.emit("confirmReady", { roomId, ready: false });
-        setLoading(false);
-        setClicked(false);
-      }, 100);
-    }
+    handleConfirmReady(!clicked);
+    setClicked(!clicked);
   };
 
   const shareRoomLink = () => {
@@ -81,6 +63,23 @@ export default function RoomComponent() {
     setModalOpen(true);
     setTimeout(() => setModalOpen(false), 2000);
   };
+
+  const handleLeaveRoom = () => {
+    const socket = getSocket(session?.accessToken);
+    if (socket && roomId) {
+      socket.emit("leaveRoom", { roomId });
+
+      setTimeout(() => {
+        router.push("/games/rock-paper-scissors");
+      }, 100);
+    } else {
+      router.push("/games/rock-paper-scissors");
+    }
+  };
+
+  if (status === "loading") {
+    return <LoaderCard />;
+  }
 
   if (countDown !== null && countDown > 0) {
     return <CountdownCard countDown={countDown} />;
@@ -155,7 +154,7 @@ export default function RoomComponent() {
                 <PlayersInRoom
                   players={players}
                   confirmedPlayers={confirmedPlayers}
-                  playerId={playerId}
+                  playerId={playerNickname}
                   label
                 />
               </div>
@@ -172,7 +171,6 @@ export default function RoomComponent() {
                       text={clicked ? "Cancelar" : "Confirmar"}
                       action={handleConfirmPlayers}
                       icon={clicked ? "mage:user-cross" : "mage:user-check"}
-                      // loading={loading}
                     />
                   </motion.div>
                 )}
@@ -181,7 +179,7 @@ export default function RoomComponent() {
                 text="Salir de la sala"
                 variant="outlined"
                 color="secondary"
-                action={() => router.push("/games/rock-paper-scissors")}
+                action={handleLeaveRoom}
                 icon="streamline:return-2"
               />
             </div>
@@ -190,8 +188,8 @@ export default function RoomComponent() {
             {modalOpen && <CopiedLinkModal />}
           </AnimatePresence>
           <ChatComponent
+            playerNickname={playerNickname}
             roomId={roomId}
-            playerId={playerId}
             players={players}
           />
         </motion.div>
