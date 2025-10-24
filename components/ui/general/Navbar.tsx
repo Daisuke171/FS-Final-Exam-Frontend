@@ -25,7 +25,6 @@ export default function Navbar({ users, session }: NavbarProps) {
   const [avatarUrl, setAvatarUrl] = useState(session?.user?.avatar);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  console.log(session);
 
   useEffect(() => {
     setIsDropdownOpen(false);
@@ -168,8 +167,8 @@ export default function Navbar({ users, session }: NavbarProps) {
             <Image
               src="/logos/sanya-logo-1.webp"
               alt="Logo"
-              width={90}
-              height={90}
+              width={100}
+              height={100}
             />
           </div>
 

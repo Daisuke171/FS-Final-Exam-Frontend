@@ -22,7 +22,10 @@ export default function ProfileDropdown({
       exit={{ opacity: 0, y: -10 }}
       className="w-65 py-2 text-font bg-white/2 backdrop-blur-md rounded-lg border border-white/20 absolute top-12 -left-15 transform -translate-x-1/2 z-10"
     >
-      <div className="flex mb-4 relative items-center gap-3 pb-4 pt-2 after:absolute after:bottom-0 after:w-[80%] after:left-1/2 after:-translate-x-1/2 after:h-[1px] after:bg-white/20 px-4">
+      <div
+        className="flex mb-4 relative items-center gap-3 pb-4 pt-2 after:absolute
+       after:bottom-0 after:w-[80%] after:left-1/2 after:-translate-x-1/2 after:h-[1px] after:bg-white/20 px-4"
+      >
         {avatar ? (
           <Image
             key={avatar}
@@ -40,9 +43,11 @@ export default function ProfileDropdown({
             />
           </div>
         )}
-        <div className="flex flex-col items-start">
-          <h3 className="text-font font-medium">{username}</h3>
-          <p className="text-subtitle">{email}</p>
+        <div className="flex flex-col items-start h-full">
+          <h3 className="text-font text-lg font-medium truncate max-w-[20ch]">
+            {username}
+          </h3>
+          <p className="text-subtitle text-sm truncate max-w-[20ch]">{email}</p>
         </div>
       </div>
       <Link
