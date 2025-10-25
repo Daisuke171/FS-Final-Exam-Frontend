@@ -105,6 +105,7 @@ export const getCodingWarSocket = (token?: string) => {
       );
       // Return a dummy socket-like object that won't connect (or return null and guard all usages)
       // For safety, we return null and let components handle it
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return null as any;
     }
     const baseUrl = getBaseUrl();
@@ -170,6 +171,7 @@ export const getCodingWarSocket = (token?: string) => {
       console.error("❌ Error de Socket (Coding War):", details);
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     codingWarSocket.on("reconnect_error", (err: any) => {
       console.error("❌ Error al reconectar (Coding War):", {
         message: err?.message,

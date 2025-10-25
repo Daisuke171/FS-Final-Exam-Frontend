@@ -272,6 +272,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       s.off("connect", onConnect);
       s.off("gameOver", onGameOver);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room]);
 
   useEffect(() => {
@@ -1029,7 +1030,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       if (redirectCountdownRef.current)
         clearInterval(redirectCountdownRef.current);
     };
-  }, [ended, room, router, scoreP1, scoreP2]);
+  }, [ended, room, router, scoreP1, scoreP2, gameStarted]);
 
   return (
     <div className="w-full">
