@@ -27,6 +27,7 @@ export default function RootLayout({
 	const session = auth();
 	return (
 		<html lang="en">
+			
 			<body
 				className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
 			>
