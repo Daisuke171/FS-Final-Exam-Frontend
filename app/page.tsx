@@ -1,5 +1,5 @@
-import MainContent from "../components/ui/general/landing-page/MainContent";
+import LandingPage from "@/components/ui/general/landing-page/LandingPage";
 
 export default function HomePage() {
-  return <MainContent />;
+  return <LandingPage />;
 }
