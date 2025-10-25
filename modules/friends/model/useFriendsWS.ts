@@ -1,57 +1,68 @@
 "use client";
-import { useEffect } from "react";
-import { authFriendsSocket, getFriendsSocket, onFriendEvent, FriendEvent, PresenceUpdate, onPresenceUpdate, onPresenceSnapshot } from "@shared/lib/friend-socket";
+import { useEffect, useRef } from "react";
+import {
+	authFriendsSocket,
+	getFriendsSocket,
+	onFriendEvent,
+	FriendEvent,
+	PresenceUpdate,
+	onPresenceUpdate,
+	onPresenceSnapshot,
+} from "../services/friend.socket";
 import { usePresenceStore } from "./presence.store";
 
+type Handlers = {
+	onEvent?: (evt: FriendEvent) => void;
+	onRefresh?: () => void;
+};
+
 export function useFriendsWS(
-  userId: string,
-  opts?: {
-    onEvent?: (e: FriendEvent) => void;
-    onRefresh?: () => void; 
-  }
+	userId: string | null,
+	{ onEvent, onRefresh }: Handlers = {}
 ) {
-    const setOnline = usePresenceStore((s) => s.setOnline);
-  const setOffline = usePresenceStore((s) => s.setOffline);
-  const setBulk = usePresenceStore((s) => s.setBulk);
+	const setOnline = usePresenceStore((s) => s.setOnline);
+	const setOffline = usePresenceStore((s) => s.setOffline);
+	const setBulk = usePresenceStore((s) => s.setBulk);
 
-  useEffect(() => {
-    if (!userId) return;
+	const unsub = useRef<(() => void)[]>([]);
+	useEffect(() => {
+		if (!userId) return;
 
-    const s = getFriendsSocket();
-    if (!s) return;
+		const s = getFriendsSocket();
+		if (!s) return;
 
-    // auth al conectar y reconectar
-    const doAuth = () => authFriendsSocket(userId);
-    if (s.connected) doAuth();
-    s.once("connect", doAuth);
-    s.on("reconnect", doAuth);
+		// Autenticar y pedir snapshot inicial
+		authFriendsSocket(userId);
 
-     // eventos de amistad (opcionales)
-    const offFriend = onFriendEvent((evt) => {
-      opts?.onEvent?.(evt);
-      if (evt.type?.startsWith?.("friend:")) opts?.onRefresh?.();
-    });
+		// Re-auth en reconexión
+		const onReconnect = () => authFriendsSocket(userId);
+		s.on("reconnect", onReconnect);
 
-      // presencia en vivo (uno a uno)
-    const offPresence = onPresenceUpdate((p: PresenceUpdate) => {
-      if (p.online) setOnline(p.userId);
-      else setOffline(p.userId);
-    });
-     // snapshot inicial (lista online)
-    const offSnapshot = onPresenceSnapshot((ids) => {
-      setBulk(ids);
-    });
+		// Snapshot de presencia
+		unsub.current.push(onPresenceSnapshot((ids) => setBulk(ids)));
 
+		// Deltas de presencia
+		unsub.current.push(
+			onPresenceUpdate(({ userId: uid, online }) =>
+				online ? setOnline(uid) : setOffline(uid)
+			)
+		);
 
-    // cleanup
-    return () => {
-      offFriend?.();
-      offPresence?.();
-      offSnapshot?.();
-      s.off("connect", doAuth);
-      s.off("reconnect", doAuth);
-    };
-  }, [userId, opts?.onEvent, opts?.onRefresh, setOnline, setOffline, setBulk]);
+		// Eventos de amistad (refetch si aceptan, etc.)
+		if (onEvent) {
+			unsub.current.push(
+				onFriendEvent((evt) => {
+					onEvent?.(evt);
+					if (evt.type === "friend:accepted") onRefresh?.();
+				})
+			);
+		}
 
-  
+		// Limpieza
+		return () => {
+			s.off("reconnect", onReconnect);
+			unsub.current.forEach((fn) => fn());
+			unsub.current = [];			
+		};
+	}, [userId, setBulk, setOnline, setOffline, onEvent, onRefresh]);
 }

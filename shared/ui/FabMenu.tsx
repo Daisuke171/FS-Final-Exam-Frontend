@@ -26,7 +26,11 @@ const ACTIONS: FabAction[] = [
   { id: "share-link", label: "Compartir link", rightEl: <span>🔗</span> },
 ];
 
-export default function FabMenu() {
+interface FabMenuProps {
+  currentUserId: string;
+}
+
+export default function FabMenu({currentUserId}: FabMenuProps) {
   const [open, setOpen] = useState(false);
   const [modal, setModal] = useState<ModalKind>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -38,9 +42,6 @@ export default function FabMenu() {
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
   const [link, setLink] = useState("");
-
-  // Reemplazar con el userId real (de auth/context)
-  const currentUserId = "8f9a8e8f-9fdb-412a-afd5-cd3b52d508ee";
 
 
   const {

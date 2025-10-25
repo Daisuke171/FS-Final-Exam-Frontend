@@ -1,4 +1,3 @@
-// modules/chat/ui/ChatWindow.tsx
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Avatar from "@shared/ui/Avatar";
@@ -8,55 +7,35 @@ import { cn } from "@shared/lib/utils";
 import {
 	useGetMessages,
 	useSendMessage,
-	InputMessage,
-} from "../model/useMessages";
-import { readMessage } from "@shared/lib/chat-socket";
+} from "../hooks/useMessages";
+import { readMessage } from "../services/chat.socket";
 import { Icon } from "@iconify/react";
-
-export interface ChatFriend {
-	id: string;
-	nickname: string;
-	skin: string;
-	chatId: string;
-}
-
-type Msg = {
-	id: string;
-	from: "me" | "friend";
-	text: string;
-	at: number;
-	read?: boolean;
-	status?: string;
-};
-
-interface ChatWindowProps {
-	friend?: ChatFriend | null;
-	visible?: boolean;
-	onClose?: () => void;
-	className?: string;
-	currentUserId?: string; // opcional para decidir "me"
-}
+import type { ChatFriend, Msg, ChatWindowProps } from "../types/chatUI.types";
+import { InputMessage } from "../types/message.types";
 
 export default function ChatWindow({
 	friend,
 	visible,
 	onClose,
 	className = "",
-	currentUserId = "8f9a8e8f-9fdb-412a-afd5-cd3b52d508ee",
+	currentUserId,
 }: ChatWindowProps) {
 	if (!visible || !friend) return null;
 
-	const chatId = friend?.chatId ?? "";
-	const username = "mi-username";
+	
 
-	const { list: raw, loading } = useGetMessages(chatId);
+	const chatId = friend?.chatId ?? "";
+	
+	//console.log( friend, currentUserId , chatId, "chat windows");
+
+	const { list, loading } = useGetMessages(chatId);
 	const { send } = useSendMessage(currentUserId);
 	const [isTyping, setIsTyping] = useState(false);
 	const endRef = useRef<HTMLDivElement>(null);
-
+	console.log(list, "lista de mensajes");
 	const messages: Msg[] = useMemo(
 		() =>
-			raw
+			list
 				.slice()
 				.sort(
 					(a, b) =>
@@ -74,8 +53,11 @@ export default function ChatWindow({
 					at: new Date(m.timestamp).getTime(),
 					read: m.read,
 				})),
-		[raw, currentUserId, friend.id]
+		[list, currentUserId, friend.id]
 	);
+
+	console.log(messages);
+	
 
 	// marcar como leídos al montar / cuando llega algo nuevo
 	useEffect(() => {

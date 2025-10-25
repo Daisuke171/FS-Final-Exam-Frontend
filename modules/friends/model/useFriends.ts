@@ -7,18 +7,14 @@ import {
   CREATE_FRIEND_INVITE_BY_USERNAME,
   CREATE_FRIEND_INVITE,
   REQUEST_FRIEND_BY_USERNAME,
+  ACCEPT_INVITE_FRIEND
 } from "@shared/lib/graphql/queries/friend.gql";
 
 
-export function useFriends(currentUserId: string) {
-  const userId = "8f9a8e8f-9fdb-412a-afd5-cd3b52d508ee";
-  console.log(userId);
-  
+export function useFriends(currentUserId: string) {  
   const { data, isLoading, refetch } = useQuery<{ friends : FriendPeer}>(FRIEND_PEERS_OF_USER, {
-    variables: { userId },
-    fetchPolicy: "cache-and-network",
+    variables: { userId: currentUserId }
   });
-  console.log(data?.friendPeersOfUser, "segundo");
   
   return {
     list: data?.friendPeersOfUser ?? [],
@@ -73,6 +69,23 @@ export function useRequestFriendByUsername() {
     requestByUsername: (requesterId: string, username: string) =>
       mutate({ variables: { input: { requesterId, username } } }),
     friend: data?.requestFriendByUsername ?? null,
+    loading,
+    error,
+    reset,
+  };
+}
+
+/** Aceptar invitación de amistad */
+export function useAcceptInviteFriend() {
+  const [mutate, { data, loading, error, reset }] = useMutation<
+    { acceptFriendInvite: FriendPayload },
+    { input: { id: string } }
+  >(ACCEPT_INVITE_FRIEND);
+
+  return {
+    accept: (receiverId: string, token: string) =>
+      mutate({ variables: { input: { receiverId, token } } }),
+    friend: data?.acceptFriendInvite ?? null,
     loading,
     error,
     reset,

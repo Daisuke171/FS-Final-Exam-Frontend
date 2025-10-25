@@ -1,88 +1,12 @@
 // modules/chat/model/useMessages.ts
 "use client";
 import type { ApolloCache, DefaultContext } from "@apollo/client";
-import { gql } from "@apollo/client/core";
+import { useApolloClient } from "@apollo/client/react"
 import { useQuery, useMutation, useSubscription } from "@apollo/client/react";
-
-export type Message = {
-  id: string;
-  chatId: string;
-  senderId: string;
-  message: string;
-  status: string;
-  read: boolean;
-  timestamp: string; // ISO
-};
-
-export type MessageDTO = {
-  id: string;
-  from: "me" | "friend";
-  text: string;
-  at: number;
-};
-
-export class InputMessage  {
-  chatId: string;
-  message: string;
-  senderId: string;
-  constructor(chatId: string, message: string, senderId: string) {
-    this.chatId = chatId;
-    this.message = message;
-    this.senderId = senderId;
-  }
-
-  toDTO() {
-    return {
-      chatId: this.chatId,
-      message: this.message,
-      senderId: this.senderId,
-    };
-  }
-}
-
-
-const GET_MESSAGES = gql`
-  query Messages($chatId: ID!) {
-    messages(chatId: $chatId) {
-      id
-      chatId
-      senderId
-      message
-      status
-      read
-      timestamp
-    }
-  }
-`;
-
-const SEND_MESSAGE = gql`
-  mutation SendMessage($input: SendMessageInput!) {
-    sendMessage(input: $input) {
-      id
-      chatId
-      senderId
-      message
-      status
-      read
-      timestamp
-    }
-  }
-`;
-
-const MESSAGE_ADDED = gql`
-  subscription MessageAdded($chatId: ID!) {
-    messageAdded(chatId: $chatId) {
-      id
-      chatId
-      senderId
-      message
-      status
-      read
-      timestamp
-    }
-  }
-`;
-
+import type { Message , MessageDTO, InputMessage } from "../types/message.types";
+import { GET_MESSAGES } from "../api/chat.queries.gql";
+import { SEND_MESSAGE  } from "../api/chat.mutation";
+import { MESSAGE_ADDED } from "../api/chat.subscritions";
 // Helper opcional (si querés DTO para la UI)
 export function toDTO(m: Message, currentUserId?: string): MessageDTO {
   return {
@@ -95,24 +19,26 @@ export function toDTO(m: Message, currentUserId?: string): MessageDTO {
 
 /** Trae mensajes por chatId */
 export function useGetMessages(chatId?: string) {
-  const { data, loading, error, refetch, client } = useQuery<
+  const client = useApolloClient();
+  const { data, loading, error, refetch } = useQuery<
     { messages: Message[] },
     { chatId: string }
   >(GET_MESSAGES, {
     variables: { chatId: chatId ?? "" },
     skip: !chatId,                       // ← evita ejecutar sin chatId
     fetchPolicy: "cache-and-network",
-  });
+  });  
 
-  // Suscripción en tiempo real (opcional, si ya tenés WS configurado)
+  // Suscripción en tiempo real
   useSubscription<{ messageAdded: Message }>(MESSAGE_ADDED, {
     skip: !chatId,
     variables: { chatId: chatId as string },
     onData: ({ data }) => {
+      console.log(data, "useGetMessages");
       const incoming = data.data?.messageAdded;
       if (!incoming) return;
 
-      // Evitar duplicado y reemplazar optimistas
+      // Evitar duplicados con mensajes optimistas
       client.updateQuery<{ messages: Message[] }>(
         { query: GET_MESSAGES, variables: { chatId: chatId as string } },
         (prev) => {
@@ -123,7 +49,8 @@ export function useGetMessages(chatId?: string) {
         }
       );
     },
-  });
+  } );
+
 
   return {
     list: data?.messages ?? [],
@@ -167,7 +94,7 @@ export function useSendMessage(currentUserId?: string) {
       const noTemps = prevList.filter((m) => !m.id.startsWith("tmp-"));
       const exists = noTemps.some((m) => m.id === next.id);
       const merged = exists ? noTemps : [...noTemps, next];
-
+      merged.sort((a, b) => +new Date(a.timestamp) - +new Date(b.timestamp));
       // 3) escribir nuevo estado
       cache.writeQuery({
         ...queryOptions,

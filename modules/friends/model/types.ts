@@ -5,44 +5,49 @@ export type Friend = {
 	nickname: string;
 	skin: string;
 	presence: Presence;
-
 };
 
 type SkinLite = {
-    id: string;
-    name: string;
-    img: string;
-    level: number;
-    value: number;
+	id: string;
+	name: string;
+	img: string;
+	level: number;
+	value: number;
 };
 
 type Peer = {
-    id: string;
-    nickname: string;
-    activeSkin?: SkinLite | null;
-    chatId: string;
+	id: string;
+	nickname: string;
+	activeSkin?: SkinLite | null;
+	chatId: string;
 };
 
 export type FriendPeer = {
-    id: string;                     // id del Friend (relación)
-    status: "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED";
-    active: boolean;
-    peer: Peer;                     // el “otro” usuario
-    chatId: string;
+	id: string; // id del Friend (relación)
+	status: "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED";
+	active: boolean;
+	peer: Peer; // el “otro” usuario
+	chatId: string;
 };
 
 export type FriendPeersResponse = { friendPeersOfUser: FriendPeer[] };
 
 export type FriendPayload = {
-  id: string;
-  status: "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED";
-  active: boolean;
-  chatId: string | null;
-  requesterId: string;
-  receiverId: string;
-  createdAt: string;
-  updatedAt: string;
+	id: string;
+	status: "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED";
+	active: boolean;
+	chatId: string | null;
+	requesterId: string;
+	receiverId: string;
+	createdAt: string;
+	updatedAt: string;
 };
+
+/* export type CreateFriendInviteInput = {
+	inviterId: string;
+	ttlHours?: number | 24;
+	targetUsername?: string;
+}; */
 
 // --------------- Clases para Inputs de Mutations ---------------
 

@@ -1,15 +1,15 @@
 "use client";
-import { apolloClient } from "shared/lib/apollo-client";
-import { FRIEND_PEERS_OF_USER } from "shared/lib/graphql/queries/friend.gql";
-import type { Friend, FriendPeer } from "../model/types";
+import type { FriendPeer } from "../model/types";
 import FriendCard from "./FriendCard";
 
 export default function FriendList({
   items,
   onSelect,
+  currentUserId,
 }: {
   items: FriendPeer[];
   onSelect: (friend: FriendPeer) => void;
+  currentUserId: string;
 }) {
  
   return (
@@ -20,7 +20,7 @@ export default function FriendList({
           onClick={() => onSelect(friend)}
           className="w-full text-left"
         >
-          <FriendCard friend={friend} />
+          <FriendCard friend={friend} currentUserId={currentUserId} />
         </button>
       ))}
     </div>

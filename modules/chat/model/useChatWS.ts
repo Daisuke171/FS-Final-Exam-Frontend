@@ -8,7 +8,7 @@ import {
   onNewMessage,
   onSent,
   onMessageRead,
-} from "@/app/chat-socket";
+} from "@shared/lib/chat-socket";
 import { useUnreadStore } from "./unread.store";
 import { useApolloClient, gql } from "@apollo/client";
 
@@ -40,7 +40,7 @@ export function useChatWS(params: {
   userId: string;
   username: string;
   chatId?: string;
-  onIncomingState?: (m: Msg) => void; // si querés además un callback
+  onIncomingState?: (m: Msg) => void; 
   onReadState?: (m: Msg) => void;
 }) {
   const { userId, username, chatId, onIncomingState, onReadState } = params;

@@ -25,7 +25,6 @@ export default function Navbar({ users, session }: NavbarProps) {
   const [avatarUrl, setAvatarUrl] = useState(session?.user?.avatar);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  console.log(session);
 
   useEffect(() => {
     setIsDropdownOpen(false);

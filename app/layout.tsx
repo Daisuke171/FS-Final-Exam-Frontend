@@ -6,6 +6,8 @@ import { Providers } from "@/app/providers";
 import "./globals.css";
 //import { Providers } from "@/components/ui/general/Providers";
 import NavbarServer from "@/components/ui/general/NabvarServer";
+import BottomBar from "@/components/ui/general/BottomBar";
+import { auth } from "@/auth";
 
 const raleway = Raleway({
 	variable: "--font-raleway",
@@ -18,21 +20,22 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: ReactNode;
+	children: ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
-      >
-        <Providers>
-          <NavbarServer />
-          {children}
-          <BottomBar />
-        </Providers>
-      </body>
-    </html>
-  );
+	const session = auth();
+	return (
+		<html lang="en">
+			<body
+				className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
+			>
+				<Providers session={session}>
+					<NavbarServer />
+					{children}
+					<BottomBar />
+				</Providers>
+			</body>
+		</html>
+	);
 }
