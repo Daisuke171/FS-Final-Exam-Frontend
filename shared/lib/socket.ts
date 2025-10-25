@@ -11,8 +11,8 @@ export function getSocket(namespace: Namespace = "/") {
 
     if (!socketInstances[namespace]) {
         const host = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost";
-        const port = process.env.NEXT_PUBLIC_API_PORT ?? "3010";
-        const url = `${host}:${port}`;
+        const port = process.env.NEXT_PUBLIC_API_PORT ?? "3011";
+        const url = `${host}:${port}${namespace}`;
 
         socketInstances[namespace] = io(url, {
             transports: ["websocket", "polling"],
@@ -23,15 +23,15 @@ export function getSocket(namespace: Namespace = "/") {
         });
 
         socketInstances[namespace].on("connect", () => {
-            console.log("✅ WS conectado:", socketInstances[namespace]?.id);
+            console.log(`✅ WS conectado [${namespace}]:`, socketInstances[namespace]?.id);
         });
 
         socketInstances[namespace].on("disconnect", (reason) => {
-            console.warn("⚠️ WS disconnect:", reason);
+            console.warn(`⚠️ WS disconnect [${namespace}]:`, reason);
         });
 
         socketInstances[namespace].on("connect_error", (err) => {
-            console.error("❌ WS connect_error:", err);
+            console.error(`❌ WS connect_error [${namespace}]:`, err);
         });
     }
     return socketInstances[namespace]!;
