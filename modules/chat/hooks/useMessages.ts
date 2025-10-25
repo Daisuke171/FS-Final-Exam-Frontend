@@ -31,52 +31,81 @@ export function useGetMessages(chatId?: string) {
   >(GET_MESSAGES, {
     variables: { chatId: chatId ?? "" },
     skip: !chatId,                       // ← evita ejecutar sin chatId
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",         // Always fetch fresh data for real-time updates
+    nextFetchPolicy: "network-only",     // Keep fetching fresh data on subsequent requests
+    pollInterval: 0,                     // Don't poll, we have subscriptions
   });  
 
-  // Suscripción en tiempo real
+  // Suscripción en tiempo real para nuevos mensajes
   useSubscription<{ messageAdded: Message }>(MESSAGE_ADDED, {
     skip: !chatId,
     variables: { chatId: chatId as string },
-    onData: ({ data }) => {
-      console.log(data, "useGetMessages");
+    onData: ({ data, client: subClient }) => {
+      console.log("📨 New message via GraphQL subscription:", data);
       const incoming = data.data?.messageAdded;
       if (!incoming) return;
 
-      // Evitar duplicados con mensajes optimistas
-      client.updateQuery<{ messages: Message[] }>(
-        { query: GET_MESSAGES, variables: { chatId: chatId as string } },
-        (prev) => {
-          const prevList = prev?.messages ?? [];
+      try {
+        // Read current cache
+        const existing = client.cache.readQuery<{ messages: Message[] }>({
+          query: GET_MESSAGES,
+          variables: { chatId: chatId as string },
+        });
+
+        if (existing) {
+          const prevList = existing.messages ?? [];
           const noTemps = prevList.filter((m) => !m.id.startsWith("tmp-"));
           const exists = noTemps.some((m) => m.id === incoming.id);
-          return { messages: exists ? noTemps : [...noTemps, incoming] };
+          
+          if (!exists) {
+            // Write updated cache
+            client.cache.writeQuery({
+              query: GET_MESSAGES,
+              variables: { chatId: chatId as string },
+              data: { messages: [...noTemps, incoming] },
+            });
+          }
         }
-      );
+      } catch (err) {
+        console.warn("Cache update failed, refetching:", err);
+        refetch?.();
+      }
     },
-  } );
+  });
 
   // Suscripción para actualizaciones de mensajes (read receipts)
   useSubscription<{ messageUpdated: Message }>(MESSAGE_UPDATED, {
     skip: !chatId,
     variables: { chatId: chatId as string },
     onData: ({ data }) => {
-      console.log("📬 Message updated (read receipt):", data);
+      console.log("📬 Message updated (read receipt) via GraphQL:", data);
       const updated = data.data?.messageUpdated;
       if (!updated) return;
 
-      // Actualizar el mensaje en el cache
-      client.updateQuery<{ messages: Message[] }>(
-        { query: GET_MESSAGES, variables: { chatId: chatId as string } },
-        (prev) => {
-          const prevList = prev?.messages ?? [];
-          return {
-            messages: prevList.map((m) =>
-              m.id === updated.id ? updated : m
-            ),
-          };
+      try {
+        // Read current cache
+        const existing = client.cache.readQuery<{ messages: Message[] }>({
+          query: GET_MESSAGES,
+          variables: { chatId: chatId as string },
+        });
+
+        if (existing) {
+          // Update the specific message
+          const updatedMessages = existing.messages.map((m) =>
+            m.id === updated.id ? updated : m
+          );
+
+          // Write back to cache
+          client.cache.writeQuery({
+            query: GET_MESSAGES,
+            variables: { chatId: chatId as string },
+            data: { messages: updatedMessages },
+          });
         }
-      );
+      } catch (err) {
+        console.warn("Cache update failed for read receipt, refetching:", err);
+        refetch?.();
+      }
     },
   });
 

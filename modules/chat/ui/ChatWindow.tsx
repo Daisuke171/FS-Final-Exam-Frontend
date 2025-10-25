@@ -142,7 +142,8 @@ export default function ChatWindow({
     // Listen for new messages from other users
     const handleNewMessage = (data: any) => {
       console.log("📨 New message received via WebSocket:", data);
-      // GraphQL subscription will handle the update
+      // Immediately refetch to show new message
+      refetch?.();
       
       // If the message is not from the current user and chat is not visible, increment unread
       if (data.senderId !== currentUserId && !visible) {
@@ -153,7 +154,8 @@ export default function ChatWindow({
     // Listen for message read updates
     const handleMessageRead = (data: any) => {
       console.log("✓✓ Message read via WebSocket:", data);
-      // GraphQL MESSAGE_UPDATED subscription will handle this now
+      // Immediately refetch to update read status (check marks)
+      refetch?.();
     };
 
     socket.on("chat:new", handleNewMessage);
@@ -166,7 +168,7 @@ export default function ChatWindow({
       socket.off("chat:new", handleNewMessage);
       socket.off("chat:read", handleMessageRead);
     };
-  }, [chatId, visible, currentUserId, clearUnread, incrementUnread]);
+  }, [chatId, visible, currentUserId, clearUnread, incrementUnread, refetch]);
 
   // Early return AFTER all hooks are called
   if (!visible || !friend) return null;
