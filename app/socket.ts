@@ -79,11 +79,13 @@ export const getCodingWarSocket = (token?: string) => {
 
   // If a socket already exists but we now have a newer token, refresh auth
   if (codingWarSocket && lastCodingWarToken) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const currentToken = (codingWarSocket as any).auth?.token as
       | string
       | undefined;
     if (currentToken !== lastCodingWarToken) {
       console.log("🔄 Actualizando token en socket existente...");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (codingWarSocket as any).auth = { token: lastCodingWarToken };
       // If we're connected with wrong/empty auth, reconnect so server sees the new token
       if (codingWarSocket.connected) {
@@ -124,10 +126,12 @@ export const getCodingWarSocket = (token?: string) => {
       );
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     codingWarSocket.on("authenticated", (data: any) => {
       console.log("✅ Autenticado en Coding War:", data);
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     codingWarSocket.on("connect_error", (error: any) => {
       const details = {
         name: error?.name,
@@ -143,6 +147,7 @@ export const getCodingWarSocket = (token?: string) => {
       codingWarSocket = null;
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     codingWarSocket.on("error", (error: any) => {
       // Improve visibility when the error object is not serializable (JSON shows {})
       const details =
@@ -150,8 +155,8 @@ export const getCodingWarSocket = (token?: string) => {
           ? {
               name: error.name,
               message: error.message,
-              description: (error as any).description,
-              data: (error as any).data,
+              description: error.description,
+              data: error.data,
             }
           : error;
       if (

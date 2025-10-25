@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import CreateRoomModal from "@/components/game/coding-war/modals/CreateRoomModal";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CustomButtonTwo from "@/components/game/coding-war/buttons/CustomButtonTwo";
 import { getCodingWarSocket } from "@/app/socket";
 import CustomTextInput from "@/components/game/coding-war/inputs/text/CustomTextInput";
@@ -34,7 +34,7 @@ export default function MainCard() {
     return () => {
       s.off("isPrivate", onIsPrivate);
     };
-  }, [socketRef.current]);
+  }, [status, session?.accessToken]);
 
   const handleOpenModal = () => {
     setOpenModal(!openModal);
