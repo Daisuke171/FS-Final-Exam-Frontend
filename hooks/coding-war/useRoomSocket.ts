@@ -32,7 +32,8 @@ export function useRoomSocket(roomId: string | string[]) {
     socketRef.current = socket;
 
     // Game/room state updates
-    socket.on("gameState", (data) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    socket.on("gameState", (data: any) => {
       if (Array.isArray(data.players)) {
         setPlayers(data.players.map((id: string) => ({ id })));
       }
