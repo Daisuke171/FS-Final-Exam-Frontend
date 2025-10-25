@@ -3,7 +3,7 @@ import GameButton from "../../buttons/landing-page/GameButton";
 import MissionItem from "./MissionItem";
 import NotificationActionButton from "../../buttons/landing-page/NotificationActionButton";
 
-export default function MainContent() {
+export default function UserContent() {
   return (
     <div className="w-full flex justify-center mt-10 px-2 md:px-6 lg:px-0 pt-20 md:pt-24 lg:pt-20 pb-24 md:pb-0">
       <div
