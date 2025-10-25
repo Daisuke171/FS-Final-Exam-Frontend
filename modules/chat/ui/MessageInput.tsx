@@ -1,7 +1,7 @@
 "use client";
 import { useState, FormEvent } from "react";
 import IconBtn from "@shared/ui/IconBtn";
-import {} from "../hooks/useChatSocket"
+import { useChatSocket } from "../hooks/useChatSocket"
 
 interface MessageInputProps {
   onSend: (text: string) => void;
@@ -15,7 +15,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
     e.preventDefault();
     const value = text.trim();
     if (!value) return;
-    onSend(value);
+    onSend(value);    
     setText("");
   };
 

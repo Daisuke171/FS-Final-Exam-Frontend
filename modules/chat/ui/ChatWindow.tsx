@@ -8,6 +8,7 @@ import {
 	useGetMessages,
 	useSendMessage,
 } from "../hooks/useMessages";
+import { useMessageAdded } from "../hooks/useMessageAdded";
 import { readMessage } from "../services/chat.socket";
 import { Icon } from "@iconify/react";
 import type { ChatFriend, Msg, ChatWindowProps } from "../types/chatUI.types";
@@ -29,10 +30,10 @@ export default function ChatWindow({
 	//console.log( friend, currentUserId , chatId, "chat windows");
 
 	const { list, loading } = useGetMessages(chatId);
+	
 	const { send } = useSendMessage(currentUserId);
 	const [isTyping, setIsTyping] = useState(false);
 	const endRef = useRef<HTMLDivElement>(null);
-	console.log(list, "lista de mensajes");
 	const messages: Msg[] = useMemo(
 		() =>
 			list
@@ -245,7 +246,7 @@ export default function ChatWindow({
 
 			{/* INPUT */}
 			<div className="p-3 shrink-0 bg-gradient-to-t from-black/10 to-transparent">
-				<MessageInput onSend={sendMessage} />
+				<MessageInput onSend={sendMessage}  />
 			</div>
 		</section>
 	);

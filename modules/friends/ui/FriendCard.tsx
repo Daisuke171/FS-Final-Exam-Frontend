@@ -3,7 +3,7 @@ import { Badge } from "@/shared/ui/Badge";
 import type { FriendPeer } from "../model/types";
 import { usePresenceStore } from "../model/presence.store";
 import { useUnreadStore } from "@/modules/chat/model/unread.store";
-import { useGetMessages } from "@/modules/chat/hooks/useMessages";
+import { useMessageAdded } from "@/modules/chat/hooks/useMessageAdded";
 
 interface FriendCardProps {
 	friend: FriendPeer;
@@ -12,11 +12,12 @@ interface FriendCardProps {
 
 export default function FriendCard({ friend, currentUserId }: FriendCardProps) {
 	const isOnline = usePresenceStore((s) => s.isOnline(friend.peer.id));
-
+	const messageAdded = useMessageAdded(friend.chatId);
 	const unread = useUnreadStore((s) => s.getCount(friend.chatId));
 
 
-
+	console.log(messageAdded);
+	
 	console.log(isOnline, "isOnline");
 	
 
