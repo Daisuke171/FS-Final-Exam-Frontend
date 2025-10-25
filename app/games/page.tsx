@@ -1,69 +1,75 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import GameCard from "@/components/ui/cards/GameCard";
+import { GameCardProps } from "@/components/ui/cards/GameCard";
 
-const games = [
+const games: GameCardProps[] = [
   {
-    key: "coding-war",
-    title: "Coding War",
-    description: "Compite tipeando código en tiempo real.",
-    href: "/games/coding-war",
-    image: "/images/placeholder/bg-placeholder.jpg",
-    badge: "Nuevo",
+    title: "Piedra, Papel o Tijera",
+    description:
+      "El clásico juego de manos reinventado. Desafía a tus amigos o enfrenta a la IA en partidas rápidas y emocionantes.",
+    image: "/logos/rps-logo-lp.webp",
+    players: "1-2",
+    difficulty: "easy",
+    xpReward: "+ 40",
+    gameType: "Estrategia",
+    isComingSoon: false,
+    href: "/games/rock-paper-scissors",
   },
   {
-    key: "rock-paper-scissors",
-    title: "Piedra Papel Tijera",
-    description: "Clásico duelo al mejor de 3.",
-    href: "/games/rock-paper-scissors",
-    image: "/images/placeholder/bg-placeholder.jpg",
-    badge: "Popular",
+    title: "Coding War",
+    description:
+      "Pon a prueba tus habilidades de programación en batallas épicas contra otros desarrolladores. Resuelve desafíos y escala rankings.",
+    image: "/logos/cw-logo-lp.webp",
+    players: "1-2",
+    difficulty: "medium",
+    xpReward: "+ 60",
+    gameType: "Lógica",
+    isComingSoon: false,
+    href: "/games/coding-war",
+  },
+  {
+    title: "Math Duel",
+    description:
+      "Desafíos matemáticos a contrarreloj. Suma, resta, multiplica y divide más rápido que tus oponentes.",
+    image: "/logos/md-logo-lp.webp",
+    players: "1-2",
+    difficulty: "medium",
+    xpReward: "+ 35",
+    gameType: "Puzzle",
+    isComingSoon: true,
   },
 ];
 
 export default function GamesHub() {
   return (
     <>
-      <div className="min-h-screen bg-gradient-one pt-[calc(75px+2.5rem)] pb-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-font">Juegos</h1>
-            <p className="text-subtitle">Elige un juego para empezar</p>
+      <div className="bg-gradient-to-b from-black-blue to-dark-blue/30 min-h-screen w-full pt-[calc(75px+2.5rem)] pb-16">
+        <div className="flex flex-col items-center mx-auto px-4">
+          <header className="mb-10 text-center max-w-[90%]">
+            <h1 className="text-4xl font-bold text-font mb-2">
+              Juegos multijugador
+            </h1>
+            <p className="text-subtitle">
+              Descubre y prueba tus habilidades en juegos emocionantes, con chat
+              integrado y grandes recompensas
+            </p>
           </header>
 
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {games.map((g) => (
-              <Link
-                key={g.key}
+          <section className="flex flex-wrap justify-center gap-6 w-full">
+            {games.map((g, i) => (
+              <GameCard
+                key={i}
+                title={g.title}
+                description={g.description}
+                image={g.image}
+                players={g.players}
+                difficulty={g.difficulty}
+                xpReward={g.xpReward}
+                gameType={g.gameType}
+                isComingSoon={g.isComingSoon}
                 href={g.href}
-                className="group relative rounded-xl overflow-hidden border border-white/10 hover:shadow-[0_0_20px_var(--shadow-purple)] transition min-h-48 md:min-h-56"
-              >
-                {/* Background image */}
-                <Image
-                  src={g.image}
-                  alt={g.title}
-                  fill
-                  priority={false}
-                  className="object-cover absolute inset-0 scale-100 group-hover:scale-105 transition duration-300"
-                />
-                {/* Dark gradient overlay for readability */}
-                <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/20" />
-
-                {/* Badge */}
-                <div className="absolute top-3 left-3 z-10">
-                  <span className="text-xs px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/30">
-                    {g.badge}
-                  </span>
-                </div>
-                {/* Foreground content */}
-                <div className="relative z-10 flex flex-col justify-end w-full h-full px-4 pb-4 pt-20">
-                  <h2 className="text-lg font-semibold text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]">
-                    {g.title}
-                  </h2>
-                  <p className="text-sm text-white/80">{g.description}</p>
-                </div>
-              </Link>
+              />
             ))}
           </section>
         </div>
