@@ -12,7 +12,7 @@ export default function LoginCard() {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.7 }}
         className="flex justify-center w-full items-center lg:items-stretch lg:max-w-[95%]"
       >
         <div className="max-w-130 rounded-l-2xl hidden lg:block">

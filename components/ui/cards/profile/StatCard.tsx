@@ -6,7 +6,7 @@ export interface StatCardProps {
   icon: IconifyIcon | string;
   title: string;
   number: number | string;
-  color?: "defeat" | "victory" | "draw" | "neutral" | "purple";
+  color?: "defeat" | "victory" | "draw" | "neutral" | "purple" | "success";
 }
 
 function getIconColor(color: string) {
@@ -21,6 +21,8 @@ function getIconColor(color: string) {
       return "text-light-blue";
     case "purple":
       return "text-bright-purple";
+    case "success":
+      return "text-light-success";
     default:
       return "text-subtitle";
   }
