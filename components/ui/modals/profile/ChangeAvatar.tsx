@@ -5,7 +5,7 @@ import {
   ACTIVATE_SKIN,
   GET_ME,
   GET_USER_SKINS_WITH_STATUS,
-} from "@/graphql/queries/user.queries";
+} from "@shared/graphql/queries/user.queries";
 import { SkinWithStatus } from "@/types/user.types";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { Icon } from "@iconify/react";

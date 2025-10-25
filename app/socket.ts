@@ -34,13 +34,14 @@ export const getSocket = (token?: string) => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
+      withCredentials: true,    
       auth: {
         token,
       },
     });
 
     socket.on("connect", () => {
-      console.log("✅ Conectado al servidor RPS | Socket ID:", socket?.id);
+      console.log("✅ Socket conectado:", socket?.id);
     });
 
     socket.on("connect_error", (error: Error) => {
@@ -63,6 +64,7 @@ export const getSocket = (token?: string) => {
   return socket;
 };
 
+export const isSocketConnected = () => socket?.connected ?? false;
 export const getCodingWarSocket = (token?: string) => {
   // update stored token if provided, so later reuse remains authenticated
   if (token) {
@@ -196,10 +198,11 @@ export const onGameState = <T = unknown>(callback: (data: T) => void) => {
 
 export const emitEvent = (event: string, data: unknown) => {
   const s = getSocket();
-  if (s?.connected) {
+  if (!s) return;
+  if (s.connected) {
     s.emit(event, data);
   } else {
-    console.warn(`⚠️ Socket no conectado. No se puede emitir: ${event}`);
+    s.once("connect", () => s.emit(event, data));
   }
 };
 
@@ -216,6 +219,15 @@ export const disconnectSocket = () => {
   }
 };
 
-export const isSocketConnected = () => {
-  return socket?.connected ?? false;
+export const onNewFriend = (callback: (data: any) => void) => {
+  const s = getSocket();
+  s?.on("newFriend", callback);   
+  return () => s?.off("newFriend", callback);
 };
+
+export const onNewMessage = (callback: (data: any) => void) => {
+  const s = getSocket();
+  s?.on("newMessage", callback);  
+  return () => s?.off("newMessage", callback);
+};
+

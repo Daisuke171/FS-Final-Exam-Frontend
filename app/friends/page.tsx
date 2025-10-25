@@ -1,7 +1,16 @@
-export default function Friends() {
+import { auth } from "@/auth";
+import FriendsPage from "@/modules/friends/FriendPage";
+
+export default async function NavbarServer() {
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
+  const accessToken = session?.accessToken;
+  
   return (
-    <div className="flex flex-col h-screen items-center justify-center">
-      <h1>Friends</h1>
-    </div>
+    <FriendsPage
+      session={session}
+      userId={userId}
+      accessToken={accessToken}
+    />
   );
 }

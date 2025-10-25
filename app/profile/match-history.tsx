@@ -5,7 +5,7 @@ import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { GameHistory } from "@/types/game.types";
-import { GET_USER_GAMES } from "@/graphql/queries/game.queries";
+import { GET_USER_GAMES } from "@/shared/graphql/queries/game.queries";
 import { useQuery } from "@apollo/client/react";
 import MatchHistoryLayout from "@/components/layout/profile/match-history-layout";
 import MatchSkeleton from "@/components/ui/skeletons/profile/MatchSkeleton";

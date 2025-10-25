@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
+import { ReactNode } from "react";
 import { Raleway } from "next/font/google";
-import BottomBar from "@/components/ui/general/BottomBar";
+// import { ApolloWrapper } from "@/lib/apollo-client";
+import { Providers } from "@/app/providers";
 import "./globals.css";
-import { Providers } from "@/components/ui/general/Providers";
+//import { Providers } from "@/components/ui/general/Providers";
 import NavbarServer from "@/components/ui/general/NabvarServer";
+import BottomBar from "@/components/ui/general/BottomBar";
+import { auth } from "@/auth";
 
 const raleway = Raleway({
-  variable: "--font-raleway",
-  subsets: ["latin"],
+	variable: "--font-raleway",
+	subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -16,21 +20,23 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
-      >
-        <Providers>
-          <NavbarServer />
-          {children}
-          <BottomBar />
-        </Providers>
-      </body>
-    </html>
-  );
+	const session = auth();
+	return (
+		<html lang="en">
+			
+			<body
+				className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
+			>
+				<Providers session={session}>
+					<NavbarServer />
+					{children}
+					<BottomBar />
+				</Providers>
+			</body>
+		</html>
+	);
 }

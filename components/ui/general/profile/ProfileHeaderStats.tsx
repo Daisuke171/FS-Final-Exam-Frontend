@@ -2,7 +2,7 @@
 
 import { useQuery } from "@apollo/client/react";
 import { UserStats } from "@/types/game.types";
-import { GET_USER_BASIC_STATS } from "@/graphql/queries/game.queries";
+import { GET_USER_BASIC_STATS } from "@/shared/graphql/queries/game.queries";
 import StatCard, { StatCardProps } from "../../cards/profile/StatCard";
 import { Icon } from "@iconify/react";
 

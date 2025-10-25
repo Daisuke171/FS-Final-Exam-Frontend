@@ -6,7 +6,7 @@ import { useState } from "react";
 import {
   GET_GLOBAL_LEADERBOARD,
   GET_LEADERBOARD,
-} from "@/graphql/queries/game.queries";
+} from "@shared/graphql/queries/game.queries";
 import { useQuery } from "@apollo/client/react";
 import { Leaderboard } from "@/types/game.types";
 import GenericErrorCard from "@/components/ui/cards/GenericErrorCard";

@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { apolloClientServer } from "./lib/apollo-client-server";
-import { LOGIN_MUTATION } from "./graphql/queries/auth.mutations";
+import { LOGIN_MUTATION } from "@shared/graphql/queries/auth.mutations";
 import { LoginResponse } from "./types/auth.types";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({

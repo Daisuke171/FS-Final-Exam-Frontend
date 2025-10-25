@@ -17,7 +17,7 @@ export default function MainContent() {
           </h2>
           <div className="flex justify-center gap-4">
             {/* Uso modularizado */}
-            <GameButton>+</GameButton>
+            <GameButton >+</GameButton>
             <GameButton>🎮</GameButton>
             <GameButton>🎲</GameButton>
           </div>

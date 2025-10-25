@@ -9,6 +9,8 @@ interface NavbarProps {
   users: number;
 }
 
+const LOGO = "/logos/3.png";
+
 export default function Navbar({ username, avatar, users }: NavbarProps) {
   return (
     <header className="fixed top-0 left-0 w-full z-50 flex justify-center">
@@ -48,9 +50,9 @@ export default function Navbar({ username, avatar, users }: NavbarProps) {
             </p>
           </div>
 
-          <div className="flex justify-center">
-            <Image src="/Sanya-logo.png" alt="Logo" width={40} height={40} />
-          </div>
+          <picture className="flex justify-center  w-40 h-20 md:items-center space-x-2">
+            <img src={LOGO} alt="Logo" className="w-full object-cover" />
+          </picture>
 
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-md border border-[var(--light-blue)] bg-[var(--light-blue)]/10 text-white text-sm font-semibold shadow-[0_0_6px_rgba(76,201,240,0.4)]">
             <span className="w-2 h-2 rounded-full bg-green-500"></span>

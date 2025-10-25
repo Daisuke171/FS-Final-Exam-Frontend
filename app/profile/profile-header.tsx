@@ -8,7 +8,7 @@ import LevelBar from "@/components/ui/general/profile/LevelBar";
 import ProfileHeaderInfo from "@/components/ui/general/profile/ProfileHeaderInfo";
 import { useQuery } from "@apollo/client/react";
 import { User } from "@/types/user.types";
-import { GET_ME } from "@/graphql/queries/user.queries";
+import { GET_ME } from "@shared/graphql/queries/user.queries";
 
 export default function ProfileHeader() {
   const { data, loading, error } = useQuery<{ me: User }>(GET_ME, {});
