@@ -28,3 +28,17 @@ export const LOGIN_MUTATION = gql`
     }
   }
 `;
+
+export const REGISTER_MUTATION = gql`
+  mutation Register($registerInput: RegisterInput!) {
+    register(registerInput: $registerInput) {
+      id
+      email
+      username
+      nickname
+      name
+      lastname
+      birthday
+    }
+  }
+`;

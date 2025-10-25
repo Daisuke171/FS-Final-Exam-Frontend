@@ -8,6 +8,7 @@ import PlayersInRoom from "@/components/game/coding-war/general/PlayersInRoom";
 import CustomButtonOne from "@/components/game/coding-war/buttons/CustomButtonOne";
 import LoaderCard from "@/components/game/coding-war/cards/LoaderCard";
 import CountdownCard from "@/components/game/coding-war/cards/CountdownCard";
+import { useSession } from "next-auth/react";
 
 interface GameStateData {
   players: string[];
@@ -15,6 +16,7 @@ interface GameStateData {
 }
 
 export default function ResultPage() {
+  const { data: session } = useSession();
   const params = useParams();
   const router = useRouter();
   const roomId = String(params.roomId || "");
@@ -33,7 +35,7 @@ export default function ResultPage() {
   const countDownHandledRef = useRef(false);
 
   useEffect(() => {
-    const s = getCodingWarSocket();
+    const s = getCodingWarSocket(session?.accessToken);
     const onGS = (data: Partial<GameStateData>) => {
       if (Array.isArray(data.players)) setPlayers(data.players);
       if (data?.ready) {
@@ -63,10 +65,10 @@ export default function ResultPage() {
       s.off("gameState", onGS);
       s.off("countDown", onCountDown);
     };
-  }, [roomId, playerId, router]);
+  }, [roomId, playerId, router, session?.accessToken]);
 
   const handleReplayToggle = () => {
-    const s = getCodingWarSocket();
+    const s = getCodingWarSocket(session?.accessToken);
     const next = !isReady;
     setIsReady(next);
     s.emit("confirmReady", { roomId, ready: next });
@@ -80,14 +82,14 @@ export default function ResultPage() {
   if (countDown !== null && countDown > 0) {
     // Show the big 3-2-1 visual timer centered while waiting to auto-redirect to match
     return (
-      <div className="min-h-screen w-full flex items-center justify-center px-4">
+      <div className="min-h-screen w-full flex items-center justify-center px-4 pt-[calc(75px+2.5rem)]">
         <CountdownCard countDown={countDown} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-4">
+    <div className="min-h-screen w-full flex items-center justify-center px-4 pt-[calc(75px+2.5rem)]">
       <div className="max-w-3xl w-full bg-gradient-to-br from-black/60 to-black/30 border border-white/10 rounded-2xl p-6 text-center">
         <h1 className="text-3xl font-semibold text-indigo-300 mb-2">
           Match Result

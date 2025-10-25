@@ -3,9 +3,9 @@
 import CustomTextInput from "../inputs/text/CustomTextInput";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { getCodingWarSocket } from "@/app/socket";
+import { useSession } from "next-auth/react";
 import { motion } from "motion/react";
 
-const socket = getCodingWarSocket();
 
 interface LogsProps {
   id: string;
@@ -33,13 +33,18 @@ export default function ChatComponent({
   players: { id: string }[];
   playerId: string | undefined;
 }) {
+  const { data: session, status } = useSession();
+  const socketRef = useRef<ReturnType<typeof getCodingWarSocket> | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [logs, setLogs] = useState<LogsProps[]>([]);
-  const [previousPlayerIds, setPreviousPlayerIds] = useState<Set<string>>(
-    new Set()
-  );
+  // Track previous player IDs in a ref to avoid triggering re-renders/effect loops
+  const previousPlayerIdsRef = useRef<Set<string>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const allItems: ChatItem[] = [...logs, ...messages].sort((a, b) => {
     const timeA =
@@ -53,9 +58,11 @@ export default function ChatComponent({
     return timeA - timeB;
   });
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  // Create the socket only once we have a token
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.accessToken) return;
+    socketRef.current = getCodingWarSocket(session.accessToken);
+  }, [status, session?.accessToken]);
   const formatTime = (timestamp: string | number) => {
     const date =
       typeof timestamp === "string" ? new Date(timestamp) : new Date(timestamp);
@@ -69,17 +76,18 @@ export default function ChatComponent({
   }, [messages, logs]);
 
   useEffect(() => {
+    if (status !== "authenticated" || !session?.accessToken) return;
+    const s = getCodingWarSocket(session.accessToken);
+    socketRef.current = s;
     const handleRoomChatMessages = (data: ChatMessage) => {
       console.log("Received messages:", data);
       setMessages((prev) => [...prev, data]);
     };
-
-    socket.on("roomChatMessages", handleRoomChatMessages);
-
+    s.on("roomChatMessages", handleRoomChatMessages);
     return () => {
-      socket.off("roomChatMessages", handleRoomChatMessages);
+      s.off("roomChatMessages", handleRoomChatMessages);
     };
-  }, []);
+  }, [status, session?.accessToken]);
 
   useEffect(() => {
     if (!isInitialized && playerId) {
@@ -91,7 +99,7 @@ export default function ChatComponent({
           timestamp: Date.now(),
         },
       ]);
-      setPreviousPlayerIds(new Set(players.map((p) => p.id)));
+      previousPlayerIdsRef.current = new Set(players.map((p) => p.id));
       setIsInitialized(true);
     }
   }, [playerId, isInitialized, players]);
@@ -100,6 +108,7 @@ export default function ChatComponent({
     if (!isInitialized) return;
 
     const currentPlayerIds = new Set(players.map((p) => p.id));
+    const previousPlayerIds = previousPlayerIdsRef.current;
 
     players.forEach((player) => {
       if (!previousPlayerIds.has(player.id) && player.id !== playerId) {
@@ -129,8 +138,9 @@ export default function ChatComponent({
       }
     });
 
-    setPreviousPlayerIds(currentPlayerIds);
-  }, [players, isInitialized, playerId, previousPlayerIds]);
+    // Update the ref with the latest snapshot without causing an extra render
+    previousPlayerIdsRef.current = currentPlayerIds;
+  }, [players, isInitialized, playerId]);
 
   const handleSendMessage = useCallback(() => {
     const input = document.querySelector(
@@ -138,7 +148,7 @@ export default function ChatComponent({
     ) as HTMLInputElement;
     const message = input.value.trim();
     if (message.length === 0) return;
-    socket.emit("roomChat", { roomId, message });
+    socketRef.current?.emit("roomChat", { roomId, message });
     input.value = "";
   }, [roomId]);
 

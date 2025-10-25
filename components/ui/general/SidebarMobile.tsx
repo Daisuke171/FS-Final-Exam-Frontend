@@ -4,6 +4,7 @@ import { signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 
 interface SidebarMobileProps {
   avatar: string | undefined;
@@ -35,6 +36,7 @@ export default function SidebarMobile({
   isAuthenticated,
   closeSidebar,
 }: SidebarMobileProps) {
+  const router = useRouter();
   return (
     <>
       <motion.div
@@ -167,7 +169,7 @@ export default function SidebarMobile({
                 icon={"tabler:user-up"}
                 size="sm"
                 color="white"
-                action={() => signIn()}
+                action={() => router.push("/register")}
               />
             </motion.ul>
           )}

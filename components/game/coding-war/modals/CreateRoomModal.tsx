@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { getCodingWarSocket } from "@/app/socket";
 import { Icon } from "@iconify-icon/react";
@@ -8,6 +8,7 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import CustomButtonOne from "../buttons/CustomButtonOne";
 import CustomCheckbox from "../inputs/checkbox/CustomCheckbox";
+import { useSession } from "next-auth/react";
 
 const formSchema = z
   .object({
@@ -29,13 +30,13 @@ const formSchema = z
 
 type FormData = z.infer<typeof formSchema>;
 
-const socket = getCodingWarSocket();
-
 export default function CreateRoomModal({
   setCloseModal,
 }: {
   setCloseModal: () => void;
 }) {
+  const { data: session, status } = useSession();
+  const socketRef = useRef<ReturnType<typeof getCodingWarSocket> | null>(null);
   const [formData, setFormData] = useState<FormData>({
     roomName: "",
     isPrivate: false,
@@ -46,9 +47,16 @@ export default function CreateRoomModal({
   const router = useRouter();
 
   useEffect(() => {
+    if (status !== "authenticated" || !session?.accessToken) return;
+    const socket = getCodingWarSocket(session.accessToken);
+    socketRef.current = socket;
     socket.on("roomCreated", (data: { roomInfo?: unknown; roomId: string }) => {
       console.log("Sala creada:", data.roomInfo);
       setLoading(false);
+      // Mark this room as already joined to avoid double join on redirect
+      const anySocket = socket as unknown as { _cwJoinedRooms?: Set<string> };
+      if (!anySocket._cwJoinedRooms) anySocket._cwJoinedRooms = new Set<string>();
+      anySocket._cwJoinedRooms.add(data.roomId);
       setCloseModal();
       router.push(`/games/coding-war/${data.roomId}`);
     });
@@ -56,7 +64,7 @@ export default function CreateRoomModal({
     return () => {
       socket.off("roomCreated");
     };
-  }, [router, setCloseModal]);
+  }, [router, setCloseModal, status, session?.accessToken]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +72,7 @@ export default function CreateRoomModal({
     setErrors({});
     const result = formSchema.safeParse(formData);
     if (result.success) {
-      socket.emit("createRoom", {
+      socketRef.current?.emit("createRoom", {
         roomName: formData.roomName,
         isPrivate: formData.isPrivate,
         password: formData.isPrivate ? formData.password : undefined,

@@ -10,6 +10,7 @@ import SidebarMobile from "./SidebarMobile";
 import AuthDropdown from "./AuthDropdown";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 interface NavbarProps {
   users: number;
@@ -142,11 +143,7 @@ export default function Navbar({ users, session }: NavbarProps) {
                 />
               ) : (
                 <div className="h-12 w-12 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
-                  <Icon
-                    icon="mdi:user"
-                    width="28"
-                    className="text-font"
-                  />
+                  <Icon icon="mdi:user" width="28" className="text-font" />
                 </div>
               )}
             </div>
@@ -167,8 +164,8 @@ export default function Navbar({ users, session }: NavbarProps) {
             <Image
               src="/logos/sanya-logo-1.webp"
               alt="Logo"
-              width={90}
-              height={90}
+              width={100}
+              height={100}
             />
           </div>
 
@@ -180,12 +177,14 @@ export default function Navbar({ users, session }: NavbarProps) {
 
         <div className="hidden md:flex w-full items-center">
           <div className="flex items-center space-x-2 md:w-25 lg:w-32">
-            <Image
-              src="/logos/sanya-logo-1.webp"
-              alt="Logo"
-              width={100}
-              height={100}
-            />
+            <Link href="/">
+              <Image
+                src="/logos/sanya-logo-1.webp"
+                alt="Logo"
+                width={100}
+                height={100}
+              />
+            </Link>
           </div>
           <nav
             className={`flex items-center ${
@@ -200,20 +199,14 @@ export default function Navbar({ users, session }: NavbarProps) {
                   link.hover || "hover:text-light-blue "
                 } cursor-pointer transition-colors duration-300 ease-in-out`}
               >
-                <Icon
-                  icon={link.icon}
-                  className="text-lg"
-                />
+                <Icon icon={link.icon} className="text-lg" />
                 {link.name}
               </a>
             ))}
           </nav>
 
           {!isAuthenticated && (
-            <div
-              ref={dropdownRef}
-              className="relative"
-            >
+            <div ref={dropdownRef} className="relative">
               <div
                 onClick={handleDropdownOpen}
                 className="flex items-center gap-2 cursor-pointer w-25"
@@ -263,10 +256,7 @@ export default function Navbar({ users, session }: NavbarProps) {
                       />
                     ) : (
                       <div className="h-11 w-11 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
-                        <Icon
-                          icon="mdi:user"
-                          className="text-font text-2xl"
-                        />
+                        <Icon icon="mdi:user" className="text-font text-2xl" />
                       </div>
                     )}
                     <Icon

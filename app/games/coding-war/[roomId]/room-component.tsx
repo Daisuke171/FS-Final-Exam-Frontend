@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCodingWarSocket } from "@/app/socket";
+import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { Icon } from "@iconify-icon/react";
 import PlayersInRoom from "@/components/game/coding-war/general/PlayersInRoom";
@@ -15,9 +16,9 @@ import RoomErrorCard from "@/components/game/coding-war/cards/RoomErrorCard";
 import { useRoomSocket } from "@/hooks/coding-war/useRoomSocket";
 import JoinByPassword from "@/components/game/coding-war/general/JoinByPassword";
 
-const socket = getCodingWarSocket();
-
 export default function RoomComponent() {
+  const { data: session, status } = useSession();
+  const socketRef = useRef<ReturnType<typeof getCodingWarSocket> | null>(null);
   const [clicked, setClicked] = useState<boolean>(false);
   const [countDown, setCountDown] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,6 +29,11 @@ export default function RoomComponent() {
   const roomId = Array.isArray(params.roomId)
     ? params.roomId[0]
     : (params.roomId as string | undefined) || "";
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.accessToken) return;
+    socketRef.current = getCodingWarSocket(session.accessToken);
+  }, [status, session?.accessToken]);
+
   useEffect(() => {
     console.log("[RoomComponent] roomId:", roomId);
   }, [roomId]);
@@ -53,40 +59,38 @@ export default function RoomComponent() {
         router.push(`/games/coding-war/${roomId}/match`);
       }
     };
-    const onGameState = () => setPlayerId(socket.id);
+  const s = socketRef.current;
+  if (!s) return;
+  const onGameState = () => setPlayerId(s.id);
 
-    socket.on("countDown", onCountDown);
-    socket.on("gameState", onGameState);
-
-    // Always request the current game/room state so the UI can populate
-    socket.emit("requestGameState", { roomId });
-
+  s.on("countDown", onCountDown);
+  s.on("gameState", onGameState);
     // Join only after we have a valid roomId, and avoid duplicate emits across StrictMode remounts
-    const anySocket = socket as unknown as { _cwJoinedRooms?: Set<string> };
+    const anySocket = s as unknown as { _cwJoinedRooms?: Set<string> };
     if (!anySocket._cwJoinedRooms) anySocket._cwJoinedRooms = new Set<string>();
     if (!anySocket._cwJoinedRooms.has(roomId)) {
-      socket.emit("joinRoom", { roomId });
+      s.emit("joinRoom", { roomId });
       anySocket._cwJoinedRooms.add(roomId);
+      // After joining, request the current room state to populate UI
+      setTimeout(() => {
+        s.emit("requestGameState", { roomId });
+      }, 50);
+    } else {
+      // Already joined previously, safe to request state
+      s.emit("requestGameState", { roomId });
     }
 
     return () => {
-      socket.off("gameState", onGameState);
-      socket.off("joinRoomError");
-      socket.off("countDown", onCountDown);
+      s.off("gameState", onGameState);
+      s.off("joinRoomError");
+      s.off("countDown", onCountDown);
     };
-  }, [roomId, router]);
+  }, [roomId, router, status, session?.accessToken]);
 
   const handleConfirmPlayers = () => {
-    socket.emit("confirmReady", { roomId, ready: true });
-
-    setClicked(true);
-    if (clicked) {
-      setTimeout(() => {
-        socket.emit("confirmReady", { roomId, ready: false });
-
-        setClicked(false);
-      }, 100);
-    }
+    const next = !clicked;
+    socketRef.current?.emit("confirmReady", { roomId, ready: next });
+    setClicked(next);
   };
 
   const shareRoomLink = () => {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useAnimationControls } from "motion/react";
 import Dragonhead from "./icons";
 import { useSocketContext } from "@/app/games/coding-war/provider/SocketContext";
+import { useSession } from "next-auth/react";
 import problems from "@/public/textTest.json";
 import { getCodingWarSocket } from "@/app/socket";
 import CustomButtonTwo from "./buttons/CustomButtonTwo";
@@ -15,6 +16,7 @@ type Problem = { lang: string; code: string };
 export default function TextViewer({ roomId }: { roomId?: string }) {
   const router = useRouter();
   const { leave } = useSocketContext();
+  const { data: session } = useSession();
   const problemList = useMemo<Problem[]>(
     () => (problems as unknown as Problem[]) ?? [],
     []
@@ -49,15 +51,15 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   const [redirectRemaining, setRedirectRemaining] = useState<number>(0);
   const [scoreP1, setScoreP1] = useState(0);
   const [scoreP2, setScoreP2] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
+  const readySentRef = useRef(false);
 
   useEffect(() => {
-    const s = getCodingWarSocket();
+  const s = getCodingWarSocket(session?.accessToken);
 
     if (room) {
       // Ask server to sync and attach us to the room if needed
       s.emit("requestGameState", { roomId: room });
-      // Signal readiness so the PlayingState can start when both clients are ready
-      s.emit("playerReadyForMatch", { roomId: room });
     }
 
     // Track own socket id
@@ -70,6 +72,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     const onTimerStart = (data: { duration: number }) => {
       setRemaining(Math.ceil((data.duration ?? 60000) / 1000));
       setEnded(false);
+      setGameStarted(true);
       // stop local fallback if any
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = null;
@@ -92,12 +95,14 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       }
       s.off("timerTick", onTimerTick);
       // Optional: sync scores from server if provided
-      if (data?.finalScores && connectedUsers.length) {
-        const [p1Id, p2Id] = connectedUsers;
-        if (p1Id !== undefined && data.finalScores[p1Id] !== undefined) {
+      // Prefer authoritative final scores from server, mapped to P1/P2 using role+ids
+      if (data?.finalScores) {
+        const p1Id = role === "P2" ? opponentId : selfId;
+        const p2Id = role === "P2" ? selfId : opponentId;
+        if (p1Id && data.finalScores[p1Id] !== undefined) {
           setScoreP1(data.finalScores[p1Id] ?? 0);
         }
-        if (p2Id !== undefined && data.finalScores[p2Id] !== undefined) {
+        if (p2Id && data.finalScores[p2Id] !== undefined) {
           setScoreP2(data.finalScores[p2Id] ?? 0);
         }
       }
@@ -105,11 +110,12 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       // Directly schedule redirect in 4s based on server scores
       if (!redirectFiredRef.current && room) {
         redirectFiredRef.current = true;
-        // Compute winner and scores from payload if possible
+        // Compute winner and scores from payload if possible (avoid stale state)
         let p1 = scoreP1;
         let p2 = scoreP2;
-        if (data?.finalScores && connectedUsers.length) {
-          const [p1Id, p2Id] = connectedUsers;
+        if (data?.finalScores) {
+          const p1Id = role === "P2" ? opponentId : selfId;
+          const p2Id = role === "P2" ? selfId : opponentId;
           p1 = p1Id ? data.finalScores[p1Id] ?? p1 : p1;
           p2 = p2Id ? data.finalScores[p2Id] ?? p2 : p2;
         }
@@ -136,12 +142,21 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       scores?: Record<string, number>;
       problemIndex?: Record<string, number>;
       result?: unknown;
+      state?: string;
     }) => {
+      // If server transitions to PlayingState, send readiness once
+      if (state?.state === "PlayingState" && room && !readySentRef.current) {
+        getCodingWarSocket(session?.accessToken).emit("playerReadyForMatch", { roomId: room });
+        readySentRef.current = true;
+      }
       if (state?.players && Array.isArray(state.players)) {
         // detect disconnect: if previously had 2 and now less than 2, or opponent missing
         const prev = prevConnectedRef.current;
         const now = state.players;
-        setConnectedUsers(now);
+        // Only update if changed (prevent render loops)
+        const changed =
+          prev.length !== now.length || prev.some((id, i) => id !== now[i]);
+        if (changed) setConnectedUsers(now);
         // compute removed IDs robustly
         const removed = prev.filter((id) => !now.includes(id));
         // keep a snapshot, not the same reference
@@ -159,13 +174,14 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
             s.off("timerTick", onTimerTick);
           }
         }
-        // Determine role based on join order
-        if (selfId) {
-          const idx = state.players.indexOf(selfId);
+        // Determine role based on join order using current socket id
+        const myId = s.id || selfId;
+        if (myId) {
+          const idx = state.players.indexOf(myId);
           if (idx === 0) setRole("P1");
           else if (idx === 1) setRole("P2");
           else setRole("spectator");
-          const opp = state.players.find((p) => p !== selfId) || null;
+          const opp = state.players.find((p) => p !== myId) || null;
           setOpponentId(opp);
         }
         // Map authoritative scores to P1/P2 by players order
@@ -256,19 +272,8 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       s.off("connect", onConnect);
       s.off("gameOver", onGameOver);
     };
-  }, [
-    room,
-    selfId,
-    opponentId,
-    connectedUsers,
-    opponentProblemIndex,
-    problemIndex,
-    problemList,
-    role,
-    router,
-    scoreP1,
-    scoreP2,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room]);
 
   useEffect(() => {
     if (roomId && roomId !== room) {
@@ -281,19 +286,21 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     // Clear any existing timer
     if (timerRef.current) clearInterval(timerRef.current);
     setEnded(false);
-    // if server events connect later, they'll clear this
-    timerRef.current = setInterval(() => {
-      setRemaining((r) => {
-        const next = Math.max(0, r - 1);
-        if (next === 0) setEnded(true);
-        return next;
-      });
-    }, 1000);
+    // Only run fallback countdown after game actually started
+    if (gameStarted) {
+      timerRef.current = setInterval(() => {
+        setRemaining((r) => {
+          const next = Math.max(0, r - 1);
+          if (next === 0) setEnded(true);
+          return next;
+        });
+      }, 1000);
+    }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
     };
-  }, [room]);
+  }, [room, gameStarted]);
 
   // Split code into lines
   const originalLines = useMemo(() => code.split("\n"), [code]);
@@ -460,7 +467,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       setInputValueP1(value);
       // Emit typing progress for P1 when local player is P1
       if (localPlayer !== null && localPlayer === player) {
-        getCodingWarSocket().emit("typingProgress", {
+        getCodingWarSocket(session?.accessToken).emit("typingProgress", {
           roomId: room,
           lineIndex: currentLine,
           input: value,
@@ -470,7 +477,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       setColoredLinesP2((prev) => ({ ...prev, [currentLine]: newColoredLine }));
       setInputValueP2(value);
       if (localPlayer !== null && localPlayer === player) {
-        getCodingWarSocket().emit("typingProgress", {
+        getCodingWarSocket(session?.accessToken).emit("typingProgress", {
           roomId: room,
           lineIndex: currentLine,
           input: value,
@@ -522,7 +529,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         }, 750);
         // Broadcast line commit for opponent mirror
         if (localPlayer !== null && localPlayer === player) {
-          getCodingWarSocket().emit("lineCommit", {
+          getCodingWarSocket(session?.accessToken).emit("lineCommit", {
             roomId: room,
             lineIndex: currentLine,
             input: trimmedInput,
@@ -539,7 +546,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           setFloatersP2((prev) => prev.filter((f) => f.id !== id));
         }, 750);
         if (localPlayer !== null && localPlayer === player) {
-          getCodingWarSocket().emit("lineCommit", {
+          getCodingWarSocket(session?.accessToken).emit("lineCommit", {
             roomId: room,
             lineIndex: currentLine,
             input: trimmedInput,
@@ -593,7 +600,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       // If this player reached the last line, request next problem only for this player
       const atLastLine = currentLine >= originalLines.length - 1;
       if (atLastLine && localPlayer !== null && localPlayer === player) {
-        getCodingWarSocket().emit("problemCompleted", { roomId: room });
+  getCodingWarSocket(session?.accessToken).emit("problemCompleted", { roomId: room });
       }
     }
   };
@@ -857,7 +864,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   // Leave handler: mark not ready, disconnect socket, cleanup timers, navigate out
   const handleLeave = () => {
     try {
-      const s = getCodingWarSocket();
+      const s = getCodingWarSocket(session?.accessToken);
       if (room) s.emit("confirmReady", { roomId: room, ready: false });
       // Disconnect from Coding War namespace so server cleans up membership
       s.disconnect();
@@ -875,7 +882,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
 
   // Listen to opponent updates
   useEffect(() => {
-    const s = getCodingWarSocket();
+  const s = getCodingWarSocket(session?.accessToken);
     const onTyping = (data: {
       playerId: string;
       lineIndex: number;
@@ -983,7 +990,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       s.off("lineCommitted", onLineCommitted);
       s.off("problemIndexUpdate", onProblemIndexUpdate);
     };
-  }, [role, room, originalLines, opponentLines, selfId, problemList]);
+  }, [role, room, originalLines, opponentLines, selfId, problemList, session?.accessToken]);
 
   // Winner display helper
   const winner: "P1" | "P2" | "draw" | null = useMemo(() => {
@@ -996,7 +1003,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
   // Navigate to result page 4s after end (fallback if gameOver is missed)
   const redirectFiredRef = useRef(false);
   useEffect(() => {
-    if (!ended || redirectFiredRef.current) return;
+    if (!ended || redirectFiredRef.current || !gameStarted) return;
     redirectFiredRef.current = true;
     // Snapshot current scores to compute winner once
     const p1Num = scoreP1;
@@ -1023,7 +1030,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       if (redirectCountdownRef.current)
         clearInterval(redirectCountdownRef.current);
     };
-  }, [ended, room, router, scoreP1, scoreP2]);
+  }, [ended, room, router, scoreP1, scoreP2, gameStarted]);
 
   return (
     <div className="w-full">

@@ -1,8 +1,10 @@
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
 import { signIn } from "next-auth/react";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 
 export default function AuthDropdown() {
+  const router = useRouter();
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -27,6 +29,7 @@ export default function AuthDropdown() {
           icon={"tabler:user-up"}
           size="sm"
           color="white"
+          action={() => router.push("/register")}
         />
       </div>
     </motion.div>

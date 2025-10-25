@@ -13,7 +13,6 @@ interface CustomFormInputProps {
   register?: UseFormRegisterReturn;
   isTouched?: boolean;
   isValid?: boolean;
-  name?: string;
   icon?: IconifyIcon | string;
 }
 
@@ -25,7 +24,6 @@ export default function CustomFormInput({
   register,
   isTouched,
   isValid,
-  name,
   icon,
 }: CustomFormInputProps) {
   const borderColor = error
@@ -41,15 +39,23 @@ export default function CustomFormInput({
     : "text-light-gray";
   const [clicked, setClicked] = useState(false);
   return (
-    <div className="flex flex-col gap-2 relative">
-      {label && <label className="text-font">{label}</label>}
+    <div className="flex flex-col gap-2 relative w-full">
+      {label && (
+        <label
+          htmlFor={register?.name}
+          className="text-font"
+        >
+          {label}
+        </label>
+      )}
       <div className="relative group">
         <input
           {...register}
-          name={name}
           type={type === "password" ? (clicked ? "text" : "password") : type}
           placeholder={placeholder}
-          className={`py-3 px-4 border-2 ${borderColor} ${
+          className={`py-3 px-4 ${
+            type === "password" && "pr-12"
+          } border-2 ${borderColor} ${
             icon && "pl-11"
           } rounded-xl w-full focus:outline-none
             focus:border-light-blue  text-font transition duration-300 ease-in-out`}
@@ -59,7 +65,7 @@ export default function CustomFormInput({
             icon={`${clicked ? "solar:eye-linear" : "solar:eye-closed-linear"}`}
             width="24"
             onClick={() => setClicked(!clicked)}
-            className={`absolute right-5 cursor-pointer ${
+            className={`absolute right-4 cursor-pointer ${
               clicked ? "top-1/2" : "top-7.5"
             } transform -translate-y-1/2 text-light-gray`}
           />
