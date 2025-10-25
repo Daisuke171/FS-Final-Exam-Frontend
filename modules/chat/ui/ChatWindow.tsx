@@ -10,6 +10,7 @@ import { Icon } from "@iconify/react";
 import type { ChatFriend, Msg, ChatWindowProps } from "../types/chatUI.types";
 import { InputMessage } from "../types/message.types";
 import { getSocket } from "@shared/lib/socket";
+import { useUnreadStore } from "../model/unread.store";
 
 export default function ChatWindow({
   friend,
@@ -27,6 +28,10 @@ export default function ChatWindow({
   const { send } = useSendMessage(currentUserId);
   const [isTyping, setIsTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  
+  // Get unread store methods
+  const clearUnread = useUnreadStore((s) => s.clear);
+  const incrementUnread = useUnreadStore((s) => s.increment);
 
   const messages: Msg[] = useMemo(
     () =>
@@ -57,7 +62,9 @@ export default function ChatWindow({
     if (!friend?.chatId) return;
     // marca como leído todos los mensajes del otro
     const messagesNews = messages.filter((m) => m.from === "friend" && !m.read);
+		
     if (messagesNews.length > 0) {
+			console.log("CANTIDAD DE MENSAJES",messagesNews);
       messagesNews.map((m) => readMessage(friend.chatId, m.id));
     }
   }, [friend?.chatId, messages]);
@@ -129,18 +136,24 @@ export default function ChatWindow({
       socket.emit("chat:set_user", { id: currentUserId });
     }
 
+    // Clear unread count when opening the chat
+    clearUnread(chatId);
+
     // Listen for new messages from other users
     const handleNewMessage = (data: any) => {
       console.log("📨 New message received via WebSocket:", data);
-      // Refetch to update the message list
-      refetch?.();
+      // GraphQL subscription will handle the update
+      
+      // If the message is not from the current user and chat is not visible, increment unread
+      if (data.senderId !== currentUserId && !visible) {
+        incrementUnread(chatId);
+      }
     };
 
     // Listen for message read updates
     const handleMessageRead = (data: any) => {
       console.log("✓✓ Message read via WebSocket:", data);
-      // Refetch to update read status
-      refetch?.();
+      // GraphQL MESSAGE_UPDATED subscription will handle this now
     };
 
     socket.on("chat:new", handleNewMessage);
@@ -153,7 +166,7 @@ export default function ChatWindow({
       socket.off("chat:new", handleNewMessage);
       socket.off("chat:read", handleMessageRead);
     };
-  }, [chatId, visible, currentUserId, refetch]);
+  }, [chatId, visible, currentUserId, clearUnread, incrementUnread]);
 
   // Early return AFTER all hooks are called
   if (!visible || !friend) return null;

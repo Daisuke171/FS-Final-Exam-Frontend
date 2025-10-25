@@ -6,7 +6,9 @@ import { useQuery, useMutation, useSubscription } from "@apollo/client/react";
 import type { Message , MessageDTO, InputMessage } from "../types/message.types";
 import { GET_MESSAGES } from "../api/chat.queries.gql";
 import { SEND_MESSAGE  } from "../api/chat.mutation";
-import { MESSAGE_ADDED } from "../api/chat.subscritions";
+import { MESSAGE_ADDED, MESSAGE_UPDATED } from "../api/chat.subscritions";
+import { useUnreadStore } from "../model/unread.store";
+import { usePathname } from "next/navigation";
 // Helper opcional (si querés DTO para la UI)
 export function toDTO(m: Message, currentUserId?: string): MessageDTO {
   return {
@@ -20,6 +22,9 @@ export function toDTO(m: Message, currentUserId?: string): MessageDTO {
 /** Trae mensajes por chatId */
 export function useGetMessages(chatId?: string) {
   const client = useApolloClient();
+  const pathname = usePathname();
+  const incrementUnread = useUnreadStore((s) => s.increment);
+  
   const { data, loading, error, refetch } = useQuery<
     { messages: Message[] },
     { chatId: string }
@@ -50,6 +55,30 @@ export function useGetMessages(chatId?: string) {
       );
     },
   } );
+
+  // Suscripción para actualizaciones de mensajes (read receipts)
+  useSubscription<{ messageUpdated: Message }>(MESSAGE_UPDATED, {
+    skip: !chatId,
+    variables: { chatId: chatId as string },
+    onData: ({ data }) => {
+      console.log("📬 Message updated (read receipt):", data);
+      const updated = data.data?.messageUpdated;
+      if (!updated) return;
+
+      // Actualizar el mensaje en el cache
+      client.updateQuery<{ messages: Message[] }>(
+        { query: GET_MESSAGES, variables: { chatId: chatId as string } },
+        (prev) => {
+          const prevList = prev?.messages ?? [];
+          return {
+            messages: prevList.map((m) =>
+              m.id === updated.id ? updated : m
+            ),
+          };
+        }
+      );
+    },
+  });
 
 
   return {

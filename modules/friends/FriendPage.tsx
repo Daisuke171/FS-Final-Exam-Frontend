@@ -8,6 +8,7 @@ import Loader from "@shared/ui/Loader";
 import { cn } from "@shared/lib/utils";
 import { FriendList } from "@modules/friends";
 import { ChatWindow } from "@modules/chat";
+import { useGlobalChatListener } from "@modules/chat/hooks/useGlobalChatListener";
 
 import type { FriendPeer } from "@modules/friends/model/types";
 import { useFriends } from "@modules/friends/model/useFriends";
@@ -29,6 +30,9 @@ export default function FriendsPage({session, userId, accessToken}: FriendsPageP
 
   const [selected, setSelected] = useState<FriendPeer | null>(null);
   const handleCloseChat = () => setSelected(null);
+
+  // Global chat listener for unread messages
+  useGlobalChatListener(userId ?? undefined);
 
   const listFriendsActives = useMemo(
     () => (list ?? []).filter((friend) => friend.active && friend.status === "ACCEPTED"),

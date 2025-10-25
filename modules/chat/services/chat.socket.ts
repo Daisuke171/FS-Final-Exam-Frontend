@@ -19,13 +19,13 @@ export function NewMessage(msg: any) {
 
 // Handle read messages
 export function onMessageRead(cb: (data: any) => void) {
-  getSocket().on("read_message", cb);
+  getSocket("/chat").on("read_message", cb);
 }
 export function offMessageRead(cb: (data: any) => void) {
-    getSocket().off("read_message", cb);
+  getSocket("/chat").off("read_message", cb);
 }
 export function readMessage(chatId: string, messageId: string) {
-  getSocket().emit("read_message", { chatId, messageId });
+  getSocket("/chat").emit("chat:read", { chatId, messageId });
 }
 
 // Handle send messages
