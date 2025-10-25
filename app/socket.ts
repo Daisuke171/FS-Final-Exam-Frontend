@@ -62,18 +62,22 @@ export const getSocket = (token?: string) => {
 };
 
 export const getCodingWarSocket = (token?: string) => {
+  // Recreate socket if it's present but disconnected, mirroring getSocket behavior
+  if (codingWarSocket && codingWarSocket.disconnected) {
+    codingWarSocket.offAny();
+    codingWarSocket = null;
+  }
+
   if (!codingWarSocket) {
     const baseUrl = getBaseUrl();
     console.log("🔌 Intentando conectar a:", `${baseUrl}/coding-war`);
     codingWarSocket = io(`${baseUrl}/coding-war`, {
-      autoConnect: true,
+      transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
-      transports: ["websocket", "polling"],
-      auth: {
-        token,
-      },
+      reconnectionDelayMax: 5000,
+      auth: { token },
     });
 
     codingWarSocket.on("connect", () => {
@@ -90,6 +94,18 @@ export const getCodingWarSocket = (token?: string) => {
     codingWarSocket.on("disconnect", (reason: string) => {
       console.warn("⚠️ Desconectado (Coding War):", reason);
       codingWarSocket = null;
+    });
+
+    codingWarSocket.on("error", (error: unknown) => {
+      console.error("❌ Error de Socket (Coding War):", error);
+      try {
+        console.error(
+          "❌ Detalles del Error (JSON Coding War):",
+          JSON.stringify(error, null, 2)
+        );
+      } catch {
+        // ignore JSON stringify errors
+      }
     });
   }
   return codingWarSocket;

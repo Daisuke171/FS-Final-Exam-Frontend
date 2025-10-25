@@ -35,9 +35,8 @@ export default function ChatComponent({
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [logs, setLogs] = useState<LogsProps[]>([]);
-  const [previousPlayerIds, setPreviousPlayerIds] = useState<Set<string>>(
-    new Set()
-  );
+  // Track previous player IDs in a ref to avoid triggering re-renders/effect loops
+  const previousPlayerIdsRef = useRef<Set<string>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -91,7 +90,7 @@ export default function ChatComponent({
           timestamp: Date.now(),
         },
       ]);
-      setPreviousPlayerIds(new Set(players.map((p) => p.id)));
+      previousPlayerIdsRef.current = new Set(players.map((p) => p.id));
       setIsInitialized(true);
     }
   }, [playerId, isInitialized, players]);
@@ -100,6 +99,7 @@ export default function ChatComponent({
     if (!isInitialized) return;
 
     const currentPlayerIds = new Set(players.map((p) => p.id));
+    const previousPlayerIds = previousPlayerIdsRef.current;
 
     players.forEach((player) => {
       if (!previousPlayerIds.has(player.id) && player.id !== playerId) {
@@ -129,8 +129,9 @@ export default function ChatComponent({
       }
     });
 
-    setPreviousPlayerIds(currentPlayerIds);
-  }, [players, isInitialized, playerId, previousPlayerIds]);
+    // Update the ref with the latest snapshot without causing an extra render
+    previousPlayerIdsRef.current = currentPlayerIds;
+  }, [players, isInitialized, playerId]);
 
   const handleSendMessage = useCallback(() => {
     const input = document.querySelector(

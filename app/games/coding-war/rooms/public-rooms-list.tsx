@@ -7,6 +7,7 @@ import { getCodingWarSocket } from "@/app/socket";
 import CustomButtonOne from "@/components/game/coding-war/buttons/CustomButtonOne";
 import { useRouter } from "next/navigation";
 import CreateRoomModal from "@/components/game/coding-war/modals/CreateRoomModal";
+import { useSession } from "next-auth/react";
 
 interface RoomData {
   id: string;
@@ -17,13 +18,20 @@ interface RoomData {
 }
 
 export default function PublicRoomsList() {
-  const socket = getCodingWarSocket();
+  const { data: session, status } = useSession();
+  const socket = getCodingWarSocket(session?.accessToken);
   const [rooms, setRooms] = useState<RoomData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    if (status === "loading") return;
+    if (status !== "authenticated" || !session?.accessToken) {
+      setIsLoading(false);
+      return;
+    }
+
     // Escuchar la lista de salas públicas
     socket.on("publicRoomsList", (data: RoomData[]) => {
       setRooms(data);
@@ -34,7 +42,7 @@ export default function PublicRoomsList() {
     return () => {
       socket.off("publicRoomsList");
     };
-  }, [socket]);
+  }, [socket, status, session?.accessToken]);
 
   const handleRefreshRooms = () => {
     setIsLoading(true);

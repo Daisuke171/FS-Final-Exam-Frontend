@@ -57,16 +57,19 @@ export default function RoomComponent() {
 
     socket.on("countDown", onCountDown);
     socket.on("gameState", onGameState);
-
-    // Always request the current game/room state so the UI can populate
-    socket.emit("requestGameState", { roomId });
-
     // Join only after we have a valid roomId, and avoid duplicate emits across StrictMode remounts
     const anySocket = socket as unknown as { _cwJoinedRooms?: Set<string> };
     if (!anySocket._cwJoinedRooms) anySocket._cwJoinedRooms = new Set<string>();
     if (!anySocket._cwJoinedRooms.has(roomId)) {
       socket.emit("joinRoom", { roomId });
       anySocket._cwJoinedRooms.add(roomId);
+      // After joining, request the current room state to populate UI
+      setTimeout(() => {
+        socket.emit("requestGameState", { roomId });
+      }, 50);
+    } else {
+      // Already joined previously, safe to request state
+      socket.emit("requestGameState", { roomId });
     }
 
     return () => {
@@ -77,16 +80,9 @@ export default function RoomComponent() {
   }, [roomId, router]);
 
   const handleConfirmPlayers = () => {
-    socket.emit("confirmReady", { roomId, ready: true });
-
-    setClicked(true);
-    if (clicked) {
-      setTimeout(() => {
-        socket.emit("confirmReady", { roomId, ready: false });
-
-        setClicked(false);
-      }, 100);
-    }
+    const next = !clicked;
+    socket.emit("confirmReady", { roomId, ready: next });
+    setClicked(next);
   };
 
   const shareRoomLink = () => {
