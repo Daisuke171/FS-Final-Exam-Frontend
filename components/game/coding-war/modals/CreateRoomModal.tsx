@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { getCodingWarSocket } from "@/app/socket";
 import { Icon } from "@iconify-icon/react";
@@ -35,8 +35,8 @@ export default function CreateRoomModal({
 }: {
   setCloseModal: () => void;
 }) {
-  const { data: session } = useSession();
-  const socket = getCodingWarSocket(session?.accessToken);
+  const { data: session, status } = useSession();
+  const socketRef = useRef<ReturnType<typeof getCodingWarSocket> | null>(null);
   const [formData, setFormData] = useState<FormData>({
     roomName: "",
     isPrivate: false,
@@ -47,6 +47,9 @@ export default function CreateRoomModal({
   const router = useRouter();
 
   useEffect(() => {
+    if (status !== "authenticated" || !session?.accessToken) return;
+    const socket = getCodingWarSocket(session.accessToken);
+    socketRef.current = socket;
     socket.on("roomCreated", (data: { roomInfo?: unknown; roomId: string }) => {
       console.log("Sala creada:", data.roomInfo);
       setLoading(false);
@@ -61,7 +64,7 @@ export default function CreateRoomModal({
     return () => {
       socket.off("roomCreated");
     };
-  }, [router, setCloseModal, socket]);
+  }, [router, setCloseModal, status, session?.accessToken]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +72,7 @@ export default function CreateRoomModal({
     setErrors({});
     const result = formSchema.safeParse(formData);
     if (result.success) {
-      socket.emit("createRoom", {
+      socketRef.current?.emit("createRoom", {
         roomName: formData.roomName,
         isPrivate: formData.isPrivate,
         password: formData.isPrivate ? formData.password : undefined,

@@ -2,14 +2,16 @@
 
 import { getCodingWarSocket } from "@/app/socket";
 
-export const socket = () => getCodingWarSocket();
+// Token-aware helpers. Prefer calling getCodingWarSocket(session?.accessToken)
+// at the call site, but keep these wrappers for convenience.
+export const socket = (token?: string) => getCodingWarSocket(token);
 
-export const joinRoom = (room: string) => {
-  const s = socket();
+export const joinRoom = (room: string, token?: string) => {
+  const s = socket(token);
   s.emit("joinRoom", { roomId: room });
 };
 
-export const leaveRoom = (room: string) => {
-  const s = socket();
+export const leaveRoom = (room: string, token?: string) => {
+  const s = socket(token);
   s.emit("leaveRoom", { room });
 };

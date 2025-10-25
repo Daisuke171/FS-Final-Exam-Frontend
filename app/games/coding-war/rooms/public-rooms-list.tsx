@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Icon } from "@iconify/react";
 import { getCodingWarSocket } from "@/app/socket";
@@ -19,34 +19,33 @@ interface RoomData {
 
 export default function PublicRoomsList() {
   const { data: session, status } = useSession();
-  const socket = getCodingWarSocket(session?.accessToken);
+  const socketRef = useRef<ReturnType<typeof getCodingWarSocket> | null>(null);
   const [rooms, setRooms] = useState<RoomData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "loading") return;
     if (status !== "authenticated" || !session?.accessToken) {
       setIsLoading(false);
       return;
     }
-
-    // Escuchar la lista de salas públicas
-    socket.on("publicRoomsList", (data: RoomData[]) => {
+    const s = getCodingWarSocket(session.accessToken);
+    socketRef.current = s;
+    const onList = (data: RoomData[]) => {
       setRooms(data);
       setIsLoading(false);
-    });
-    socket.emit("getPublicRooms");
-
-    return () => {
-      socket.off("publicRoomsList");
     };
-  }, [socket, status, session?.accessToken]);
+    s.on("publicRoomsList", onList);
+    s.emit("getPublicRooms");
+    return () => {
+      s.off("publicRoomsList", onList);
+    };
+  }, [status, session?.accessToken]);
 
   const handleRefreshRooms = () => {
     setIsLoading(true);
-    socket.emit("getPublicRooms");
+    socketRef.current?.emit("getPublicRooms");
   };
 
   const handleJoinRoom = (roomId: string) => {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getCodingWarSocket } from "@/app/socket";
 import { useRouter, usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 interface RoomInfo {
   id: string;
@@ -20,12 +21,15 @@ export function useRoomSocket(roomId: string | string[]) {
   const [isPrivate, setIsPrivate] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const socketRef = useRef(getCodingWarSocket());
+  const { data: session, status } = useSession();
+  const socketRef = useRef<ReturnType<typeof getCodingWarSocket> | null>(null);
   const router = useRouter();
   const currentPathname = usePathname();
 
   useEffect(() => {
-    const socket = socketRef.current;
+    if (status !== "authenticated" || !session?.accessToken) return;
+    const socket = getCodingWarSocket(session.accessToken);
+    socketRef.current = socket;
 
     // Game/room state updates
     socket.on("gameState", (data) => {
@@ -69,7 +73,7 @@ export function useRoomSocket(roomId: string | string[]) {
       socket.off("joinRoomError");
       socket.off("joinRoomSuccess");
     };
-  }, [roomIdStr]);
+  }, [roomIdStr, status, session?.accessToken]);
 
   const handleJoinRoomById = () => {
     const input = document.querySelector(
@@ -80,7 +84,7 @@ export function useRoomSocket(roomId: string | string[]) {
       setError("El campo no puede estar vacío");
       return;
     }
-    socketRef.current.emit("joinRoom", { roomId: value });
+  socketRef.current?.emit("joinRoom", { roomId: value });
   };
 
   const handleJoinRoomByPassword = () => {
@@ -92,7 +96,7 @@ export function useRoomSocket(roomId: string | string[]) {
       setError("El campo no puede estar vacío");
       return;
     }
-    socketRef.current.emit("joinRoom", { roomId: roomIdStr, password });
+  socketRef.current?.emit("joinRoom", { roomId: roomIdStr, password });
   };
 
   return {

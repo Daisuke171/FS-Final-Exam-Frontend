@@ -2,30 +2,39 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import CreateRoomModal from "@/components/game/coding-war/modals/CreateRoomModal";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import CustomButtonTwo from "@/components/game/coding-war/buttons/CustomButtonTwo";
 import { getCodingWarSocket } from "@/app/socket";
 import CustomTextInput from "@/components/game/coding-war/inputs/text/CustomTextInput";
 import { useRoomSocket } from "@/hooks/coding-war/useRoomSocket";
 import JoinByPassword from "@/components/game/coding-war/general/JoinByPassword";
-
-const socket = getCodingWarSocket();
+import { useSession } from "next-auth/react";
 
 export default function MainCard() {
+  const { data: session, status } = useSession();
+  const socketRef = useRef<ReturnType<typeof getCodingWarSocket> | null>(null);
+  // Create socket only when authenticated
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.accessToken) return;
+    socketRef.current = getCodingWarSocket(session.accessToken);
+    return () => {
+      // do not disconnect globally here; listeners are attached per effect below
+    };
+  }, [status, session?.accessToken]);
   const [openModal, setOpenModal] = useState(false);
   const [roomId, setRoomId] = useState<string | null>(null);
   const { error, handleJoinRoomByPassword, handleJoinRoomById, message, isPrivate } =
     useRoomSocket(roomId || "");
 
   useEffect(() => {
-    socket.on("isPrivate", (data) => {
-      setRoomId(data.roomId);
-    });
-
+    const s = socketRef.current;
+    if (!s) return;
+    const onIsPrivate = (data: { roomId: string }) => setRoomId(data.roomId);
+    s.on("isPrivate", onIsPrivate);
     return () => {
-      socket.off("isPrivate");
+      s.off("isPrivate", onIsPrivate);
     };
-  }, []);
+  }, [socketRef.current]);
 
   const handleOpenModal = () => {
     setOpenModal(!openModal);
