@@ -10,33 +10,35 @@ import BottomBar from "@/components/ui/general/BottomBar";
 import { auth } from "@/auth";
 
 const raleway = Raleway({
-	variable: "--font-raleway",
-	subsets: ["latin"],
+  variable: "--font-raleway",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: "Sanya Games",
   description: "Welcome to Sanya Games - Your Ultimate Gaming Hub!",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
-	children,
+  children,
 }: Readonly<{
-	children: ReactNode;
+  children: ReactNode;
 }>) {
-	const session = auth();
-	return (
-		<html lang="en">
-			
-			<body
-				className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
-			>
-				<Providers session={session}>
-					<NavbarServer />
-					{children}
-					<BottomBar />
-				</Providers>
-			</body>
-		</html>
-	);
+  const session = auth();
+  return (
+    <html lang="en">
+      <body
+        className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
+      >
+        <Providers session={session}>
+          <NavbarServer />
+          {children}
+          <BottomBar />
+        </Providers>
+      </body>
+    </html>
+  );
 }
