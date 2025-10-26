@@ -8,6 +8,7 @@ import "./globals.css";
 import NavbarServer from "@/components/ui/general/NabvarServer";
 import BottomBar from "@/components/ui/general/BottomBar";
 import { auth } from "@/auth";
+import Footer from "@/components/ui/general/Footer";
 
 const raleway = Raleway({
   variable: "--font-raleway",
@@ -33,6 +34,7 @@ export default async function RootLayout({
         <Providers session={session}>
           <NavbarServer />
           {children}
+          <Footer />
           <BottomBar />
         </Providers>
       </body>
