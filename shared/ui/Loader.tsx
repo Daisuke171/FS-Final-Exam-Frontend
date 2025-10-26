@@ -7,7 +7,7 @@ interface LoaderProps {
   text?: string;
 }
 
-export default function Loader({ text }: LoaderProps): void {
+export default function Loader({ text }: LoaderProps) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.5 }}

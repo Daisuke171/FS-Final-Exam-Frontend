@@ -10,9 +10,7 @@ import { GlobalChatProvider } from "@/modules/chat/provider/GlobalChatProvider";
 function ApolloAuthBoundary({ children }: { children: ReactNode }) {
   const { data: session } = useSession();
 
-  const client = useMemo(() => createApolloClient(), [
-    session?.accessToken,
-  ]);
+  const client = useMemo(() => createApolloClient(), [session?.accessToken]);
 
   return (
     <ApolloProvider client={client}>

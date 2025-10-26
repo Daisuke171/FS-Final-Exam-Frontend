@@ -14,15 +14,15 @@ import {
 
 
 export function useFriends(currentUserId: string) {  
-  const { data, isLoading, refetch } = useQuery<{ friends : FriendPeer}>(FRIEND_PEERS_OF_USER, {
+  const { data, loading, refetch, error } = useQuery<{ friendPeersOfUser: FriendPeer[] }>(FRIEND_PEERS_OF_USER, {
     variables: { userId: currentUserId }
   });
   
   return {
     list: data?.friendPeersOfUser ?? [],
-    loading: isLoading,
+    loading,
     refetch,
-    error: data?.error,
+    error,
   };
 }
 
@@ -81,7 +81,7 @@ export function useRequestFriendByUsername() {
 export function useAcceptInviteFriend() {
   const [mutate, { data, loading, error, reset }] = useMutation<
     { acceptFriendInvite: FriendPayload },
-    { input: { id: string } }
+    { input: { receiverId: string; token: string } }
   >(ACCEPT_INVITE_FRIEND);
 
   return {

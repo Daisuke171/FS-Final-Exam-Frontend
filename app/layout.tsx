@@ -18,6 +18,9 @@ const raleway = Raleway({
 export const metadata: Metadata = {
   title: "Sanya Games",
   description: "Welcome to Sanya Games - Your Ultimate Gaming Hub!",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default async function RootLayout({
@@ -34,7 +37,6 @@ export default async function RootLayout({
         <Providers session={session}>
           <NavbarServer />
           {children}
-          <Footer />
           <BottomBar />
         </Providers>
       </body>

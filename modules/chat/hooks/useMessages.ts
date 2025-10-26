@@ -134,7 +134,7 @@ export function useSendMessage(currentUserId?: string) {
         timestamp: new Date().toISOString(),        
       },
     }),
-    update: (cache: ApolloCache<unknown>, { data }) => {
+    update: (cache, { data }) => {
       const next = data?.sendMessage;
       if (!next) return;
 
@@ -160,8 +160,8 @@ export function useSendMessage(currentUserId?: string) {
     },
   });
   return {
-    send: ({ chatId, message, senderId }: InputMessage) =>
-      mutate({ variables: { input: { chatId, message, senderId } } }),
+    send: ({ chatId, message }: InputMessage) =>
+      mutate({ variables: { input: { chatId, message } } }),
     loading,
   };
 }

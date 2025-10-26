@@ -219,13 +219,15 @@ export const disconnectSocket = () => {
   }
 };
 
-export const onNewFriend = (callback: (data: unknown) => void) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const onNewFriend = (callback: (data: any) => void) => {
   const s = getSocket();
   s?.on("newFriend", callback);   
   return () => s?.off("newFriend", callback);
 };
 
-export const onNewMessage = (callback: (data: unknown) => void) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const onNewMessage = (callback: (data: any) => void) => {
   const s = getSocket();
   s?.on("newMessage", callback);  
   return () => s?.off("newMessage", callback);
