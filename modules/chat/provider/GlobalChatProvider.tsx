@@ -6,10 +6,6 @@ import { getSocket } from "@shared/lib/socket";
 import { useUnreadStore } from "../model/unread.store";
 import { usePathname } from "next/navigation";
 
-/**
- * Global provider to handle chat notifications and unread counts across the entire app.
- * Connects to the /chat WebSocket namespace and listens for new messages.
- */
 export function GlobalChatProvider({ children }: { children: ReactNode }) {
   const { data: session } = useSession();
   const incrementUnread = useUnreadStore((s) => s.increment);

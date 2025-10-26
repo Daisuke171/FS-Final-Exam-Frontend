@@ -3,12 +3,14 @@
 import { useQuery, useMutation, useSubscription } from "@apollo/client/react";
 import { FriendPeer, CreateFriendInviteInputByUsername, CreateFriendInviteInput, FriendPayload } from "./types";
 import {                  
-  FRIEND_PEERS_OF_USER,
+  FRIEND_PEERS_OF_USER,  
+} from "../api/friend.queries";
+import { 
   CREATE_FRIEND_INVITE_BY_USERNAME,
   CREATE_FRIEND_INVITE,
   REQUEST_FRIEND_BY_USERNAME,
   ACCEPT_INVITE_FRIEND
-} from "@shared/lib/graphql/queries/friend.gql";
+} from "../api/friend.mutation";
 
 
 export function useFriends(currentUserId: string) {  

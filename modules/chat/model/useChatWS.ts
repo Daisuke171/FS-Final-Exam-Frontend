@@ -1,4 +1,3 @@
-// modules/chat/model/useChatWS.ts
 "use client";
 import { useEffect } from "react";
 import {

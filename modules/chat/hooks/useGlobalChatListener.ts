@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSubscription } from "@apollo/client/react";
-import { MESSAGE_ADDED } from "../api/chat.subscritions";
 import { useUnreadStore } from "../model/unread.store";
 import { usePathname } from "next/navigation";
-import type { Message } from "../types/message.types";
 
 /**
  * Global listener for all chat messages across all chats.
