@@ -119,8 +119,8 @@ export default function Navbar({ users, session }: NavbarProps) {
 
       {/* CONTENEDOR CENTRAL (Ancho y Altura final) */}
       <div
-        className="relative w-[95%]
-          max-w-350
+        className="relative w-full
+          max-w-300
           mx-4 flex items-center justify-between px-0  py-3"
       >
         {/* Versión móvil (sin cambios) */}
@@ -143,7 +143,11 @@ export default function Navbar({ users, session }: NavbarProps) {
                 />
               ) : (
                 <div className="h-12 w-12 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
-                  <Icon icon="mdi:user" width="28" className="text-font" />
+                  <Icon
+                    icon="mdi:user"
+                    width="28"
+                    className="text-font"
+                  />
                 </div>
               )}
             </div>
@@ -199,14 +203,20 @@ export default function Navbar({ users, session }: NavbarProps) {
                   link.hover || "hover:text-light-blue "
                 } cursor-pointer transition-colors duration-300 ease-in-out`}
               >
-                <Icon icon={link.icon} className="text-lg" />
+                <Icon
+                  icon={link.icon}
+                  className="text-lg"
+                />
                 {link.name}
               </a>
             ))}
           </nav>
 
           {!isAuthenticated && (
-            <div ref={dropdownRef} className="relative">
+            <div
+              ref={dropdownRef}
+              className="relative"
+            >
               <div
                 onClick={handleDropdownOpen}
                 className="flex items-center gap-2 cursor-pointer w-25"
@@ -256,7 +266,10 @@ export default function Navbar({ users, session }: NavbarProps) {
                       />
                     ) : (
                       <div className="h-11 w-11 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
-                        <Icon icon="mdi:user" className="text-font text-2xl" />
+                        <Icon
+                          icon="mdi:user"
+                          className="text-font text-2xl"
+                        />
                       </div>
                     )}
                     <Icon
