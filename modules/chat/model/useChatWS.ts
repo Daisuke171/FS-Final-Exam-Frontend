@@ -7,7 +7,7 @@ import {
   onNewMessage,
   onSent,
   onMessageRead,
-} from "@shared/lib/chat-socket";
+} from "@/shared/lib/chat-socket";
 import { useUnreadStore } from "./unread.store";
 import { useApolloClient, gql } from "@apollo/client";
 
@@ -39,12 +39,14 @@ export function useChatWS(params: {
   userId: string;
   username: string;
   chatId?: string;
-  onIncomingState?: (m: Msg) => void; 
+  onIncomingState?: (m: Msg) => void;
   onReadState?: (m: Msg) => void;
 }) {
   const { userId, username, chatId, onIncomingState, onReadState } = params;
   const client = useApolloClient();
-  const increment = useUnreadStore((incomingMessage) => incomingMessage.increment);
+  const increment = useUnreadStore(
+    (incomingMessage) => incomingMessage.increment
+  );
 
   // autenticar socket con set_user (y re-autenticar al reconectar)
   useEffect(() => {
@@ -108,7 +110,11 @@ export function useChatWS(params: {
         (prev) => {
           const list = prev?.messages ?? [];
           return {
-            messages: list.map((m) => (m.id === updated.id ? { ...m, read: updated.read, status: updated.status } : m)),
+            messages: list.map((m) =>
+              m.id === updated.id
+                ? { ...m, read: updated.read, status: updated.status }
+                : m
+            ),
           };
         }
       );
@@ -122,7 +128,7 @@ export function useChatWS(params: {
     };
   }, [client, chatId, onIncomingState, onReadState]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (!userId) return;
 
     // Cuando llega un nuevo mensaje
@@ -136,5 +142,3 @@ export function useChatWS(params: {
     return () => incomingMessage?.();
   }, [userId, increment]);
 }
-
- 
