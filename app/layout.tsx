@@ -10,8 +10,8 @@ import BottomBar from "@/components/ui/general/BottomBar";
 import { auth } from "@/auth";
 
 const raleway = Raleway({
-	variable: "--font-raleway",
-	subsets: ["latin"],
+  variable: "--font-raleway",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -19,24 +19,23 @@ export const metadata: Metadata = {
   description: "Welcome to Sanya Games - Your Ultimate Gaming Hub!",
 };
 
-export default function RootLayout({
-	children,
+export default async function RootLayout({
+  children,
 }: Readonly<{
-	children: ReactNode;
+  children: ReactNode;
 }>) {
-	const session = auth();
-	return (
-		<html lang="en">
-			
-			<body
-				className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
-			>
-				<Providers session={session}>
-					<NavbarServer />
-					{children}
-					<BottomBar />
-				</Providers>
-			</body>
-		</html>
-	);
+  const session = await auth();
+  return (
+    <html lang="en">
+      <body
+        className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
+      >
+        <Providers session={session}>
+          <NavbarServer />
+          {children}
+          <BottomBar />
+        </Providers>
+      </body>
+    </html>
+  );
 }

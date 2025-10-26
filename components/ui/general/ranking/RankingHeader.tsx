@@ -13,11 +13,15 @@ export default function RankingHeader({
   setFilter: (filter: GameFilter) => void;
 }) {
   const { isVisible } = useScrollDirection({ threshold: 80, topOffset: 10 });
-  const filterOptions: { label: string; value: GameFilter }[] = [
+  const filterOptions: {
+    label: string;
+    value: GameFilter;
+    disabled?: boolean;
+  }[] = [
     { label: "General", value: "general" },
     { label: "Rock Paper Scissors", value: "rockPaperScissors" },
-    { label: "Code War", value: "codeWar" },
-    { label: "Tic Tac Toe", value: "ticTacToe" },
+    { label: "Coding War", value: "codeWar" },
+    { label: "Math War", value: "ticTacToe", disabled: true },
   ];
   return (
     <motion.header
@@ -30,9 +34,15 @@ export default function RankingHeader({
         {filterOptions.map((option) => (
           <button
             key={option.value}
-            onClick={() => setFilter(option.value)}
-            className={`p-5 py-3 relative cursor-pointer font-medium whitespace-nowrap  transition-colors ${
-              filter === option.value
+            onClick={
+              option.disabled ? undefined : () => setFilter(option.value)
+            }
+            className={`p-5 py-3 relative cursor-pointer ${
+              option.disabled
+                ? "pointer-events-none line-through decoration-2"
+                : ""
+            } font-medium whitespace-nowrap  transition-colors ${
+              filter === option.value && !option.disabled
                 ? "text-font"
                 : "text-light-gray hover:bg-white/10"
             }`}

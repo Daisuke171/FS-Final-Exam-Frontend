@@ -2,6 +2,7 @@
 
 import GameCard from "@/components/ui/cards/GameCard";
 import { GameCardProps } from "@/components/ui/cards/GameCard";
+import { motion } from "motion/react";
 
 const games: GameCardProps[] = [
   {
@@ -46,7 +47,12 @@ export default function GamesHub() {
     <>
       <div className="bg-gradient-to-b from-black-blue to-dark-blue/30 min-h-screen w-full pt-[calc(75px+2.5rem)] pb-16">
         <div className="flex flex-col items-center mx-auto px-4">
-          <header className="mb-10 text-center max-w-[90%]">
+          <motion.header
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="mb-10 text-center max-w-[90%]"
+          >
             <h1 className="text-4xl font-bold text-font mb-2">
               Juegos multijugador
             </h1>
@@ -54,9 +60,14 @@ export default function GamesHub() {
               Descubre y prueba tus habilidades en juegos emocionantes, con chat
               integrado y grandes recompensas
             </p>
-          </header>
+          </motion.header>
 
-          <section className="flex flex-wrap justify-center gap-6 w-full">
+          <motion.section
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="flex flex-wrap justify-center gap-6 w-full"
+          >
             {games.map((g, i) => (
               <GameCard
                 key={i}
@@ -71,7 +82,7 @@ export default function GamesHub() {
                 href={g.href}
               />
             ))}
-          </section>
+          </motion.section>
         </div>
       </div>
     </>

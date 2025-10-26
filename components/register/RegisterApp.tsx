@@ -11,7 +11,11 @@ import FormTitle from "@/components/register/FormTitle";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import FruitSelector from "@/components/register/FruitSelector";
+<<<<<<< HEAD
 import { REGISTER_MUTATION } from "@shared/graphql/queries/auth.mutations";
+=======
+import { REGISTER_MUTATION } from "@/shared/graphql/queries/auth.mutations";
+>>>>>>> feature/refresh-token
 import { useMutation } from "@apollo/client/react";
 import RegisterSuccess from "./RegisterSuccess";
 

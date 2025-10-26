@@ -1,3 +1,5 @@
+"use client";
+
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
 import { Icon } from "@iconify/react";
 import { signIn, signOut } from "next-auth/react";
@@ -5,6 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import { LOGOUT_MUTATION } from "@/shared/graphql/queries/auth.mutations";
+import { useMutation } from "@apollo/client/react";
+import { useState } from "react";
 
 interface SidebarMobileProps {
   avatar: string | undefined;
@@ -37,6 +42,22 @@ export default function SidebarMobile({
   closeSidebar,
 }: SidebarMobileProps) {
   const router = useRouter();
+  const [logout] = useMutation(LOGOUT_MUTATION);
+  const [isLoading, setIsLoading] = useState(false);
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      await logout();
+      await signOut({
+        redirect: false,
+      });
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+
+      setIsLoading(false);
+    }
+  };
   return (
     <>
       <motion.div
@@ -137,14 +158,22 @@ export default function SidebarMobile({
                 </Link>
               ))}
               <button
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="flex font-medium items-center w-full text-light-error gap-2 py-1.5"
+                disabled={isLoading}
+                onClick={handleLogout}
+                className={`flex cursor-pointer font-medium items-center w-full text-light-error gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-1.5`}
               >
-                <Icon
-                  icon="mdi:logout"
-                  width={18}
-                />
-                Cerrar Sesión
+                {isLoading ? (
+                  <Icon
+                    icon="eos-icons:loading"
+                    className="animate-spin text-lg"
+                  />
+                ) : (
+                  <Icon
+                    icon="mdi:logout"
+                    className="text-lg"
+                  />
+                )}
+                {isLoading ? "Cerrando..." : "Cerrar sesión"}
               </button>
             </motion.ul>
           ) : (

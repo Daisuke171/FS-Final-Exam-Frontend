@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 :root {
-	/* -------------------- COLORES -------------------- */
+  /* -------------------- COLORES -------------------- */
 
-	/* Background colors for gradient */
-	--background-gradient-1: oklch(0.2088 0.0988 271.67);
-	--background-gradient-2: oklch(0.1889 0.087 275.96);
-	--background-gradient-3: oklch(0.1463 0.0559 298.52);
+  /* Background colors for gradient */
+  --background-gradient-1: oklch(0.2088 0.0988 271.67);
+  --background-gradient-2: oklch(0.1889 0.087 275.96);
+  --background-gradient-3: oklch(0.1463 0.0559 298.52);
 
-	/* Buttons colors for gradient */
-	--btn-gradient-1: oklch(0.7813 0.1562 317.26);
-	--btn-gradient-2: oklch(0.7824 0.1213 222.46);
+  /* Buttons colors for gradient */
+  --btn-gradient-1: oklch(0.7813 0.1562 317.26);
+  --btn-gradient-2: oklch(0.7824 0.1213 222.46);
 
-	--foreground: oklch(1 0 129.63);
+  --foreground: oklch(1 0 129.63);
 
   /* Purple tones */
   --bright-purple: oklch(65.636% 0.22923 309.171);
@@ -30,26 +30,26 @@
   --dark-blue: oklch(34.988% 0.13955 279.494);
   --black-blue: oklch(13.536% 0.03564 284.084);
 
-	--box-fill: oklch(0.6843 0.1083 222.73 / 5%);
-	--captcha-fill: oklch(0.7824 0.1213 222.46 / 15%);
-	--stroke: oklch(0.7824 0.1213 222.46);
+  --box-fill: oklch(0.6843 0.1083 222.73 / 5%);
+  --captcha-fill: oklch(0.7824 0.1213 222.46 / 15%);
+  --stroke: oklch(0.7824 0.1213 222.46);
 
-	/* Font colors */
-	--font-dark: oklch(0.1517 0.0548 298.37);
-	--font-light: oklch(95.514% 0.00011 271.152);
-	--font-medium: oklch(79.837% 0.00009 271.152);
+  /* Font colors */
+  --font-dark: oklch(0.1517 0.0548 298.37);
+  --font-light: oklch(95.514% 0.00011 271.152);
+  --font-medium: oklch(79.837% 0.00009 271.152);
 
-	/* Gray tones */
-	--light-gray: oklch(65.004% 0.00007 271.152);
-	--dark-gray: oklch(42.393% 0.00005 271.152);
-	--shadow-gray: oklch(32.109% 0.00004 271.152);
-	--transparent-gray: oklch(42.393% 0.00005 271.152 / 0.288);
+  /* Gray tones */
+  --light-gray: oklch(65.004% 0.00007 271.152);
+  --dark-gray: oklch(42.393% 0.00005 271.152);
+  --shadow-gray: oklch(32.109% 0.00004 271.152);
+  --transparent-gray: oklch(42.393% 0.00005 271.152 / 0.288);
 
-	/* Bronze tones */
-	--light-bronze: oklch(70.532% 0.07578 43.223);
-	--bronze: oklch(52.31% 0.06732 43.218);
-	--dark-bronze: oklch(35.464% 0.06336 43.82);
-	--transparent-bronze: oklch(28.93% 0.05659 44.343 / 0.322);
+  /* Bronze tones */
+  --light-bronze: oklch(70.532% 0.07578 43.223);
+  --bronze: oklch(52.31% 0.06732 43.218);
+  --dark-bronze: oklch(35.464% 0.06336 43.82);
+  --transparent-bronze: oklch(28.93% 0.05659 44.343 / 0.322);
 
   /* Utility colors */
   --online-user: oklch(0.8693 0.1716 128.44);
@@ -59,49 +59,49 @@
   --medium-ranking: oklch(79.07% 0.15253 81.243);
   --shadow-ranking: oklch(66.329% 0.13566 78.165);
 
-	/* Success tones */
-	--light-success: oklch(81.093% 0.16614 145.614);
-	--success: oklch(70.071% 0.16051 145.321);
-	--shadow-success: oklch(53.712% 0.13105 145.294);
-	--dark-success: oklch(39.65% 0.08657 147.461);
-	--transparent-success: oklch(65.081% 0.15962 145.321 / 0.205);
+  /* Success tones */
+  --light-success: oklch(81.093% 0.16614 145.614);
+  --success: oklch(70.071% 0.16051 145.321);
+  --shadow-success: oklch(53.712% 0.13105 145.294);
+  --dark-success: oklch(39.65% 0.08657 147.461);
+  --transparent-success: oklch(65.081% 0.15962 145.321 / 0.205);
 
-	/* Error tones */
-	--light-error: oklch(65.081% 0.15962 23.426);
-	--error: oklch(0.5134 0.1504 24.88);
-	--shadow-error: oklch(43.462% 0.14204 26.215);
-	--dark-error: oklch(23.903% 0.07386 24.652);
-	--transparent-error: oklch(43.462% 0.14204 26.215 / 0.205);
+  /* Error tones */
+  --light-error: oklch(65.081% 0.15962 23.426);
+  --error: oklch(0.5134 0.1504 24.88);
+  --shadow-error: oklch(43.462% 0.14204 26.215);
+  --dark-error: oklch(23.903% 0.07386 24.652);
+  --transparent-error: oklch(43.462% 0.14204 26.215 / 0.205);
 
-	/* Navbar background */
-	--navbar-bg: oklch(0.144 0.061 320.8 / 0.8);
-	/* Glow funcional */
-	--navbar-glow: rgba(76, 201, 240, 0.3);
+  /* Navbar background */
+  --navbar-bg: oklch(0.144 0.061 320.8 / 0.8);
+  /* Glow funcional */
+  --navbar-glow: rgba(76, 201, 240, 0.3);
 }
 
 @theme {
-	--breakpoint-xs: 480px;
+  --breakpoint-xs: 480px;
 
-	--color-background: var(--background-gradient-3);
-	--color-foreground: var(--foreground);
+  --color-background: var(--background-gradient-3);
+  --color-foreground: var(--foreground);
 
-	--color-bright-purple: var(--bright-purple);
-	--color-light-purple: var(--light-purple);
-	--color-transparent-purple: var(--transparent-purple);
-	--color-shadow-purple: var(--shadow-purple);
-	--color-hover-purple: var(--hover-purple);
+  --color-bright-purple: var(--bright-purple);
+  --color-light-purple: var(--light-purple);
+  --color-transparent-purple: var(--transparent-purple);
+  --color-shadow-purple: var(--shadow-purple);
+  --color-hover-purple: var(--hover-purple);
 
-	--color-font: var(--font-light);
-	--color-subtitle: var(--font-medium);
+  --color-font: var(--font-light);
+  --color-subtitle: var(--font-medium);
 
-	--color-light-gray: var(--light-gray);
-	--color-dark-gray: var(--dark-gray);
-	--color-shadow-gray: var(--shadow-gray);
-	--color-transparent-gray: var(--transparent-gray);
+  --color-light-gray: var(--light-gray);
+  --color-dark-gray: var(--dark-gray);
+  --color-shadow-gray: var(--shadow-gray);
+  --color-transparent-gray: var(--transparent-gray);
 
-	--color-light-bronze: var(--light-bronze);
-	--color-dark-bronze: var(--dark-bronze);
-	--color-transparent-bronze: var(--transparent-bronze);
+  --color-light-bronze: var(--light-bronze);
+  --color-dark-bronze: var(--dark-bronze);
+  --color-transparent-bronze: var(--transparent-bronze);
 
   --color-bright-blue: var(--bright-blue);
   --color-light-blue: var(--light-blue);
@@ -111,18 +111,18 @@
   --color-dark-blue: var(--dark-blue);
   --color-black-blue: var(--black-blue);
 
-	--color-light-success: var(--light-success);
-	--color-dark-success: var(--dark-success);
-	--color-shadow-success: var(--shadow-success);
-	--color-transparent-success: var(--transparent-success);
-	--color-success: var(--success);
+  --color-light-success: var(--light-success);
+  --color-dark-success: var(--dark-success);
+  --color-shadow-success: var(--shadow-success);
+  --color-transparent-success: var(--transparent-success);
+  --color-success: var(--success);
 
-	--color-light-error: var(--light-error);
-	--color-error: var(--error);
-	--color-shadow-error: var(--shadow-error);
-	--color-dark-error: var(--dark-error);
-	--color-transparent-error: var(--transparent-error);
-	--color-online-user: var(--online-user);
+  --color-light-error: var(--light-error);
+  --color-error: var(--error);
+  --color-shadow-error: var(--shadow-error);
+  --color-dark-error: var(--dark-error);
+  --color-transparent-error: var(--transparent-error);
+  --color-online-user: var(--online-user);
 
   --color-light-ranking: var(--light-ranking);
   --color-ranking: var(--ranking);
@@ -130,7 +130,7 @@
   --color-shadow-ranking: var(--shadow-ranking);
   --color-transparent-ranking: var(--transparent-ranking);
 
-	--font-sans: var(--font-raleway);
+  --font-sans: var(--font-raleway);
 }
 
 /* -------------------- BASE Y UTILIDADES -------------------- */
@@ -139,25 +139,25 @@
 
 /* Miscelaneo */
 .glass-box-one {
-	@apply p-8 border-2 bg-white/7 backdrop-blur-md border-light-gray rounded-xl;
+  @apply p-8 border-2 bg-white/7 backdrop-blur-md border-light-gray rounded-xl;
 }
 
 .glass-box-two {
-	@apply bg-white/7 backdrop-blur-md rounded-xl;
+  @apply bg-white/7 backdrop-blur-md rounded-xl;
 }
 
 .custom-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-	gap: 1rem;
-	@media (width < 768px) {
-		gap: 0.6rem;
-		grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
-	}
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  @media (width < 768px) {
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  }
 }
 
 .custom-scrollbar {
-	@apply [&::-webkit-scrollbar]:w-2
+  @apply [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-black/30
   [&::-webkit-scrollbar-track]:rounded-full
   [&::-webkit-scrollbar-thumb]:rounded-full
@@ -165,101 +165,101 @@
 }
 
 .custom-grid-avatar {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
 }
 
 /* Gradientes */
 .bg-gradient-one {
-	@apply bg-radial from-[var(--background-gradient-1)] from-0% via-[var(--background-gradient-2)] 
+  @apply bg-radial from-[var(--background-gradient-1)] from-0% via-[var(--background-gradient-2)] 
     via-[7%] to-[var(--background-gradient-3)] to-[63%];
 }
 
 .btn-gradient-one {
-	@apply bg-linear-to-r from-[var(--btn-gradient-1)] from-5% to-[var(--btn-gradient-2)];
+  @apply bg-linear-to-r from-[var(--btn-gradient-1)] from-5% to-[var(--btn-gradient-2)];
 }
 
 body {
-	@apply text-foreground font-sans antialiased;
+  @apply text-foreground font-sans antialiased;
 }
 
 /* -------------------- ANIMACIONES -------------------- */
 
 @keyframes vibrate-1 {
-	0% {
-		-webkit-transform: translate(0);
-		transform: translate(0);
-	}
-	20% {
-		-webkit-transform: translate(-2px, 2px);
-		transform: translate(-2px, 2px);
-	}
-	40% {
-		-webkit-transform: translate(-2px, -2px);
-		transform: translate(-2px, -2px);
-	}
-	60% {
-		-webkit-transform: translate(2px, 2px);
-		transform: translate(2px, 2px);
-	}
-	80% {
-		-webkit-transform: translate(2px, -2px);
-		transform: translate(2px, -2px);
-	}
-	100% {
-		-webkit-transform: translate(0);
-		transform: translate(0);
-	}
+  0% {
+    -webkit-transform: translate(0);
+    transform: translate(0);
+  }
+  20% {
+    -webkit-transform: translate(-2px, 2px);
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    -webkit-transform: translate(-2px, -2px);
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    -webkit-transform: translate(2px, 2px);
+    transform: translate(2px, 2px);
+  }
+  80% {
+    -webkit-transform: translate(2px, -2px);
+    transform: translate(2px, -2px);
+  }
+  100% {
+    -webkit-transform: translate(0);
+    transform: translate(0);
+  }
 }
 
 @keyframes vibrate-2 {
-	0% {
-		-webkit-transform: translate(0);
-		transform: translate(0);
-	}
-	20% {
-		-webkit-transform: translate(2px, -2px);
-		transform: translate(2px, -2px);
-	}
-	40% {
-		-webkit-transform: translate(2px, 2px);
-		transform: translate(2px, 2px);
-	}
-	60% {
-		-webkit-transform: translate(-2px, 2px);
-		transform: translate(-2px, 2px);
-	}
-	80% {
-		-webkit-transform: translate(-2px, -2px);
-		transform: translate(-2px, -2px);
-	}
-	100% {
-		-webkit-transform: translate(0);
-		transform: translate(0);
-	}
+  0% {
+    -webkit-transform: translate(0);
+    transform: translate(0);
+  }
+  20% {
+    -webkit-transform: translate(2px, -2px);
+    transform: translate(2px, -2px);
+  }
+  40% {
+    -webkit-transform: translate(2px, 2px);
+    transform: translate(2px, 2px);
+  }
+  60% {
+    -webkit-transform: translate(-2px, 2px);
+    transform: translate(-2px, 2px);
+  }
+  80% {
+    -webkit-transform: translate(-2px, -2px);
+    transform: translate(-2px, -2px);
+  }
+  100% {
+    -webkit-transform: translate(0);
+    transform: translate(0);
+  }
 }
 @keyframes blink-1 {
-	0%,
-	50%,
-	100% {
-		opacity: 1;
-	}
-	25%,
-	75% {
-		opacity: 0;
-	}
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  25%,
+  75% {
+    opacity: 0;
+  }
 }
 
 @keyframes glow {
-	100% {
-		filter: drop-shadow(0 0 10px var(--color-ranking));
-	}
-	50% {
-		filter: drop-shadow(0 0 14px var(--color-ranking));
-	}
-	0% {
-		filter: drop-shadow(0 0 10px var(--color-ranking));
-	}
+  100% {
+    filter: drop-shadow(0 0 10px var(--color-ranking));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px var(--color-ranking));
+  }
+  0% {
+    filter: drop-shadow(0 0 10px var(--color-ranking));
+  }
 }
 
 @keyframes shimmer {
@@ -289,19 +289,19 @@ body {
 
 /* Navbar fino y centrado con glow funcional */
 .navbar-glass {
-	background-color: var(--navbar-bg);
-	border-bottom: solid 0.5px var(--light-gray);
-	border-radius: 0;
+  background-color: var(--navbar-bg);
+  border-bottom: solid 0.5px var(--light-gray);
+  border-radius: 0;
 }
 
 /* Desktop >= 992px: centrado y limitado */
 @media screen and (min-width: 992px) {
-	.navbar-glass {
-		width: 90%;
-		max-width: 900px;
-		left: 50%;
-		transform: translateX(-50%);
-	}
+  .navbar-glass {
+    width: 90%;
+    max-width: 900px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
 
 /* Barra inferior móvil */
@@ -313,7 +313,7 @@ body {
 }
 
 .bottom-bar-mobile a {
-	@apply text-white font-bold transition-all;
+  @apply text-white font-bold transition-all;
 }
 
 .bottom-bar-mobile a:hover {
@@ -323,9 +323,9 @@ body {
 }
 
 @media screen and (min-width: 768px) {
-	.bottom-bar-mobile {
-		@apply hidden;
-	}
+  .bottom-bar-mobile {
+    @apply hidden;
+  }
 }
 
 /* -------------------- MAIN CONTENT & COMPONENTES -------------------- */
@@ -343,13 +343,13 @@ body {
 }
 
 .favorites-box-title {
-	@apply text-white font-bold text-lg mb-3;
+  @apply text-white font-bold text-lg mb-3;
 }
 
 .favorites-buttons {
-	display: flex;
-	gap: 1rem;
-	justify-content: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
 }
 
 .favorites-button {
@@ -383,18 +383,18 @@ body {
 
 /* Botones de misiones/notificaciones (Contenedor) */
 .mission-btn {
-	@apply flex justify-between items-center w-full px-4 py-2 rounded-lg
+  @apply flex justify-between items-center w-full px-4 py-2 rounded-lg
            text-white text-sm font-semibold bg-[var(--medium-blue)]/20
            border border-[var(--light-blue)]/30 transition-all;
 }
 
 .mission-btn:hover {
-	@apply bg-[var(--medium-blue)]/40 shadow-[0_0_10px_var(--shadow-blue)];
+  @apply bg-[var(--medium-blue)]/40 shadow-[0_0_10px_var(--shadow-blue)];
 }
 
 /* Íconos de acción en notificaciones (Contenedor de botones de check/times) */
 .action-icons button {
-	@apply w-8 h-8 rounded-full flex items-center justify-center bg-[var(--light-blue)]/20 
+  @apply w-8 h-8 rounded-full flex items-center justify-center bg-[var(--light-blue)]/20 
            hover:bg-[var(--light-blue)]/40 transition;
 }
 
@@ -420,8 +420,8 @@ body {
 }
 
 .btn-glow:active {
-	background-color: rgba(76, 201, 240, 0.5);
-	transform: scale(0.97);
+  background-color: rgba(76, 201, 240, 0.5);
+  transform: scale(0.97);
 }
 
 /* Brillo Celeste para Hover */
@@ -432,9 +432,9 @@ body {
 
 /* Brillo Dorado para Hover */
 .hover-gold-glow:hover {
-	text-shadow: 0 0 6px rgba(253, 230, 138, 0.8),
-		0 0 10px rgba(253, 230, 138, 0.4);
-	transition: text-shadow 0.3s ease-in-out;
+  text-shadow: 0 0 6px rgba(253, 230, 138, 0.8),
+    0 0 10px rgba(253, 230, 138, 0.4);
+  transition: text-shadow 0.3s ease-in-out;
 }
 
 /* -------------------- Estilos para el chat -------------------- */
@@ -443,40 +443,41 @@ body {
   transition: color 0.25s ease-in-out;
 }
 
-
 /* puntos typing (tres dots con delays) */
 @keyframes typing-dot {
-	0%,
-	80%,
-	100% {
-		transform: translateY(0.25rem) scale(0.9);
-		opacity: 0.5;
-	}
-	40% {
-		transform: translateY(-0.25rem) scale(1);
-		opacity: 1;
-	}
+  0%,
+  80%,
+  100% {
+    transform: translateY(0.25rem) scale(0.9);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translateY(-0.25rem) scale(1);
+    opacity: 1;
+  }
 }
 .typing-1 {
-	animation: typing-dot 1.4s infinite;
+  animation: typing-dot 1.4s infinite;
 }
 .typing-2 {
-	animation: typing-dot 1.4s 0.15s infinite;
+  animation: typing-dot 1.4s 0.15s infinite;
 }
 .typing-3 {
-	animation: typing-dot 1.4s 0.3s infinite;
+  animation: typing-dot 1.4s 0.3s infinite;
 }
 
 .chat-inner-shadow {
-	box-shadow: inset 0 2rem 2rem -2rem rgba(0, 0, 0, 0.05),
-		inset 0 -2rem 2rem -2rem rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 2rem 2rem -2rem rgba(0, 0, 0, 0.05),
+    inset 0 -2rem 2rem -2rem rgba(0, 0, 0, 0.05);
 }
 .chat-scroll::-webkit-scrollbar {
   width: 8px;
 }
 
-.chat-scroll::-webkit-scrollbar-thumb, ::-webkit-scrollbar, ::-webkit-scrollbar-track {
-  background: rgba(34, 211, 238, 0.4); 
+.chat-scroll::-webkit-scrollbar-thumb,
+::-webkit-scrollbar,
+::-webkit-scrollbar-track {
+  background: rgba(34, 211, 238, 0.4);
   border-radius: 8px;
 }
 
@@ -490,6 +491,5 @@ body {
 
 .chat-inner-shadow {
   box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.1),
-              inset 0 -6px 12px rgba(0, 0, 0, 0.1);
+    inset 0 -6px 12px rgba(0, 0, 0, 0.1);
 }
-

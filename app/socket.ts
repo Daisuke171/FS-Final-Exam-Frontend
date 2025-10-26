@@ -219,13 +219,13 @@ export const disconnectSocket = () => {
   }
 };
 
-export const onNewFriend = (callback: (data: any) => void) => {
+export const onNewFriend = (callback: (data: unknown) => void) => {
   const s = getSocket();
   s?.on("newFriend", callback);   
   return () => s?.off("newFriend", callback);
 };
 
-export const onNewMessage = (callback: (data: any) => void) => {
+export const onNewMessage = (callback: (data: unknown) => void) => {
   const s = getSocket();
   s?.on("newMessage", callback);  
   return () => s?.off("newMessage", callback);
