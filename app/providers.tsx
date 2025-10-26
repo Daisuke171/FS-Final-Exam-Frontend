@@ -28,7 +28,7 @@ export function Providers({
 }) {
   return (
     <SessionProvider session={session}>
-      <ApolloAuthBoundary children={children}>{children}</ApolloAuthBoundary>
+      <ApolloAuthBoundary>{children}</ApolloAuthBoundary>
     </SessionProvider>
   );
 }

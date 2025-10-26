@@ -7,7 +7,6 @@ import Image from "next/image";
 import { LOGOUT_MUTATION } from "@/shared/graphql/queries/auth.mutations";
 import { useMutation } from "@apollo/client/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 
 export default function ProfileDropdown({
