@@ -1,8 +1,50 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { apolloClientServer } from "./lib/apollo-client-server";
-import { LOGIN_MUTATION } from "@shared/graphql/queries/auth.mutations";
-import { LoginResponse } from "./types/auth.types";
+import {
+  LOGIN_MUTATION,
+  REFRESH_TOKEN_MUTATION,
+} from "@shared/graphql/queries/auth.mutations";
+import { LoginResponse, RefreshTokenResponse } from "./types/auth.types";
+
+async function refreshAccessToken(token: any) {
+  try {
+    console.log("🔄 Refrescando access token...");
+
+    const { data, error } =
+      await apolloClientServer.mutate<RefreshTokenResponse>({
+        mutation: REFRESH_TOKEN_MUTATION,
+        variables: {
+          refreshToken: token.refreshToken,
+        },
+        errorPolicy: "all",
+      });
+
+    if (error || !data?.refreshAccessToken) {
+      console.error("❌ Error al refrescar token:", error);
+      throw new Error("Failed to refresh access token");
+    }
+
+    const { accessToken, refreshToken } = data.refreshAccessToken;
+
+    console.log("✅ Token refrescado exitosamente");
+
+    return {
+      ...token,
+      accessToken,
+      refreshToken,
+      accessTokenExpires: Date.now() + 14 * 60 * 1000,
+      error: undefined,
+    };
+  } catch (error) {
+    console.error("❌ Error en refreshAccessToken:", error);
+
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET || "development-secret-change-in-production",
@@ -42,7 +84,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error(message);
         }
 
-        const { accessToken, user } = data.login;
+        const { accessToken, refreshToken, user } = data.login;
 
         return {
           id: user.id,
@@ -52,6 +94,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email,
           avatar: user.skins?.[0]?.skin?.img,
           accessToken,
+          refreshToken,
         };
       },
     }),
@@ -67,14 +110,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.username = user.username;
         token.avatar = user.avatar;
         token.accessToken = user.accessToken;
-        console.log("💾 Token guardado:", token.accessToken);
+        token.refreshToken = user.refreshToken;
+        token.accessTokenExpires = Date.now() + 14 * 60 * 1000;
+
+        return token;
       }
       if (trigger === "update" && session?.user) {
         if (session.user.avatar) {
           token.avatar = session.user.avatar;
         }
+        return token;
       }
-      return token;
+
+      const now = Date.now();
+      const timeUntilExpiry = (token.accessTokenExpires as number) - now;
+
+      if (timeUntilExpiry > 60 * 1000) {
+        return token;
+      }
+
+      console.log("⏰ Access token expirado o por expirar, refrescando...");
+      return refreshAccessToken(token);
     },
 
     async session({ session, token }) {
@@ -85,6 +141,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.username = token.username as string;
       session.user.avatar = token.avatar as string;
       session.accessToken = token.accessToken as string;
+      session.refreshToken = token.refreshToken as string;
+      session.error = token.error as string | undefined;
       console.log("📦 Session creada:", session);
 
       return session;
@@ -97,5 +155,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   session: {
     strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60,
   },
 });
