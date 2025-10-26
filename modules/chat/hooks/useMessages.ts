@@ -161,8 +161,8 @@ export function useSendMessage(currentUserId?: string) {
     },
   });
   return {
-    send: ({ chatId, message, senderId }: InputMessage) =>
-      mutate({ variables: { input: { chatId, message, senderId } } }),
+    send: ({ chatId, message }: InputMessage) =>
+      mutate({ variables: { input: { chatId, message } } }),
     loading,
   };
 }
