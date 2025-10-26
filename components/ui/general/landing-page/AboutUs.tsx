@@ -2,6 +2,8 @@
 
 import AboutCard, { AboutCardProps } from "./AboutCard";
 import { motion } from "motion/react";
+import useBreakpoint from "@/hooks/useBreakpoint";
+import { is } from "zod/locales";
 
 const cards: AboutCardProps[] = [
   {
@@ -70,12 +72,18 @@ const item = {
 };
 
 export default function AboutUs() {
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === "mobile";
   return (
     <section className="bg-gradient-one text-center mx-auto max-w-[90%] lg:max-w-full min-h-screen flex flex-col justify-center items-center py-15">
       <motion.h2
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 1, margin: "-100px" }}
+        viewport={{
+          once: true,
+          amount: 1,
+          margin: isMobile ? "0px" : "-100px",
+        }}
         transition={{ duration: 0.6 }}
         className="text-4xl font-bold text-font mb-2"
       >
@@ -84,37 +92,62 @@ export default function AboutUs() {
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 1, margin: "-100px" }}
+        viewport={{
+          once: true,
+          amount: 1,
+          margin: isMobile ? "0px" : "-100px",
+        }}
         transition={{ duration: 0.6 }}
         className="mb-15 text-subtitle"
       >
         A continuación te mostraremos un resumen las funcionalidades de nuestra
         página
       </motion.p>
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.6 }}
-        transition={{ duration: 0.6 }}
-        className="flex items-center flex-wrap  justify-center gap-5"
-      >
-        {cards.map((card, index) => (
-          <motion.div
-            key={index}
-            variants={item}
-            viewport={{ once: true, amount: 1 }}
-            transition={{ duration: 0.6 }}
-          >
-            <AboutCard
-              icon={card.icon}
-              title={card.title}
-              desc={card.desc}
-              color={card.color}
-            />
-          </motion.div>
-        ))}
-      </motion.div>
+      {isMobile ? (
+        <div className="flex items-center flex-wrap  justify-center gap-5">
+          {cards.map((card, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.6 }}
+            >
+              <AboutCard
+                icon={card.icon}
+                title={card.title}
+                desc={card.desc}
+                color={card.color}
+              />
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.6 }}
+          className="flex items-center flex-wrap  justify-center gap-5"
+        >
+          {cards.map((card, index) => (
+            <motion.div
+              key={index}
+              variants={item}
+              viewport={{ once: true, amount: 1 }}
+              transition={{ duration: 0.6 }}
+            >
+              <AboutCard
+                icon={card.icon}
+                title={card.title}
+                desc={card.desc}
+                color={card.color}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </section>
   );
 }

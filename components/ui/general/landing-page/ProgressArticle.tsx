@@ -4,6 +4,7 @@ import Image from "next/image";
 import LandingChip from "../../chips/LandingChip";
 import { ReactNode } from "react";
 import { motion } from "motion/react";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 export interface ProgressArticleProps {
   title: string;
@@ -58,11 +59,13 @@ export default function ProgressArticle({
   reverse = false,
   listItems,
 }: ProgressArticleProps) {
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === "mobile";
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.5 }}
+      viewport={{ once: true, amount: isMobile ? 0.4 : 0.5 }}
       transition={{ duration: 0.6 }}
       className={`flex w-full max-w-160 lg:max-w-none lg:w-auto ${
         reverse

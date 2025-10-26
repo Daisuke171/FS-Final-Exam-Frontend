@@ -4,6 +4,7 @@ import Image from "next/image";
 import HomeGameCard from "./HomeGameCard";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 const games = [
   {
@@ -48,6 +49,8 @@ const item = {
 };
 
 export default function GamesSection() {
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === "mobile";
   const router = useRouter();
   return (
     <section className="relative w-full flex flex-col items-center justify-center min-h-screen py-15">
@@ -73,31 +76,53 @@ export default function GamesSection() {
             Desafía a tus amigos y sube de nivel en cada partida
           </p>
         </motion.div>
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-wrap justify-center gap-5"
-        >
-          {games.map((game, index) => (
-            <motion.div
-              key={index}
-              viewport={{ once: true, amount: 1 }}
-              transition={{ duration: 0.6 }}
-              variants={item}
-            >
-              <HomeGameCard
-                title={game.title}
-                description={game.description}
-                image={game.image}
-                isComingSoon={game.isComingSoon}
-                action={() => router.push(game.href)}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
+        {isMobile ? (
+          <div className="flex flex-wrap justify-center gap-5">
+            {games.map((game, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.6 }}
+                transition={{ duration: 0.6 }}
+              >
+                <HomeGameCard
+                  title={game.title}
+                  description={game.description}
+                  image={game.image}
+                  isComingSoon={game.isComingSoon}
+                  action={() => router.push(game.href)}
+                />
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-wrap justify-center gap-5"
+          >
+            {games.map((game, index) => (
+              <motion.div
+                key={index}
+                viewport={{ once: true, amount: 1 }}
+                transition={{ duration: 0.6 }}
+                variants={item}
+              >
+                <HomeGameCard
+                  title={game.title}
+                  description={game.description}
+                  image={game.image}
+                  isComingSoon={game.isComingSoon}
+                  action={() => router.push(game.href)}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   );

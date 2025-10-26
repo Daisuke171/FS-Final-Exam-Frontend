@@ -2,6 +2,7 @@
 
 import ProgressArticle, { ProgressArticleProps } from "./ProgressArticle";
 import { motion } from "motion/react";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 const progressionSections: ProgressArticleProps[] = [
   {
@@ -86,13 +87,19 @@ const progressionSections: ProgressArticleProps[] = [
 ];
 
 export default function ProgressSection() {
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === "mobile";
   return (
     <section className="flex flex-col w-full bg-black-blue items-center justify-center min-h-screen py-15">
       <div className="max-w-[90%]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 1, margin: "-100px" }}
+          viewport={{
+            once: true,
+            amount: 1,
+            margin: isMobile ? "0px" : "-100px",
+          }}
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-4xl text-center font-bold text-font mb-2">
