@@ -135,7 +135,7 @@ export function useSendMessage(currentUserId?: string) {
         timestamp: new Date().toISOString(),        
       },
     }),
-    update: (cache: ApolloCache<unknown>, { data }) => {
+    update: (cache, { data }) => {
       const next = data?.sendMessage;
       if (!next) return;
 
