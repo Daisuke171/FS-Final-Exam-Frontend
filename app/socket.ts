@@ -219,12 +219,14 @@ export const disconnectSocket = () => {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const onNewFriend = (callback: (data: any) => void) => {
   const s = getSocket();
   s?.on("newFriend", callback);   
   return () => s?.off("newFriend", callback);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const onNewMessage = (callback: (data: any) => void) => {
   const s = getSocket();
   s?.on("newMessage", callback);  
