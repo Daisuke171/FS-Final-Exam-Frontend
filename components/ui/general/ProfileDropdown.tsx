@@ -1,10 +1,14 @@
 "use client";
 
-import { signOut } from "next-auth/react";
 import { Icon } from "@iconify/react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
+import { LOGOUT_MUTATION } from "@/shared/graphql/queries/auth.mutations";
+import { useMutation } from "@apollo/client/react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 export default function ProfileDropdown({
   username,
@@ -15,6 +19,22 @@ export default function ProfileDropdown({
   email: string;
   avatar: string;
 }) {
+  const [logout] = useMutation(LOGOUT_MUTATION);
+  const [isLoading, setIsLoading] = useState(false);
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      await logout();
+      await signOut({
+        redirect: false,
+      });
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+
+      setIsLoading(false);
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -71,14 +91,22 @@ export default function ProfileDropdown({
         Configuración
       </Link>
       <button
-        onClick={() => signOut({ callbackUrl: "/" })}
-        className="flex cursor-pointer font-medium items-center w-full text-light-error gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-1.5"
+        disabled={isLoading}
+        onClick={handleLogout}
+        className={`flex cursor-pointer font-medium items-center w-full text-light-error gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-1.5`}
       >
-        <Icon
-          icon="mdi:logout"
-          className="text-lg"
-        />
-        Cerrar Sesión
+        {isLoading ? (
+          <Icon
+            icon="eos-icons:loading"
+            className="animate-spin text-lg"
+          />
+        ) : (
+          <Icon
+            icon="mdi:logout"
+            className="text-lg"
+          />
+        )}
+        {isLoading ? "Cerrando..." : "Cerrar sesión"}
       </button>
     </motion.div>
   );
