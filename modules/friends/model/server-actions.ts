@@ -1,6 +1,6 @@
 import { apolloClientServer } from "@/lib/apollo-client-server";
 import { auth } from "@/auth";
-import { ACCEPT_INVITE_FRIEND } from "@shared/lib/graphql/queries/friend.gql";
+import { ACCEPT_INVITE_FRIEND } from "../api/friend.mutation";
 
 export async function acceptInviteFriendServer(token: string) {
   const session = await auth();

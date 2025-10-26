@@ -39,12 +39,6 @@ export default function FriendsPage({session, userId, accessToken}: FriendsPageP
     [list]
   );
 
-  const chatsForFriend = useMemo(() => {
-    /* const map: Record<string, FriendPeer> = {};
-    listFriendsActives.forEach((f) => (map[f.chatId] = f));
-    return map; */
-  }, [listFriendsActives]);
-
   useEffect(() => {
     if (!session || !userId) return;
     authFriendsSocket(userId);

@@ -7,7 +7,7 @@ import { cn } from "@shared/lib/utils";
 import { useGetMessages, useSendMessage } from "../hooks/useMessages";
 import { readMessage } from "../services/chat.socket";
 import { Icon } from "@iconify/react";
-import type { ChatFriend, Msg, ChatWindowProps } from "../types/chatUI.types";
+import type { Msg, ChatWindowProps } from "../types/chatUI.types";
 import { InputMessage } from "../types/message.types";
 import { getSocket } from "@shared/lib/socket";
 import { useUnreadStore } from "../model/unread.store";
@@ -20,8 +20,6 @@ export default function ChatWindow({
   currentUserId,
 }: ChatWindowProps) {
   const chatId = friend?.chatId ?? "";
-
-  //console.log( friend, currentUserId , chatId, "chat windows");
 
   const { list, loading, refetch } = useGetMessages(chatId);
 

@@ -43,12 +43,6 @@ export type FriendPayload = {
 	updatedAt: string;
 };
 
-/* export type CreateFriendInviteInput = {
-	inviterId: string;
-	ttlHours?: number | 24;
-	targetUsername?: string;
-}; */
-
 // --------------- Clases para Inputs de Mutations ---------------
 
 export class CreateFriendInviteInput {

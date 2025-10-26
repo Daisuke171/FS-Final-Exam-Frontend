@@ -1,6 +1,5 @@
-// modules/chat/model/useMessages.ts
 "use client";
-import type { ApolloCache, DefaultContext } from "@apollo/client";
+import type { ApolloCache } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react"
 import { useQuery, useMutation, useSubscription } from "@apollo/client/react";
 import type { Message , MessageDTO, InputMessage } from "../types/message.types";

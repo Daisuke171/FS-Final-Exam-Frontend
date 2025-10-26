@@ -14,7 +14,7 @@ export default async function InviteFriendPage({ searchParams }: { searchParams:
     redirect("/friends");
   } catch (_) {
     console.error(_)
-    redirect("/friends?invite=error");
+    redirect("/friends");
   }
 }
 
