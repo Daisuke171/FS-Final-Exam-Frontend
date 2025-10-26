@@ -21,6 +21,5 @@ export function createApolloClient() {
   return new ApolloClient({
     link,
     cache: globalCache,
-    connectToDevTools: true,
   });
 }

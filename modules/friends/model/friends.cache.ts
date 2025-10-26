@@ -1,4 +1,4 @@
-import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client";
+import { ApolloClient, gql } from "@apollo/client";
 
 export const MY_FRIENDS = gql`
   query MyFriends($userId: ID!) {
@@ -30,7 +30,7 @@ type FriendEntity = {
 
 /** Lee la lista cacheada (si existe) */
 export function readMyFriendsCache(
-  client: ApolloClient<NormalizedCacheObject>,
+  client: ApolloClient,
   userId: string
 ): FriendEntity[] | null {
   try {
@@ -46,7 +46,7 @@ export function readMyFriendsCache(
 
 /** Upsert (agrega si no existe, si existe actualiza campos) */
 export function upsertFriendInCache(
-  client: ApolloClient<NormalizedCacheObject>,
+  client: ApolloClient,
   userId: string,
   friend: FriendEntity
 ) {
@@ -63,7 +63,7 @@ export function upsertFriendInCache(
 
 /** Solo cambia status */
 export function updateFriendStatusInCache(
-  client: ApolloClient<NormalizedCacheObject>,
+  client: ApolloClient,
   userId: string,
   friendId: string,
   status: FriendEntity["status"]
@@ -78,7 +78,7 @@ export function updateFriendStatusInCache(
 
 /** Toggle active */
 export function toggleActiveInCache(
-  client: ApolloClient<NormalizedCacheObject>,
+  client: ApolloClient,
   userId: string,
   friendId: string,
   active: boolean
@@ -93,7 +93,7 @@ export function toggleActiveInCache(
 
 /** Remove */
 export function removeFriendFromCache(
-  client: ApolloClient<NormalizedCacheObject>,
+  client: ApolloClient,
   userId: string,
   friendId: string
 ) {

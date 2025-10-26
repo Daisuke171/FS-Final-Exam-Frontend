@@ -37,7 +37,7 @@ export default function FriendCard({ friend, currentUserId }: FriendCardProps) {
 
 			<div className="flex items-center gap-2">
 				{unread > 0 && (
-					<Badge color="cyan" type="message">
+					<Badge type="message">
 						+{unread}
 					</Badge>
 				)}

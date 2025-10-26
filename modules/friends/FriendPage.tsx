@@ -90,6 +90,7 @@ export default function FriendsPage({session, userId, accessToken}: FriendsPageP
           <FriendList
             items={listFriendsActives}
             onSelect={(fp: FriendPeer) => setSelected(fp)}
+            currentUserId={userId ?? ""}
           />
         </aside>
 

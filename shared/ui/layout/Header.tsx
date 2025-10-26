@@ -1,5 +1,5 @@
 import Image from "next/image";
-import IconBtn from "../ui/IconBtn";
+import IconBtn from "../IconBtn";
 
 export default function Header() {
   return (

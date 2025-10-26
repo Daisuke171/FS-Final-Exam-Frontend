@@ -1,8 +1,8 @@
 // modules/chat/model/useChatSocket.ts
 import { useEffect } from "react";
-import { getSocket } from "@/shared/lib/friend-socket";
+import { getSocket } from "@shared/lib/socket";
 import { useQueryClient } from "@tanstack/react-query";
-import type { MessageDTO } from "./messages.api";
+import type { MessageDTO } from "./types";
 
 export function useChatSocket(friendId: string, onTyping?: (v: boolean) => void) {
   const qc = useQueryClient();

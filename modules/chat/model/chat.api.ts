@@ -23,12 +23,39 @@ const SEND_MESSAGE = gql`
   }
 `;
 
+interface Message {
+  id: string;
+  from: string;
+  text: string;
+  at: number;
+}
+
+interface GetMessagesData {
+  messages: Message[];
+}
+
+interface GetMessagesVars {
+  friendId: string;
+}
+
+interface SendMessageData {
+  sendMessage: Message;
+}
+
+interface SendMessageVars {
+  friendId: string;
+  text: string;
+}
+
 export function useMessages(friendId: string) {
-  const { data, loading } = useQuery(GET_MESSAGES, { variables: { friendId } });
-  const [sendMessage] = useMutation(SEND_MESSAGE);
+  const { data, loading } = useQuery<GetMessagesData, GetMessagesVars>(
+    GET_MESSAGES, 
+    { variables: { friendId } }
+  );
+  const [sendMessage] = useMutation<SendMessageData, SendMessageVars>(SEND_MESSAGE);
 
   return {
-    messages: data?.messages ?? [],
+    messages: (data?.messages ?? []) as Message[],
     loading,
     sendMessage: (text: string) => sendMessage({ variables: { friendId, text } }),
   };
