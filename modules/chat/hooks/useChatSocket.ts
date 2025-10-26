@@ -2,7 +2,6 @@
 import { useEffect, useRef } from "react";
 import {
   joinChat,
-  leaveChat,
   onChatNew,
   offChatNew,
   onChatRead,
@@ -59,7 +58,6 @@ export function useChatSocket(chatId?: string, opts: Opts = {}) {
       offChatNew(hNew);
       offChatRead(hRead);
       socket.off("reconnect", rejoin);
-      leaveChat(chatId);
     };
   }, [chatId]);
 }
