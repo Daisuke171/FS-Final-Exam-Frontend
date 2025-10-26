@@ -5,19 +5,17 @@ import NotificationActionButton from "../../buttons/landing-page/NotificationAct
 
 export default function UserContent() {
   return (
-    <div className="w-full flex justify-center mt-10 px-2 md:px-6 lg:px-0 pt-20 md:pt-24 lg:pt-20 pb-24 md:pb-0">
+    <div className="w-full h-screen flex items-center justify-center pt-[calc(75px+2.5rem)] pb-10">
       <div
         className="w-full max-w-[900px] lg:max-w-4xl xl:max-w-6xl 
                    flex flex-col items-center space-y-6 relative z-10"
       >
-        {/* 🎮 Juegos Favoritos */}
         <div className="favorites-box glass-glow p-6 max-w-lg w-full mx-auto">
           <h2 className="text-white font-bold text-sm md:text-base mb-6 text-left">
             Juegos favoritos
           </h2>
           <div className="flex justify-center gap-4">
-            {/* Uso modularizado */}
-            <GameButton >+</GameButton>
+            <GameButton>+</GameButton>
             <GameButton>🎮</GameButton>
             <GameButton>🎲</GameButton>
           </div>
