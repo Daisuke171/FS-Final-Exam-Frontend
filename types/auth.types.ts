@@ -1,6 +1,7 @@
 export interface LoginResponse {
   login: {
     accessToken: string;
+    refreshToken: string;
     user: {
       id: string;
       name: string;
@@ -27,4 +28,24 @@ export interface LoginResponse {
 export interface LoginInput {
   usernameOrEmail: string;
   password: string;
+}
+
+export interface RefreshTokenResponse {
+  refreshAccessToken: {
+    accessToken: string;
+    refreshToken: string;
+    user: {
+      id: string;
+      name: string;
+      lastname: string;
+      nickname: string;
+      username: string;
+      email: string;
+      skins?: Array<{
+        skin: {
+          img: string;
+        };
+      }>;
+    };
+  };
 }
