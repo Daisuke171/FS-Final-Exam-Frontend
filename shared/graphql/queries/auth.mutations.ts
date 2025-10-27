@@ -71,3 +71,27 @@ export const LOGOUT_MUTATION = gql`
     logout
   }
 `;
+
+export const GOOGLE_AUTH_MUTATION = gql`
+  mutation GoogleAuth($googleAuthInput: GoogleAuthInput!) {
+    googleAuth(googleAuthInput: $googleAuthInput) {
+      accessToken
+      refreshToken
+      user {
+        id
+        email
+        name
+        nickname
+        username
+        skins {
+          id
+          skin {
+            name
+            img
+          }
+          active
+        }
+      }
+    }
+  }
+`;
