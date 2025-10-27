@@ -1,11 +1,17 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { apolloClientServer } from "./lib/apollo-client-server";
 import {
+  GOOGLE_AUTH_MUTATION,
   LOGIN_MUTATION,
   REFRESH_TOKEN_MUTATION,
 } from "@shared/graphql/queries/auth.mutations";
-import { LoginResponse, RefreshTokenResponse } from "./types/auth.types";
+import {
+  GoogleAuthResponse,
+  LoginResponse,
+  RefreshTokenResponse,
+} from "./types/auth.types";
 
 async function refreshAccessToken(token: any) {
   try {
@@ -52,6 +58,10 @@ async function refreshAccessToken(token: any) {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET || "development-secret-change-in-production",
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -104,6 +114,56 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
 
   callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google" && profile) {
+        try {
+          console.log("🔐 Autenticando con Google...");
+
+          const { data, error } =
+            await apolloClientServer.mutate<GoogleAuthResponse>({
+              mutation: GOOGLE_AUTH_MUTATION,
+              variables: {
+                googleAuthInput: {
+                  email: profile.email,
+                  name:
+                    profile.name || profile.email?.split("@")[0] || "Usuario",
+                  googleId: account.providerAccountId,
+                },
+              },
+              errorPolicy: "all",
+            });
+
+          if (error || !data?.googleAuth) {
+            console.error("❌ Error al autenticar con Google:", error);
+            return false;
+          }
+
+          const {
+            accessToken,
+            refreshToken,
+            user: backendUser,
+          } = data.googleAuth;
+
+          user.id = backendUser.id;
+          user.name = backendUser.name;
+          user.nickname = backendUser.nickname;
+          user.username = backendUser.username;
+          user.email = backendUser.email;
+          user.avatar = backendUser.skins?.[0]?.skin?.img || null;
+          user.image = null;
+          user.accessToken = accessToken;
+          user.refreshToken = refreshToken;
+
+          console.log("✅ Usuario autenticado con Google exitosamente");
+          return true;
+        } catch (error) {
+          console.error("❌ Error en signIn callback:", error);
+          return false;
+        }
+      }
+
+      return true;
+    },
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
@@ -112,6 +172,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.email = user.email;
         token.username = user.username;
         token.avatar = user.avatar;
+        token.picture = user.avatar || null;
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
         token.accessTokenExpires = Date.now() + 14 * 60 * 1000;
@@ -145,6 +206,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.email = token.email as string;
       session.user.username = token.username as string;
       session.user.avatar = token.avatar as string;
+      session.user.image = (token.avatar as string) || null;
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
       session.error = token.error as string | undefined;
