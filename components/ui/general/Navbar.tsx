@@ -17,6 +17,14 @@ interface NavbarProps {
   session: Session | null;
 }
 
+interface LinkProps {
+  name: string;
+  href: string;
+  icon: string;
+  hover?: string;
+  isComingSoon?: boolean;
+}
+
 export default function Navbar({ users, session }: NavbarProps) {
   // const { data: session } = useSession();
   const { isVisible } = useScrollDirection({ threshold: 80, topOffset: 10 });
@@ -71,16 +79,18 @@ export default function Navbar({ users, session }: NavbarProps) {
     };
   }, [isDropdownOpen]);
 
-  const links = [
+  const links: LinkProps[] = [
     {
       name: "Inicio",
       href: "/",
       icon: "mdi:home",
+      hover: "hover:text-bright-purple",
     },
     {
       name: "Amigos",
       href: "/friends",
       icon: "mdi:account-group",
+      hover: "hover:text-light-success",
     },
     {
       name: "Juegos",
@@ -92,6 +102,12 @@ export default function Navbar({ users, session }: NavbarProps) {
       href: "/ranking",
       icon: "solar:ranking-bold",
       hover: "hover:text-ranking",
+    },
+    {
+      name: "Foro",
+      href: "/forum",
+      icon: "mdi:forum",
+      isComingSoon: true,
     },
   ];
 
@@ -132,24 +148,27 @@ export default function Navbar({ users, session }: NavbarProps) {
                 className={`text-3xl transition-all duration-300 `}
                 onClick={handleSidebarOpen}
               />
-              {session?.user?.avatar ? (
-                <Image
-                  key={avatarUrl}
-                  src={avatarUrl!}
-                  alt={session?.user?.name ?? "Avatar"}
-                  width={48}
-                  height={48}
-                  className="rounded-full border-2 border-[var(--light-blue)] shadow-[0_0_8px_rgba(76,201,240,0.4)]"
-                />
-              ) : (
-                <div className="h-12 w-12 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
-                  <Icon
-                    icon="mdi:user"
-                    width="28"
-                    className="text-font"
-                  />
-                </div>
-              )}
+              {isAuthenticated &&
+                (session?.user?.avatar ? (
+                  <div className="h-12 w-12 overflow-hidden rounded-full">
+                    <Image
+                      key={avatarUrl}
+                      src={avatarUrl!}
+                      alt={session?.user?.name ?? "Avatar"}
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-12 w-12 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
+                    <Icon
+                      icon="mdi:user"
+                      width="28"
+                      className="text-font"
+                    />
+                  </div>
+                ))}
             </div>
           </div>
           <AnimatePresence>
@@ -157,7 +176,7 @@ export default function Navbar({ users, session }: NavbarProps) {
               <SidebarMobile
                 closeSidebar={handleSidebarOpen}
                 isAuthenticated={isAuthenticated}
-                avatar={session?.user?.avatar}
+                avatar={avatarUrl}
                 nickname={session?.user?.nickname}
                 email={session?.user?.email}
                 name={session?.user?.name}
@@ -180,36 +199,52 @@ export default function Navbar({ users, session }: NavbarProps) {
         </div>
 
         <div className="hidden md:flex w-full items-center">
-          <div className="flex items-center space-x-2 md:w-25 lg:w-32">
-            <Link href="/">
-              <Image
-                src="/logos/sanya-logo-1.webp"
-                alt="Logo"
-                width={100}
-                height={100}
-              />
-            </Link>
-          </div>
+          <Link
+            className="flex items-center w-25"
+            href="/"
+          >
+            <Image
+              src="/logos/sanya-logo-1.webp"
+              alt="Logo"
+              width={100}
+              height={100}
+            />
+          </Link>
+
           <nav
             className={`flex items-center ${
               isAuthenticated ? "max-w-[70%]" : "max-w-[75%]"
-            } gap-14 text-white font-semibold text-sm mx-auto justify-between`}
+            } gap-10 text-font font-semibold text-sm mx-auto justify-between`}
           >
-            {links.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className={`flex items-center gap-2 ${
-                  link.hover || "hover:text-light-blue "
-                } cursor-pointer transition-colors duration-300 ease-in-out`}
-              >
-                <Icon
-                  icon={link.icon}
-                  className="text-lg"
-                />
-                {link.name}
-              </a>
-            ))}
+            {links.map((link) => {
+              const isActive =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href);
+
+              // 2. Define la clase de hover y la de activo
+              const hoverClass = link.hover || "hover:text-light-blue";
+              const activeClass = (
+                link.hover || "hover:text-light-blue"
+              ).replace("hover:", "");
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`flex items-center py-3  px-4 gap-2 rounded-lg cursor-pointer ${
+                    link.isComingSoon && "opacity-50 pointer-events-none"
+                  } transition-colors duration-300 ease-in-out ${
+                    isActive ? `${activeClass + " bg-white/3"}` : hoverClass
+                  }`}
+                >
+                  <Icon
+                    icon={link.icon}
+                    className="text-lg"
+                  />
+                  {link.name}
+                </Link>
+              );
+            })}
           </nav>
 
           {!isAuthenticated && (
@@ -256,14 +291,16 @@ export default function Navbar({ users, session }: NavbarProps) {
                     className="flex items-center gap-2"
                   >
                     {session?.user?.avatar ? (
-                      <Image
-                        key={avatarUrl}
-                        src={avatarUrl!}
-                        alt={session?.user?.name ?? "Avatar"}
-                        width={44}
-                        height={44}
-                        className="rounded-full border-2 border-[var(--light-blue)] shadow-[0_0_8px_rgba(76,201,240,0.4)]"
-                      />
+                      <div className="h-11 w-11  flex items-center justify-center rounded-full overflow-hidden">
+                        <Image
+                          key={avatarUrl}
+                          src={avatarUrl!}
+                          alt={session?.user?.name ?? "Avatar"}
+                          width={44}
+                          height={44}
+                          className="object-cover h-full w-full"
+                        />
+                      </div>
                     ) : (
                       <div className="h-11 w-11 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
                         <Icon
