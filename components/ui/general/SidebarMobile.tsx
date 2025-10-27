@@ -7,9 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { LOGOUT_MUTATION } from "@/shared/graphql/queries/auth.mutations";
-import { useMutation } from "@apollo/client/react";
-import { useState } from "react";
+import { useLockBodyScroll } from "@/hooks/useBlockBodyScroll";
+import { useLogout } from "@/hooks/useLogout";
 
 interface SidebarMobileProps {
   avatar: string | undefined;
@@ -41,31 +40,17 @@ export default function SidebarMobile({
   isAuthenticated,
   closeSidebar,
 }: SidebarMobileProps) {
+  useLockBodyScroll();
   const router = useRouter();
-  const [logout] = useMutation(LOGOUT_MUTATION);
-  const [isLoading, setIsLoading] = useState(false);
-  const handleLogout = async () => {
-    setIsLoading(true);
-    try {
-      await logout();
-      await signOut({
-        redirect: false,
-      });
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-
-      setIsLoading(false);
-    }
-  };
+  const { logout, isLoading } = useLogout();
   return (
     <>
       <motion.div
         initial={{ x: -300 }}
         animate={{ x: 0 }}
-        exit={{ x: -300, transition: { duration: 0.2 } }}
-        transition={{ type: "spring", duration: 0.6 }}
-        className="h-screen z-100 bg-white/7 fixed left-0 max-w-68 top-0 backdrop-blur-md px-1 "
+        exit={{ x: -300 }}
+        transition={{ duration: 0.2 }}
+        className="h-screen z-100 bg-background fixed left-0 max-w-68 top-0 px-1"
       >
         <div className="px-6 py-4">
           <Icon
@@ -87,14 +72,16 @@ export default function SidebarMobile({
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
               {avatar ? (
-                <Image
-                  key={avatar}
-                  src={avatar}
-                  alt={name!}
-                  width={60}
-                  height={60}
-                  className="object-cover rounded-full"
-                />
+                <div className="w-15 h-15 rounded-full overflow-hidden">
+                  <Image
+                    key={avatar}
+                    src={avatar}
+                    alt={name!}
+                    width={60}
+                    height={60}
+                    className="object-cover h-full w-full"
+                  />
+                </div>
               ) : (
                 <div className="w-15 h-15 rounded-full bg-background flex justify-center items-center">
                   <Icon
@@ -106,7 +93,9 @@ export default function SidebarMobile({
               )}
               <div className="flex flex-col items-start">
                 <p className="text-sm text-font font-medium">{nickname}</p>
-                <p className="text-xs text-subtitle">{email}</p>
+                <p className="text-xs text-subtitle max-w-[20ch] truncate">
+                  {email}
+                </p>
               </div>
             </motion.div>
           ) : (
@@ -159,8 +148,8 @@ export default function SidebarMobile({
               ))}
               <button
                 disabled={isLoading}
-                onClick={handleLogout}
-                className={`flex cursor-pointer font-medium items-center w-full text-light-error gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-1.5`}
+                onClick={() => logout()}
+                className={`flex cursor-pointer font-medium items-center w-full text-light-error gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out py-1.5`}
               >
                 {isLoading ? (
                   <Icon

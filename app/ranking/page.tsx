@@ -102,7 +102,7 @@ export default function Ranking() {
           filter={filter}
           setFilter={setFilter}
         />
-        <div className="h-screen w-full flex justify-center items-center max-w-[95%] -mt-12">
+        <div className="h-screen w-full flex justify-center items-center max-w-[95%] ">
           <div className="flex flex-col items-center p-6 md:p-8 lg:p-10 bg-white/7  rounded-xl">
             <Icon
               icon="solar:ranking-line-duotone"

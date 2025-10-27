@@ -29,20 +29,20 @@ export default function ProfileHeaderInfo({
           <h2 className="text-lg text-font font-medium">
             No se ha podido cargar tu información
           </h2>
-          <p className="text-subtitle">{
-            typeof error === "string"
+          <p className="text-subtitle">
+            {typeof error === "string"
               ? error
-              : (error as { message?: string })?.message ?? "Error desconocido"
-          }</p>
+              : (error as { message?: string })?.message ?? "Error desconocido"}
+          </p>
         </div>
       </article>
     );
   return (
-    <article className="flex justify-between flex-shrink-0 md:pr-8 xl:pr-0 items-center gap-8">
+    <article className="flex justify-center flex-shrink-0 md:pr-8 xl:pr-0 items-center gap-8">
       <div className="flex items-center gap-5">
         <div
           onClick={action}
-          className="h-26 w-26 xl:h-30 xl:w-30  cursor-pointer group flex items-center relative justify-center overflow-hidden rounded-full bg-background border border-dark-gray"
+          className="h-24 w-24 xl:h-28 xl:w-28  cursor-pointer group flex items-center relative justify-center overflow-hidden rounded-full bg-background border border-dark-gray"
         >
           {activeSkin?.skin?.img ? (
             <Image
@@ -67,13 +67,7 @@ export default function ProfileHeaderInfo({
           />
         </div>
         <div className="flex flex-col  [@media(min-width:458px)_and_(max-width:1024px)]:gap-5 [@media(min-width:458px)_and_(max-width:1024px)]:flex-row">
-          <div className="flex flex-col">
-            <Icon
-              onClick={action}
-              icon="mdi:account-cog"
-              width="30"
-              className="lg:hidden flex place-self-start mb-1"
-            />
+          <div className="flex flex-col justify-center">
             <div className="flex items-center gap-5">
               <h2 className="text-lg text-font font-medium flex items-center gap-1">
                 {user?.nickname}

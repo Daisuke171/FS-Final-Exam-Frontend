@@ -12,10 +12,12 @@ export default async function NavbarServer() {
   }
 
   return (
-    <FriendsPage
-      session={session}
-      userId={userId}
-      accessToken={accessToken}
-    />
+    <div className="w-full h-screen flex items-center">
+      <FriendsPage
+        session={session}
+        userId={userId}
+        accessToken={accessToken}
+      />
+    </div>
   );
 }

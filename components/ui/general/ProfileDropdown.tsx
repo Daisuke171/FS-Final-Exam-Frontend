@@ -4,10 +4,7 @@ import { Icon } from "@iconify/react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
-import { LOGOUT_MUTATION } from "@/shared/graphql/queries/auth.mutations";
-import { useMutation } from "@apollo/client/react";
-import { useState } from "react";
-import { signOut } from "next-auth/react";
+import { useLogout } from "@/hooks/useLogout";
 
 export default function ProfileDropdown({
   username,
@@ -18,22 +15,7 @@ export default function ProfileDropdown({
   email: string;
   avatar: string;
 }) {
-  const [logout] = useMutation(LOGOUT_MUTATION);
-  const [isLoading, setIsLoading] = useState(false);
-  const handleLogout = async () => {
-    setIsLoading(true);
-    try {
-      await logout();
-      await signOut({
-        redirect: false,
-      });
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-
-      setIsLoading(false);
-    }
-  };
+  const { logout, isLoading } = useLogout();
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -46,14 +28,16 @@ export default function ProfileDropdown({
        after:bottom-0 after:w-[80%] after:left-1/2 after:-translate-x-1/2 after:h-[1px] after:bg-white/20 px-4"
       >
         {avatar ? (
-          <Image
-            key={avatar}
-            src={avatar}
-            alt="avatar"
-            width={60}
-            height={60}
-            className="object-cover rounded-full"
-          />
+          <div className="h-14 w-14 rounded-full overflow-hidden">
+            <Image
+              key={avatar}
+              src={avatar}
+              alt="avatar"
+              width={60}
+              height={60}
+              className="object-cover w-full h-full"
+            />
+          </div>
         ) : (
           <div className="w-15 h-15 rounded-full bg-background flex justify-center items-center">
             <Icon
@@ -91,7 +75,7 @@ export default function ProfileDropdown({
       </Link>
       <button
         disabled={isLoading}
-        onClick={handleLogout}
+        onClick={() => logout()}
         className={`flex cursor-pointer font-medium items-center w-full text-light-error gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-1.5`}
       >
         {isLoading ? (

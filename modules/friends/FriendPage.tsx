@@ -21,10 +21,13 @@ interface FriendsPageProps {
   accessToken: string | null;
 }
 
-export default function FriendsPage({session, userId, accessToken}: FriendsPageProps) {
-
-  console.log(session , "friend session");
-  console.log(userId , "friend userId");
+export default function FriendsPage({
+  session,
+  userId,
+  accessToken,
+}: FriendsPageProps) {
+  console.log(session, "friend session");
+  console.log(userId, "friend userId");
 
   const { list, loading, refetch } = useFriends(userId ?? "");
 
@@ -35,7 +38,10 @@ export default function FriendsPage({session, userId, accessToken}: FriendsPageP
   useGlobalChatListener(userId ?? undefined);
 
   const listFriendsActives = useMemo(
-    () => (list ?? []).filter((friend) => friend.active && friend.status === "ACCEPTED"),
+    () =>
+      (list ?? []).filter(
+        (friend) => friend.active && friend.status === "ACCEPTED"
+      ),
     [list]
   );
 
@@ -53,19 +59,19 @@ export default function FriendsPage({session, userId, accessToken}: FriendsPageP
         refetch?.();
       }
     },
-    onRefresh: () => refetch?.(),   
+    onRefresh: () => refetch?.(),
   });
 
-  if ( !session || loading) {
+  if (!session || loading) {
     return (
-      <main className="max-w-7xl mx-auto px-4 pb-20 md:pb-6 pt-8">
+      <main className="w-[90%] max-w-300 mx-auto px-4 pb-20 md:pb-6 pt-8">
         <Loader text="Cargando amigos..." />
       </main>
     );
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 pb-20 mt-16 md:pb-6 pt-8">
+    <main className="w-[90%] max-w-300 mx-auto px-4 pb-20 mt-16 md:pb-6 pt-8">
       <div className="pb-4 flex items-center justify-center">
         <h2 className="text-2xl font-light">AMIGOS</h2>
       </div>
@@ -73,7 +79,9 @@ export default function FriendsPage({session, userId, accessToken}: FriendsPageP
       <div className="grid gap-4 md:grid-cols-[280px_1fr_auto] px-4">
         <aside
           className={cn(
-            selected ? "hidden md:block" : "block md:sticky md:top-20 self-start"
+            selected
+              ? "hidden md:block"
+              : "block md:sticky md:top-20 self-start"
           )}
         >
           {!listFriendsActives.length && (

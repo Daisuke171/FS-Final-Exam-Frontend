@@ -12,7 +12,7 @@ export default function RegisterPage() {
     redirect("/profile");
   }
   return (
-    <div className="flex flex-col h-full w-full items-center justify-center mt-[calc(75.5px+2.5rem)] mb-[calc(57px+2.5rem)] md:mb-10">
+    <div className="flex flex-col min-h-screen w-full items-center justify-center mt-[calc(75.5px+2.5rem)] mb-[calc(57px+2.5rem)] md:mb-10">
       <RegisterApp />
     </div>
   );

@@ -45,7 +45,7 @@ const games: GameCardProps[] = [
 export default function GamesHub() {
   return (
     <>
-      <div className="bg-gradient-to-b from-black-blue to-dark-blue/30 min-h-screen w-full pt-[calc(75px+2.5rem)] pb-16">
+      <div className="bg-gradient-to-b flex flex-col justify-center items-center from-black-blue to-dark-blue/30 min-h-screen w-full pt-[calc(75px+2.5rem)] pb-10">
         <div className="flex flex-col items-center mx-auto px-4">
           <motion.header
             initial={{ opacity: 0, y: -10 }}
