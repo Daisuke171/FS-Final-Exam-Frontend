@@ -30,7 +30,28 @@ export function getSocket(namespace: Namespace = "/") {
         });
 
         socketInstances[namespace].on("connect_error", (err) => {
-            console.error(`❌ WS connect_error [${namespace}]:`, err);
+            // Normalize message and avoid dumping entire error object (which can include stack)
+            const message = err && typeof err === "object" ? (err as any).message ?? String(err) : String(err);
+
+            // If server replies "Invalid namespace", that means the backend doesn't expose this namespace.
+            // Clean up this socket instance to avoid repeated noisy errors and let future calls fall back.
+            if (message && message.includes("Invalid namespace")) {
+                console.warn(`⚠️ WS server does not expose namespace '${namespace}'. Cleaning up client socket to avoid repeated errors.`);
+                try {
+                    socketInstances[namespace]?.offAny();
+                    socketInstances[namespace]?.disconnect();
+                } catch (e) {
+                    // ignore cleanup errors
+                }
+                // Remove the instance so subsequent calls to getSocket will create a fresh connection (or a different namespace)
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                delete socketInstances[namespace];
+                return;
+            }
+
+            // Generic connect error: log succinct info (message + optional data) to reduce noise in console
+            const data = err && typeof err === "object" ? (err as any).data ?? null : null;
+            console.error(`❌ WS connect_error [${namespace}]:`, message, data);
         });
     }
     return socketInstances[namespace]!;

@@ -30,6 +30,18 @@ const games: GameCardProps[] = [
     href: "/games/coding-war",
   },
   {
+    title: "Turing Detective",
+    description:
+      "Juega contra el ordenador en un juego de azar. Desafía a tus amigos o enfrenta a la IA en partidas rápidas y emocionantes.",
+    image: "/logos/td-logo-lp.jpg",
+    players: "1-2",
+    difficulty: "medium",
+    xpReward: "+ 60",
+    gameType: "Lógica",
+    isComingSoon: false,
+    href: "/games/turing-detective",
+  },
+  {
     title: "Math Duel",
     description:
       "Desafíos matemáticos a contrarreloj. Suma, resta, multiplica y divide más rápido que tus oponentes.",

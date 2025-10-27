@@ -189,6 +189,8 @@ export default function Navbar({ users, session }: NavbarProps) {
               alt="Logo"
               width={100}
               height={100}
+              priority
+              style={{ width: "auto", height: "auto" }}
             />
           </div>
 
@@ -208,6 +210,8 @@ export default function Navbar({ users, session }: NavbarProps) {
               alt="Logo"
               width={100}
               height={100}
+              priority
+              style={{ width: "auto", height: "auto" }}
             />
           </Link>
 
