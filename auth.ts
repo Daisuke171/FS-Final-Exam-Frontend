@@ -22,7 +22,10 @@ async function refreshAccessToken(token: any) {
 
     if (error || !data?.refreshAccessToken) {
       console.error("❌ Error al refrescar token:", error);
-      throw new Error("Failed to refresh access token");
+      return {
+        ...token,
+        error: "RefreshAccessTokenError",
+      };
     }
 
     const { accessToken, refreshToken } = data.refreshAccessToken;
@@ -130,6 +133,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       console.log("⏰ Access token expirado o por expirar, refrescando...");
+      console.log("🕐 Tiempo restante:", timeUntilExpiry);
+      console.log("Refresh token:", token.refreshToken);
       return refreshAccessToken(token);
     },
 
@@ -143,8 +148,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
       session.error = token.error as string | undefined;
-      console.log("📦 Session creada:", session);
-
       return session;
     },
   },
