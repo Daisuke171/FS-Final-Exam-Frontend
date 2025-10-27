@@ -49,3 +49,25 @@ export interface RefreshTokenResponse {
     };
   };
 }
+
+export interface GoogleAuthResponse {
+  googleAuth: {
+    accessToken: string;
+    refreshToken: string;
+    user: {
+      id: string;
+      email: string;
+      name: string;
+      nickname: string;
+      username: string;
+      skins?: {
+        id: string;
+        active: boolean;
+        skin: {
+          name: string;
+          img: string;
+        };
+      }[];
+    };
+  };
+}
