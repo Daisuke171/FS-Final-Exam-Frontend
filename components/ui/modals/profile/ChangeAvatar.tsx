@@ -13,12 +13,14 @@ import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useLockBodyScroll } from "@/hooks/useBlockBodyScroll";
 
 export default function ChangeAvatar({
   closeModal,
 }: {
   closeModal: () => void;
 }) {
+  useLockBodyScroll();
   const { update } = useSession();
   const [selectedSkinId, setSelectedSkinId] = useState<string | null>(null);
 
@@ -38,9 +40,6 @@ export default function ChangeAvatar({
       },
     ],
     awaitRefetchQueries: true,
-    onCompleted: () => {
-      closeModal();
-    },
     onError: (error) => {
       alert(error.message);
     },
@@ -86,6 +85,8 @@ export default function ChangeAvatar({
       }
     } catch (error) {
       console.error("Error activating skin:", error);
+    } finally {
+      closeModal();
     }
   };
 
@@ -117,6 +118,8 @@ export default function ChangeAvatar({
               <CustomButtonOne
                 icon={"material-symbols:check-circle-outline"}
                 text="Confirmar"
+                action={handleSave}
+                loading={activating}
                 color="secondary"
                 size="sm"
               />
@@ -168,10 +171,13 @@ export default function ChangeAvatar({
                   skins?.map((skin) => (
                     <motion.div
                       key={skin.id}
-                      onClick={() => handleSkinClick(skin)}
+                      onClick={
+                        activating ? undefined : () => handleSkinClick(skin)
+                      }
                       whileHover={
                         skin.isUnlocked &&
                         !skin.isActive &&
+                        !activating &&
                         skin.id !== selectedSkinId
                           ? { scale: 1.05 }
                           : {}
@@ -179,6 +185,7 @@ export default function ChangeAvatar({
                       whileTap={
                         skin.isUnlocked &&
                         !skin.isActive &&
+                        !activating &&
                         skin.id !== selectedSkinId
                           ? { scale: 0.95 }
                           : {}
@@ -251,6 +258,7 @@ export default function ChangeAvatar({
                 action={closeModal}
                 icon={"material-symbols:cancel-outline-rounded"}
                 text="Cancelar"
+                disabled={activating}
                 color="error"
                 variant="outlined"
               />
