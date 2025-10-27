@@ -7,10 +7,15 @@ import GamesSection from "./GamesSection";
 import CtaSection from "./CtaSection";
 import { useSession } from "next-auth/react";
 import UserContent from "./UserContent";
+import GlobalLoader from "../../loaders/GlobalLoader";
 
 export default function LandingPage() {
   const { status } = useSession();
   const isAuthenticated = status === "authenticated";
+  const isLoading = status === "loading";
+
+  if (isLoading) return <GlobalLoader />;
+
   return (
     <div>
       {isAuthenticated ? (

@@ -3,7 +3,6 @@
 import AboutCard, { AboutCardProps } from "./AboutCard";
 import { motion } from "motion/react";
 import useBreakpoint from "@/hooks/useBreakpoint";
-import { is } from "zod/locales";
 
 const cards: AboutCardProps[] = [
   {

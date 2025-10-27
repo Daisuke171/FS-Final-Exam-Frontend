@@ -1,3 +1,5 @@
+"use client";
+
 import { Icon } from "@iconify/react";
 import { formatNumber } from "@/utils/formatNumber";
 import { motion, useMotionValueEvent, useInView } from "motion/react";
