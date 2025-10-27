@@ -6,7 +6,7 @@ import CustomFormInput from "@/components/ui/inputs/CustomFormInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { motion } from "motion/react";
 
 export const loginSchema = z.object({
@@ -33,6 +33,8 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const {
     register,
     handleSubmit,
@@ -57,6 +59,20 @@ export default function LoginForm() {
       console.log("✅ Login exitoso!");
       window.location.href = "/";
       setLoginError(null);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsGoogleLoading(true);
+      startTransition(async () => {
+        await signIn("google", {
+          callbackUrl: "/",
+        });
+      });
+    } catch (error) {
+      console.error("Error al iniciar sesión con Google:", error);
+      setIsGoogleLoading(false);
     }
   };
 
@@ -101,6 +117,7 @@ export default function LoginForm() {
           icon={"stash:signin"}
           text="Iniciar Sesión"
           loading={isSubmitting}
+          disabled={isGoogleLoading || isPending}
         />
         <div className="flex items-center w-full gap-5">
           <div className="w-1/2 h-[1px] bg-light-gray"></div>
@@ -113,7 +130,9 @@ export default function LoginForm() {
           type="button"
           color="secondary"
           variant="outlined"
-          action={() => signIn("google")}
+          disabled={isSubmitting}
+          loading={isGoogleLoading || isPending}
+          action={handleGoogleSignIn}
           icon={"uim:google"}
           text="Entrar con Google"
         />

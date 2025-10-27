@@ -15,6 +15,7 @@ import { REGISTER_MUTATION } from "@/shared/graphql/queries/auth.mutations";
 import { useMutation } from "@apollo/client/react";
 import RegisterSuccess from "./RegisterSuccess";
 import { signIn } from "next-auth/react";
+import { useTransition } from "react";
 
 export const registerSchema = z
   .object({
@@ -83,6 +84,8 @@ export default function RegisterApp() {
   const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
   const [captchaError, setCaptchaError] = useState(false);
   const [countdown, setCountdown] = useState(3);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
 
@@ -103,6 +106,20 @@ export default function RegisterApp() {
       setCaptchaError(false);
     }
   }, []);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsGoogleLoading(true);
+      startTransition(async () => {
+        await signIn("google", {
+          callbackUrl: "/",
+        });
+      });
+    } catch (error) {
+      console.error("Error al iniciar sesión con Google:", error);
+      setIsGoogleLoading(false);
+    }
+  };
 
   const onSubmit = async (data: RegisterFormData) => {
     if (!isCaptchaVerified) {
@@ -291,6 +308,7 @@ export default function RegisterApp() {
               color="secondary"
               icon={"stash:signin"}
               text="REGISTRARSE"
+              disabled={isGoogleLoading}
               loading={isSubmitting || loading}
             />
             <div className="flex items-center w-full gap-5">
@@ -304,9 +322,11 @@ export default function RegisterApp() {
               type="button"
               color="white"
               variant="outlined"
+              loading={isGoogleLoading || isPending}
               icon={"uim:google"}
-              action={() => signIn("google")}
+              action={handleGoogleSignIn}
               text="Continuar con google"
+              disabled={isSubmitting}
             />
           </div>
 

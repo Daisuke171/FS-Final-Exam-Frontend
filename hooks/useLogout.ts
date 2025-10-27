@@ -26,6 +26,7 @@ export function useLogout() {
       }
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
+    } finally {
       setIsLoading(false);
     }
   };
