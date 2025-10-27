@@ -113,6 +113,7 @@ export default function LoginForm() {
           type="button"
           color="secondary"
           variant="outlined"
+          action={() => signIn("google")}
           icon={"uim:google"}
           text="Entrar con Google"
         />

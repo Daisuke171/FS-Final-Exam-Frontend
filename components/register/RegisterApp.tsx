@@ -14,6 +14,7 @@ import FruitSelector from "@/components/register/FruitSelector";
 import { REGISTER_MUTATION } from "@/shared/graphql/queries/auth.mutations";
 import { useMutation } from "@apollo/client/react";
 import RegisterSuccess from "./RegisterSuccess";
+import { signIn } from "next-auth/react";
 
 export const registerSchema = z
   .object({
@@ -304,6 +305,7 @@ export default function RegisterApp() {
               color="white"
               variant="outlined"
               icon={"uim:google"}
+              action={() => signIn("google")}
               text="Continuar con google"
             />
           </div>
