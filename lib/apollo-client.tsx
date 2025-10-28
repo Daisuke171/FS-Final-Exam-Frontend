@@ -36,7 +36,7 @@ export const apolloClient = new ApolloClient({
         if (explicit) return explicit;
         const base = process.env.NEXT_PUBLIC_API_URL;
         if (base) return `${base.replace(/\/$/, "")}/graphql`;
-        return "http://localhost:3011/graphql";
+        return "http://localhost:3010/graphql";
       })(),
     }),
   ]),
