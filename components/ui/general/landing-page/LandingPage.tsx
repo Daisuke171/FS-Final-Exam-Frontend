@@ -6,7 +6,7 @@ import ProgressSection from "./ProgressSection";
 import GamesSection from "./GamesSection";
 import CtaSection from "./CtaSection";
 import { useSession } from "next-auth/react";
-import UserContent from "./UserContent";
+import UserContent from "./user-view/UserContent";
 import GlobalLoader from "../../loaders/GlobalLoader";
 
 export default function LandingPage() {

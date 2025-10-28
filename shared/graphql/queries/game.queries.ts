@@ -1,5 +1,21 @@
 import { gql } from "@apollo/client";
 
+export const GET_GAMES = gql`
+  query GetGames {
+    games {
+      id
+      name
+      description
+      gameLogo
+      createdAt
+      updatedAt
+      minPlayers
+      maxPlayers
+      category
+    }
+  }
+`;
+
 export const GET_USER_GAMES = gql`
   query GetUserGames($gameId: ID) {
     userGames(gameId: $gameId) {

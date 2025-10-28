@@ -62,3 +62,29 @@ export const ACTIVATE_SKIN = gql`
     }
   }
 `;
+
+export const GET_USER_FAVORITES = gql`
+  query GetUserFavorites {
+    userFavorites {
+      id
+      gameId
+      userId
+      game {
+        id
+        name
+        description
+        gameLogo
+      }
+      totalGames
+      winRate
+      lastPlayed
+      createdAt
+    }
+  }
+`;
+
+export const TOGGLE_FAVORITE = gql`
+  mutation ToggleFavorite($gameId: ID!) {
+    toggleFavorite(gameId: $gameId)
+  }
+`;
