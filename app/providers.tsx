@@ -8,7 +8,7 @@ import { createApolloClient } from "@/shared/lib/apollo/client";
 import { GlobalChatProvider } from "@/modules/chat/provider/GlobalChatProvider";
 import AuthRefreshChecker from "@/components/auth/AuthRefreshChecker";
 
-function ApolloAuthBoundary({ children }: { children: ReactNode }) {
+function ApolloAuthBoundary({ children }: { children?: ReactNode }) {
   const { data: session } = useSession();
 
   const client = useMemo(() => createApolloClient(), [session?.accessToken]);

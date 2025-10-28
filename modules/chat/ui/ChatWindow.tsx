@@ -53,8 +53,6 @@ export default function ChatWindow({
     [list, currentUserId, friend?.id]
   );
 
-  console.log(messages);
-
   // marcar como leídos al montar / cuando llega algo nuevo
   useEffect(() => {
     if (!friend?.chatId) return;
@@ -62,7 +60,6 @@ export default function ChatWindow({
     const messagesNews = messages.filter((m) => m.from === "friend" && !m.read);
 
     if (messagesNews.length > 0) {
-      console.log("CANTIDAD DE MENSAJES", messagesNews);
       messagesNews.map((m) => readMessage(friend.chatId, m.id));
     }
   }, [friend?.chatId, messages]);
@@ -116,7 +113,7 @@ export default function ChatWindow({
   // Auto-scroll al final
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages.length, isTyping, visible]);
+  }, [messages.length, visible]);
 
   // WebSocket real-time integration
   useEffect(() => {
@@ -125,25 +122,21 @@ export default function ChatWindow({
     const socket = getSocket("/chat");
     if (!socket) return;
 
-    // Join the chat room
-    console.log("🔌 Joining chat room:", chatId);
+   
     socket.emit("chat:join", { chatId });
 
-    // Set user if needed (if not using JWT in handshake)
+   
     if (currentUserId) {
       socket.emit("chat:set_user", { id: currentUserId });
     }
 
-    // Clear unread count when opening the chat
+    
     clearUnread(chatId);
 
-    // Listen for new messages from other users
-    const handleNewMessage = (data: any) => {
-      console.log("📨 New message received via WebSocket:", data);
-      // Immediately refetch to show new message
-      refetch?.();
 
-      // If the message is not from the current user and chat is not visible, increment unread
+    const handleNewMessage = (data: any) => {
+       refetch?.();
+            
       if (data.senderId !== currentUserId && !visible) {
         incrementUnread(chatId);
       }
@@ -151,8 +144,7 @@ export default function ChatWindow({
 
     // Listen for message read updates
     const handleMessageRead = (data: any) => {
-      console.log("✓✓ Message read via WebSocket:", data);
-      // Immediately refetch to update read status (check marks)
+      incrementUnread(chatId);
       refetch?.();
     };
 
@@ -168,7 +160,7 @@ export default function ChatWindow({
     };
   }, [chatId, visible, currentUserId, clearUnread, incrementUnread, refetch]);
 
-  // Early return AFTER all hooks are called
+  
   if (!visible || !friend) return null;
 
   const sendMessage = (text: string) => {
@@ -262,7 +254,7 @@ export default function ChatWindow({
                         height={14}
                         className={cn(
                           "ml-1 message-status",
-                          !m.read ? "text-gray-400" : "text-cyan-400"
+                          !m.read ? "text-gray-400" : "text-cyan-300"
                         )}
                       />
                     )}
@@ -275,7 +267,7 @@ export default function ChatWindow({
 
         {isTyping && (
           <div className="ml-4 mr-auto w-fit max-w-[66%]">
-            <div className="px-4 py-2 m-4 rounded-2xl rounded-bl-none bg-white text-slate-700 w-fit">
+            <div className="px-4 py-2 m-4 rounded-2xl rounded-bl-none bg-cyan-500/50 text-slate-700 w-fit">
               <span className="inline-flex gap-1 align-middle">
                 <i className="typing-1 inline-block w-2 h-2 rounded-full bg-gray-400" />
                 <i className="typing-2 inline-block w-2 h-2 rounded-full bg-gray-400" />

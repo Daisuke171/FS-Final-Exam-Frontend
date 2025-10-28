@@ -8,8 +8,6 @@ import Loader from "@shared/ui/Loader";
 import { cn } from "@shared/lib/utils";
 import { FriendList } from "@modules/friends";
 import { ChatWindow } from "@modules/chat";
-import { useGlobalChatListener } from "@modules/chat/hooks/useGlobalChatListener";
-
 import type { FriendPeer } from "@modules/friends/model/types";
 import { useFriends } from "@modules/friends/model/useFriends";
 import { useFriendsWS } from "@modules/friends/model/useFriendsWS";
@@ -19,24 +17,14 @@ import GlobalLoader from "@/components/ui/loaders/GlobalLoader";
 interface FriendsPageProps {
   session: Session | null;
   userId: string | null;
-  accessToken: string | null;
 }
 
-export default function FriendsPage({
-  session,
-  userId,
-  accessToken,
-}: FriendsPageProps) {
-  console.log(session, "friend session");
-  console.log(userId, "friend userId");
+export default function FriendsPage({session, userId}: FriendsPageProps) {
 
-  const { list, loading, refetch } = useFriends(userId ?? "");
+  const { list, loading, refetch } = useFriends(userId ?? "");  
 
   const [selected, setSelected] = useState<FriendPeer | null>(null);
   const handleCloseChat = () => setSelected(null);
-
-  // Global chat listener for unread messages
-  useGlobalChatListener(userId ?? undefined);
 
   const listFriendsActives = useMemo(
     () =>
@@ -52,7 +40,7 @@ export default function FriendsPage({
     if (userId) getFriendsSocket().emit("presence:get", { userId });
   }, [userId]);
 
-  //  ✅ Conectar WS sólo si hay userId
+    //  ✅ Conectar WS sólo si hay userId
   useFriendsWS(userId, {
     onEvent: (e) => {
       console.log("friend:event", e);
