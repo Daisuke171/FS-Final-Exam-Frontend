@@ -162,11 +162,7 @@ export default function Navbar({ users, session }: NavbarProps) {
                   </div>
                 ) : (
                   <div className="h-12 w-12 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
-                    <Icon
-                      icon="mdi:user"
-                      width="28"
-                      className="text-font"
-                    />
+                    <Icon icon="mdi:user" width="28" className="text-font" />
                   </div>
                 ))}
             </div>
@@ -184,14 +180,20 @@ export default function Navbar({ users, session }: NavbarProps) {
             )}
           </AnimatePresence>
           <div className="flex justify-center">
-            <Image
-              src="/logos/sanya-logo-1.webp"
-              alt="Logo"
-              width={100}
-              height={100}
-              priority
-              style={{ width: "auto", height: "auto" }}
-            />
+            <Link
+              className={`flex items-center ${
+                isAuthenticated ? "w-38.5" : "w-25"
+              }`}
+              href="/"
+            >
+              <Image
+                src="/logos/sanya-logo-1.webp"
+                alt="Logo"
+                width={100}
+                height={100}
+                priority
+              />
+            </Link>
           </div>
 
           <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-transparent-success/90 text-font text-base font-semibold">
@@ -244,10 +246,7 @@ export default function Navbar({ users, session }: NavbarProps) {
                     isActive ? `${activeClass + " bg-white/4"}` : hoverClass
                   }`}
                 >
-                  <Icon
-                    icon={link.icon}
-                    className="text-lg"
-                  />
+                  <Icon icon={link.icon} className="text-lg" />
                   {link.name}
                 </Link>
               );
@@ -255,10 +254,7 @@ export default function Navbar({ users, session }: NavbarProps) {
           </nav>
 
           {!isAuthenticated && (
-            <div
-              ref={dropdownRef}
-              className="relative"
-            >
+            <div ref={dropdownRef} className="relative">
               <div
                 onClick={handleDropdownOpen}
                 className="flex items-center gap-2 cursor-pointer w-25"
@@ -313,10 +309,7 @@ export default function Navbar({ users, session }: NavbarProps) {
                       </div>
                     ) : (
                       <div className="h-11 w-11 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
-                        <Icon
-                          icon="mdi:user"
-                          className="text-font text-2xl"
-                        />
+                        <Icon icon="mdi:user" className="text-font text-2xl" />
                       </div>
                     )}
                     <Icon
