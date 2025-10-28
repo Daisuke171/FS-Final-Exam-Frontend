@@ -11,6 +11,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@ai-sdk/google": "^2.0.24",
     "@apollo/client": "^4.0.7",
     "@fontsource/raleway": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",

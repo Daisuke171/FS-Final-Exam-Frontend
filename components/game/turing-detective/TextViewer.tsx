@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { getTuringSocket } from "@/app/socket";
 import { useSession } from "next-auth/react";
+import { generateText } from "ai";
+import { google } from "@ai-sdk/google";
 
 interface Message {
   id: string;
@@ -18,181 +20,221 @@ export default function TextViewer({ roomId }: { roomId: string }) {
   const [timeLeft, setTimeLeft] = useState(60);
   const [round, setRound] = useState(1);
   const [isRunning, setIsRunning] = useState(false);
-  const [opponentIsAI, setOpponentIsAI] = useState<boolean | null>(null);
+  const [myRole, setMyRole] = useState<"human" | "ai" | null>(null); // Am I playing as human or AI this round?
+  const [opponentRole, setOpponentRole] = useState<"human" | "ai" | null>(null);
+  const [waitingForVote, setWaitingForVote] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
   const aiTimerRef = useRef<number | null>(null);
   const socketRef = useRef<ReturnType<typeof getTuringSocket> | null>(null);
 
-    const aiPhrases = [
-      "Hola, ¿cómo estás?",
-      "Me gusta este juego",
-      "Creo que tu respuesta es correcta",
-      "No se, no estoy seguro",
-      "¿Puedes explicar más?",
-      "Si, claro",
-      "No entiendo bien",
-      "Estoy confusoo", // intentional mistake
-      "Por que pensas eso?", // missing accent
-      "Talvez debimos preguntar antes", // misspelling
-    ];
+  const aiPhrases = [
+    "Hola, ¿cómo estás?",
+    "Me gusta este juego",
+    "Creo que tu respuesta es correcta",
+    "No se, no estoy seguro",
+    "¿Puedes explicar más?",
+    "Si, claro",
+    "No entiendo bien",
+    "Estoy confusoo", // intentional mistake
+    "Por que pensas eso?", // missing accent
+    "Talvez debimos preguntar antes", // misspelling
+  ];
 
-    // Try using the `ai` package when available; fall back to `aiPhrases` if it isn't or the API shape is unknown.
-    async function fetchAiMessage(contextText = "") {
-      // Build a short prompt requesting Spanish output and occasional grammar mistakes
-      const prompt = `Responde en español argentino rioplatense. Habla como una persona real y de vez en cuando comete pequeños errores gramaticales o de acentuación, por lo general no se usa muchas comas. Mantén la respuesta corta (1-2 oraciones). Context: ${contextText}`;
+  // Use Google's Gemini API via AI SDK
+  async function fetchAiMessage(contextText = "") {
+    const prompt = `Sos una persona argentina que habla español rioplatense. Respondé de manera natural y conversacional, como si estuvieras chateando con alguien. De vez en cuando cometés pequeños errores gramaticales o de tipeo (falta de tildes, errores de ortografía menores). Mantené la respuesta MUY corta (máximo 2 oraciones). No uses muchas comas. Contexto de la conversación: ${contextText}`;
 
-      try {
-        // dynamic import so bundlers/tree-shaking won't break if package missing
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const mod: any = await import("ai");
-
-        // Try common entry points across different `ai` packages
-        if (mod) {
-          // 1) modern `ai` package may expose `chat.completions.create` or `chat.completions` style
-          if (mod.chat && typeof mod.chat.completions?.create === "function") {
-            const res = await mod.chat.completions.create({
-              model: "gpt-4o-mini",
-              messages: [{ role: "user", content: prompt }],
-              max_tokens: 80,
-            });
-            return String(res?.choices?.[0]?.message?.content ?? res?.output ?? res?.text ?? aiPhrases[Math.floor(Math.random() * aiPhrases.length)]);
-          }
-
-          // 2) some libs expose `generate` or `complete`
-          if (typeof mod.generate === "function") {
-            const res = await mod.generate({ model: "gpt-4o-mini", prompt, max_tokens: 80 });
-            return String(res?.output ?? res?.text ?? aiPhrases[Math.floor(Math.random() * aiPhrases.length)]);
-          }
-
-          if (typeof mod.complete === "function") {
-            const res = await mod.complete(prompt);
-            return String(res?.output ?? res?.text ?? aiPhrases[Math.floor(Math.random() * aiPhrases.length)]);
-          }
-
-          // 3) default export could be a function
-          if (typeof mod.default === "function") {
-            const res = await mod.default(prompt);
-            return String(res ?? aiPhrases[Math.floor(Math.random() * aiPhrases.length)]);
-          }
-        }
-      } catch (e) {
-        // If import or call fails, fall back silently
-        // console.debug("AI generation failed, falling back to canned phrases:", e);
+    try {
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_GENERATIVE_AI_API_KEY;
+      if (!apiKey) {
+        console.warn("No Google AI API key found, using canned phrases");
+        return aiPhrases[Math.floor(Math.random() * aiPhrases.length)];
       }
 
-      // Fallback: return a random canned Spanish phrase (with occasional mistakes)
+      const result = await generateText({
+        model: google("gemini-1.5-flash"),
+        prompt,
+      });
+
+      return (
+        result.text || aiPhrases[Math.floor(Math.random() * aiPhrases.length)]
+      );
+    } catch (e) {
+      console.error("AI generation failed:", e);
+      // Fallback to canned phrases
       return aiPhrases[Math.floor(Math.random() * aiPhrases.length)];
     }
+  }
 
   useEffect(() => {
     if (status !== "authenticated" || !session?.accessToken) return;
-    
+
     // Use the Turing Detective namespace socket
     const s = getTuringSocket(session.accessToken);
     socketRef.current = s;
 
     if (!s) {
-      // No socket available (SSR guard or not connected); start local-only mode
       addSystemMessage("Socket not available — running local demo mode.");
-      console.warn("[TextViewer] No socket available for chat, running local demo");
+      console.warn(
+        "[TextViewer] No socket available for chat, running local demo"
+      );
       return;
     }
 
     console.log("[TextViewer] Using Turing socket (id):", s.id);
-    // Join a room specific for this match so server or other clients can route messages
-    console.log("[TextViewer] Emitting chat:join ->", { chatId: roomId });
-    s.emit("chat:join", { chatId: roomId });
 
-    const handleNew = (payload: any) => {
-      // payload expected: { chatId, senderId?, text }
-      console.log("[TextViewer] chat:new received:", payload);
-      if (payload?.chatId !== roomId) return;
-      const msg: Message = {
-        id: String(Math.random()).slice(2),
-        sender: payload.sender === "ai" ? "ai" : payload.senderId ? "opponent" : "opponent",
-        text: payload.text,
-        timestamp: Date.now(),
-      };
-      setMessages((m) => [...m, msg]);
-    };
+    // Listen for round start from server
+    s.on(
+      "turing:roundStart",
+      (data: {
+        round: number;
+        yourRole: "human" | "ai";
+        opponentRole: "human" | "ai";
+        timeLimit: number;
+      }) => {
+        console.log("[TextViewer] Round started:", data);
+        setRound(data.round);
+        setMyRole(data.yourRole);
+        setOpponentRole(data.opponentRole);
+        setTimeLeft(data.timeLimit);
+        setIsRunning(true);
+        setMessages([]);
+        setWaitingForVote(false);
 
-    s.on("chat:new", handleNew);
+        if (data.yourRole === "ai") {
+          addSystemMessage(
+            "Esta ronda juegas como IA. Los mensajes serán generados automáticamente."
+          );
+          startAI();
+        } else {
+          addSystemMessage(
+            `Ronda ${data.round} iniciada. Tienes ${data.timeLimit} segundos para chatear.`
+          );
+        }
+      }
+    );
+
+    // Listen for chat messages
+    s.on(
+      "turing:message",
+      (payload: { senderId: string; text: string; timestamp: number }) => {
+        console.log("[TextViewer] Message received:", payload);
+        const msg: Message = {
+          id: String(Math.random()).slice(2),
+          sender: payload.senderId === s.id ? "you" : "opponent",
+          text: payload.text,
+          timestamp: payload.timestamp,
+        };
+        setMessages((m) => [...m, msg]);
+      }
+    );
+
+    // Listen for round end
+    s.on("turing:roundEnd", () => {
+      console.log("[TextViewer] Round ended");
+      stopAI();
+      setIsRunning(false);
+      setWaitingForVote(true);
+      addSystemMessage(
+        "Tiempo terminado. Adivina si tu oponente era humano o IA."
+      );
+    });
+
+    // Listen for vote results
+    s.on(
+      "turing:voteResult",
+      (data: {
+        yourGuess: boolean;
+        correct: boolean;
+        actualRole: "human" | "ai";
+      }) => {
+        console.log("[TextViewer] Vote result:", data);
+        const guessText = data.yourGuess ? "IA" : "Humano";
+        const actualText = data.actualRole === "ai" ? "IA" : "Humano";
+        const resultText = data.correct ? "¡Correcto!" : "Incorrecto";
+        addSystemMessage(
+          `Adivinaste: ${guessText}. Era: ${actualText}. ${resultText}`
+        );
+        setWaitingForVote(false);
+      }
+    );
+
+    // Listen for game over
+    s.on(
+      "turing:gameOver",
+      (data: { winner?: string; scores: Record<string, number> }) => {
+        console.log("[TextViewer] Game over:", data);
+        const myScore = data.scores[s.id || ""] || 0;
+        const isWinner = data.winner === s.id;
+        addSystemMessage(
+          `¡Juego terminado! Tu puntaje: ${myScore}. ${
+            isWinner ? "¡Ganaste! 🎉" : "Mejor suerte la próxima."
+          }`
+        );
+        setGameStarted(false);
+      }
+    );
 
     return () => {
-      try {
-        s.emit("chat:leave", { chatId: roomId });
-        s.off("chat:new", handleNew);
-      } catch (e) {
-        // ignore
-      }
+      s.off("turing:roundStart");
+      s.off("turing:message");
+      s.off("turing:roundEnd");
+      s.off("turing:voteResult");
+      s.off("turing:gameOver");
       socketRef.current = null;
       stopAI();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, status, session?.accessToken]);
 
   useEffect(() => {
     let tick: number | undefined;
     if (isRunning && timeLeft > 0) {
       tick = window.setInterval(() => {
-        setTimeLeft((t) => t - 1);
+        setTimeLeft((t) => {
+          if (t <= 1) {
+            // Time's up, let server know (server will emit roundEnd)
+            return 0;
+          }
+          return t - 1;
+        });
       }, 1000) as unknown as number;
-    } else if (timeLeft === 0) {
-      // round ended
-      stopAI();
-      setIsRunning(false);
-      addSystemMessage(`Round ${round} finished. Please guess if opponent was an AI.`);
     }
 
     return () => {
       if (tick) window.clearInterval(tick);
     };
-  }, [isRunning, timeLeft, round]);
+  }, [isRunning, timeLeft]);
 
-  function startRound() {
-    setMessages([]);
-    setInput("");
-    setTimeLeft(60);
-    setIsRunning(true);
-    // Randomly decide whether opponent is AI for this demo if not set
-    const isAI = Math.random() < 0.5;
-    setOpponentIsAI(isAI);
-    addSystemMessage(`Round ${round} started. You have 60 seconds to chat.`);
-    if (isAI) startAI();
-  }
-
-  function nextRound() {
-    if (round >= 3) {
-      addSystemMessage("Game finished — 3 rounds completed.");
-      // optionally emit final result to server
-      return;
-    }
-    setRound((r) => r + 1);
-    setOpponentIsAI(null);
-    // small delay between rounds
-    setTimeout(() => startRound(), 800);
+  function startGame() {
+    console.log("[TextViewer] Starting game, emitting turing:startGame");
+    socketRef.current?.emit("turing:startGame", { roomId });
+    setGameStarted(true);
   }
 
   function startAI() {
     stopAI();
-    // AI will send messages at random intervals during the minute
-      const sendAiMessage = async () => {
-      const context = messages.slice(-6).map((m) => `${m.sender}: ${m.text}`).join(" \n ");
+    // AI will send messages at random intervals during the round
+    const sendAiMessage = async () => {
+      const context = messages
+        .slice(-6)
+        .map((m) => `${m.sender}: ${m.text}`)
+        .join(" \n ");
       const text = await fetchAiMessage(context);
-      const msg: Message = {
-        id: String(Math.random()).slice(2),
-        sender: "ai",
-        text,
-        timestamp: Date.now(),
-      };
-      setMessages((m) => [...m, msg]);
+
+      // Send AI message through socket (not just local state)
+      socketRef.current?.emit("turing:message", { roomId, text });
+
+      console.log("[TextViewer] AI sent message:", text);
     };
 
     const schedule = () => {
       // every 5-15 seconds
       const delay = 5000 + Math.floor(Math.random() * 10000);
       aiTimerRef.current = window.setTimeout(() => {
-        sendAiMessage();
-        if (isRunning && timeLeft > 0) schedule();
+        if (isRunning && timeLeft > 0) {
+          sendAiMessage();
+          schedule();
+        }
       }, delay) as unknown as number;
     };
     schedule();
@@ -216,38 +258,19 @@ export default function TextViewer({ roomId }: { roomId: string }) {
   }
 
   function sendMessage() {
-    if (!input.trim()) return;
-    const msg: Message = {
-      id: String(Math.random()).slice(2),
-      sender: "you",
-      text: input.trim(),
-      timestamp: Date.now(),
-    };
-    setMessages((m) => [...m, msg]);
+    if (!input.trim() || myRole === "ai") return; // Can't send if you're AI this round
 
-    // Emit through socket if available so real opponent can receive it
-    try {
-      console.log("[TextViewer] Emitting chat:new ->", { chatId: roomId, text: input.trim() });
-      socketRef.current?.emit("chat:new", { chatId: roomId, text: input.trim() });
-    } catch (e) {
-      console.error("[TextViewer] Error emitting chat:new", e);
-    }
-
+    const text = input.trim();
+    console.log("[TextViewer] Sending message:", text);
+    socketRef.current?.emit("turing:message", { roomId, text });
     setInput("");
   }
 
-  function vote(isAiGuess: boolean) {
-    const correct = opponentIsAI === isAiGuess;
-    addSystemMessage(`You guessed ${isAiGuess ? "AI" : "Human"}. That is ${correct ? "correct" : "incorrect"}.`);
-    // emit vote to server if needed
-    try {
-      console.log("[TextViewer] Emitting turing:vote ->", { roomId, round, guessIsAi: isAiGuess, correct });
-      socketRef.current?.emit("turing:vote", { roomId, round, guessIsAi: isAiGuess, correct });
-    } catch (e) {
-      console.error("[TextViewer] Error emitting turing:vote", e);
-    }
-    // proceed to next round after a short delay
-    setTimeout(() => nextRound(), 1200);
+  function vote(guessOpponentIsAI: boolean) {
+    console.log("[TextViewer] Voting:", guessOpponentIsAI);
+    socketRef.current?.emit("turing:vote", { roomId, guessOpponentIsAI });
+    setWaitingForVote(false);
+    addSystemMessage("Voto enviado. Esperando resultado...");
   }
 
   return (
@@ -257,21 +280,48 @@ export default function TextViewer({ roomId }: { roomId: string }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-2 rounded-lg">
-              <span className="text-sm font-semibold text-white">Ronda {round} / 3</span>
+              <span className="text-sm font-semibold text-white">
+                Ronda {round} / 3
+              </span>
             </div>
+            {myRole && (
+              <div
+                className={`text-sm px-3 py-1 rounded-full ${
+                  myRole === "ai"
+                    ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                    : "bg-green-500/20 text-green-400 border border-green-500/30"
+                }`}
+              >
+                {myRole === "ai"
+                  ? "🤖 Juegas como IA"
+                  : "👤 Juegas como Humano"}
+              </div>
+            )}
             {isRunning && (
               <div className="text-sm text-subtitle animate-pulse">
                 🎮 Chateando...
               </div>
             )}
           </div>
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-            timeLeft <= 10 && timeLeft > 0 
-              ? 'bg-red-500/20 text-red-400 animate-pulse' 
-              : 'bg-slate-700/50 text-white'
-          }`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+              timeLeft <= 10 && timeLeft > 0
+                ? "bg-red-500/20 text-red-400 animate-pulse"
+                : "bg-slate-700/50 text-white"
+            }`}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span className="font-mono font-bold text-lg">{timeLeft}s</span>
           </div>
@@ -280,48 +330,82 @@ export default function TextViewer({ roomId }: { roomId: string }) {
 
       {/* Chat messages */}
       <div className="glass-box-one mb-4 p-4 h-96 flex flex-col">
-        <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-slate-700/30" data-testid="messages">
+        <div
+          className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-slate-700/30"
+          data-testid="messages"
+        >
           {messages.length === 0 && (
             <div className="h-full flex items-center justify-center text-subtitle">
               <div className="text-center">
-                <svg className="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <svg
+                  className="w-16 h-16 mx-auto mb-3 opacity-50"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
                 </svg>
                 <p className="text-sm">Sin mensajes aún</p>
               </div>
             </div>
           )}
           {messages.map((m, idx) => (
-            <div 
-              key={m.id} 
-              className={`flex ${m.sender === "you" ? "justify-end" : "justify-start"} animate-in slide-in-from-bottom-2 duration-300`}
+            <div
+              key={m.id}
+              className={`flex ${
+                m.sender === "you" ? "justify-end" : "justify-start"
+              } animate-in slide-in-from-bottom-2 duration-300`}
               style={{ animationDelay: `${idx * 50}ms` }}
             >
               {m.sender === "system" ? (
                 <div className="w-full text-center">
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-yellow-400 text-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     {m.text}
                   </div>
                 </div>
               ) : (
-                <div className={`max-w-[75%] ${m.sender === "you" ? "items-end" : "items-start"} flex flex-col gap-1`}>
+                <div
+                  className={`max-w-[75%] ${
+                    m.sender === "you" ? "items-end" : "items-start"
+                  } flex flex-col gap-1`}
+                >
                   <div className="flex items-center gap-2 px-2">
-                    <span className={`text-xs font-medium ${
-                      m.sender === "you" ? "text-blue-400" : 
-                      m.sender === "ai" ? "text-purple-400" : "text-green-400"
-                    }`}>
-                      {m.sender === "you" ? "Tú" : m.sender === "ai" ? "🤖 IA" : "Oponente"}
+                    <span
+                      className={`text-xs font-medium ${
+                        m.sender === "you" ? "text-blue-400" : "text-green-400"
+                      }`}
+                    >
+                      {m.sender === "you" ? "Tú" : "Oponente"}
                     </span>
                   </div>
-                  <div className={`px-4 py-3 rounded-2xl shadow-lg ${
-                    m.sender === 'you' 
-                      ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-none' 
-                      : 'bg-gradient-to-br from-slate-700 to-slate-800 text-white rounded-bl-none border border-slate-600/50'
-                  }`}>
-                    <p className="text-sm leading-relaxed break-words">{m.text}</p>
+                  <div
+                    className={`px-4 py-3 rounded-2xl shadow-lg ${
+                      m.sender === "you"
+                        ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-none"
+                        : "bg-gradient-to-br from-slate-700 to-slate-800 text-white rounded-bl-none border border-slate-600/50"
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed break-words">
+                      {m.text}
+                    </p>
                   </div>
                 </div>
               )}
@@ -337,19 +421,35 @@ export default function TextViewer({ roomId }: { roomId: string }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-1 px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-600/50 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            placeholder={isRunning ? "Escribe tu mensaje..." : "Inicia la ronda para chatear"}
-            disabled={!isRunning}
+            placeholder={
+              myRole === "ai"
+                ? "La IA envía mensajes automáticamente..."
+                : isRunning
+                ? "Escribe tu mensaje..."
+                : "Esperando inicio de ronda..."
+            }
+            disabled={!isRunning || myRole === "ai"}
             onKeyDown={(e) => {
               if (e.key === "Enter") sendMessage();
             }}
           />
-          <button 
-            onClick={sendMessage} 
-            disabled={!isRunning || !input.trim()} 
+          <button
+            onClick={sendMessage}
+            disabled={!isRunning || !input.trim() || myRole === "ai"}
             className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95 shadow-lg"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+              />
             </svg>
           </button>
         </div>
@@ -357,43 +457,80 @@ export default function TextViewer({ roomId }: { roomId: string }) {
 
       {/* Action buttons */}
       <div className="mt-4 flex gap-3 justify-center">
-        {!isRunning && round <= 3 && (
-          <button 
-            onClick={startRound} 
+        {!gameStarted && (
+          <button
+            onClick={startGame}
             className="group px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold text-lg hover:from-green-700 hover:to-emerald-700 transition-all transform hover:scale-105 active:scale-95 shadow-xl flex items-center gap-3"
           >
-            <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-6 h-6 group-hover:rotate-12 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
-            Iniciar Ronda {round}
+            Iniciar Juego
           </button>
         )}
 
-        {timeLeft === 0 && (
+        {waitingForVote && (
           <div className="flex flex-col items-center gap-3 w-full max-w-md">
-            <p className="text-lg font-semibold text-white mb-2">¿Tu oponente es una IA?</p>
+            <p className="text-lg font-semibold text-white mb-2">
+              ¿Tu oponente era una IA?
+            </p>
             <div className="flex gap-4 w-full">
-              <button 
-                onClick={() => vote(true)} 
+              <button
+                onClick={() => vote(true)}
                 className="flex-1 group px-6 py-4 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-rose-700 transition-all transform hover:scale-105 active:scale-95 shadow-xl"
               >
                 <div className="flex items-center justify-center gap-2">
-                  <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <svg
+                    className="w-6 h-6 group-hover:rotate-12 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
                   </svg>
-                  <span>Es IA</span>
+                  <span>Sí, era IA</span>
                 </div>
               </button>
-              <button 
-                onClick={() => vote(false)} 
+              <button
+                onClick={() => vote(false)}
                 className="flex-1 group px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-xl"
               >
                 <div className="flex items-center justify-center gap-2">
-                  <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  <svg
+                    className="w-6 h-6 group-hover:rotate-12 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
                   </svg>
-                  <span>Es Humano</span>
+                  <span>No, era Humano</span>
                 </div>
               </button>
             </div>
