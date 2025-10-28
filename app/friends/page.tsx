@@ -16,7 +16,6 @@ export default async function NavbarServer() {
       <FriendsPage
         session={session}
         userId={userId}
-        accessToken={accessToken}
       />
     </div>
   );

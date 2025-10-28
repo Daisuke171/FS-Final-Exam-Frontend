@@ -2,16 +2,14 @@
 
 import { ReactNode, useMemo } from "react";
 import { ApolloProvider } from "@apollo/client/react";
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider } from "next-auth/react";
 import type { Session } from "next-auth";
 import { createApolloClient } from "@/shared/lib/apollo/client";
 import { GlobalChatProvider } from "@/modules/chat/provider/GlobalChatProvider";
 import AuthRefreshChecker from "@/components/auth/AuthRefreshChecker";
 
 function ApolloAuthBoundary({ children }: { children?: ReactNode }) {
-  const { data: session } = useSession();
-
-  const client = useMemo(() => createApolloClient(), [session?.accessToken]);
+  const client = useMemo(() => createApolloClient(), []);
 
   return (
     <ApolloProvider client={client}>

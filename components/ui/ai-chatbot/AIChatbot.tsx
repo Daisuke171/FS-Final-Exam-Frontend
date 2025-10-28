@@ -50,7 +50,12 @@ export default function AIChatbot() {
         }
       ]);
     }
-  }, [session?.user?.name, status]);
+  }, [session?.user?.name, session?.user, status]);
+
+  // Auto scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const toggleChat = () => setIsOpen(!isOpen);
 
@@ -58,11 +63,6 @@ export default function AIChatbot() {
   if (status === 'loading') {
     return null;
   }
-
-  // Auto scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,7 +87,6 @@ export default function AIChatbot() {
       content: input
     };
 
-    const currentInput = input;
     setInput('');
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);

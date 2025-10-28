@@ -34,7 +34,7 @@ export function useChatbot() {
 export function useChatbotHelper() {
   const { setIsOpen } = useChatbot();
 
-  const openChatWithMessage = (_message: string) => {
+  const openChatWithMessage = () => {
     setIsOpen(true);
     // This could be extended to pre-fill a message
   };
