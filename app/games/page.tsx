@@ -38,7 +38,7 @@ const games: GameCardProps[] = [
     difficulty: "medium",
     xpReward: "+ 60",
     gameType: "Lógica",
-    isComingSoon: false,
+    isComingSoon: true,
     href: "/games/turing-detective",
   },
   {

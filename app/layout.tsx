@@ -9,6 +9,7 @@ import NavbarServer from "@/components/ui/general/NabvarServer";
 import BottomBar from "@/components/ui/general/BottomBar";
 import { auth } from "@/auth";
 import Footer from "@/components/ui/general/Footer";
+import AIChatbot from "@/components/ui/ai-chatbot/AIChatbot";
 
 const raleway = Raleway({
   variable: "--font-raleway",
@@ -39,6 +40,7 @@ export default async function RootLayout({
           {children}
           <BottomBar />
           <Footer/>
+          <AIChatbot />
         </Providers>
       </body>
     </html>
