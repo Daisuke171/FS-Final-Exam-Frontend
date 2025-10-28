@@ -13,17 +13,21 @@ import {
 } from "@friends/model/useFriends";
 import { Modal } from "@friends/ui/ModalInviter";
 
+import { useFriendsPendings, useAcceptFriend } from "@modules/friends/model/useFriends";
+
+
 type FabAction = {
-  id: "add-user" | "share-link";
+  id: "add-user" | "share-link" | "friend-request";
   label: string;
   rightEl?: ReactNode;
 };
 
-type ModalKind = null | "add-user" | "share-link";
+type ModalKind = null | "add-user" | "share-link" | "friend-request";
 
 const ACTIONS: FabAction[] = [
   { id: "add-user", label: "Añadir usuario", rightEl: <span>＋</span> },
   { id: "share-link", label: "Compartir link", rightEl: <span>🔗</span> },
+  { id: "friend-request", label: "Solicitudes de amistad", rightEl: <span>💌</span>},
 ];
 
 interface FabMenuProps {
@@ -50,9 +54,12 @@ export default function FabMenu({currentUserId}: FabMenuProps) {
     error: errorLink,
   } = useCreateLink();
 
-
+  const { list, loading } = useFriendsPendings(currentUserId);
+      const { accept } = useAcceptFriend();
+  // const { list, loading: loadingPendings, refetch: refetchPendings } = useFriendsPendings(currentUserId);
 
   const { requestByUsername, loading: loadingInvite, error: errorInvite } = useRequestFriendByUsername();
+console.log(list);
 
   // ===== Handlers =====
   const handleCreateLink = async () => {
@@ -159,7 +166,7 @@ export default function FabMenu({currentUserId}: FabMenuProps) {
                 setModal(a.id);
               }}
               className={cn(
-                "flex items-center justify-between w-44 px-3 py-1.5 rounded-md",
+                "flex items-center justify-between w-44 px-3 py-1.5 rounded-md text-start",
                 "text-white text-sm hover:bg-cyan-300/10 focus:outline-none",
                 "focus-visible:ring-2 focus-visible:ring-cyan-300/60"
               )}
@@ -190,7 +197,7 @@ export default function FabMenu({currentUserId}: FabMenuProps) {
               Username
               <input
                 className="mt-1 w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-700"
-                placeholder="@usuario"
+                placeholder="usuario"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -267,6 +274,48 @@ export default function FabMenu({currentUserId}: FabMenuProps) {
               </p>
             )}
           </div>
+        </Modal>
+      )}
+
+       {/* ======= MODAL FRIEND-REQUEST ======= */}
+       {modal === "friend-request" && (
+        <Modal onClose={() => setModal(null)} title="Solicitud de amistad" >
+           <div className="space-y-3">
+            {list.map((f) => {
+                const other = f.peer
+                return (
+                    <div
+                        key={f.id}
+                        className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-cyan-300/30"
+                    >
+                        <div className="font-semibold">{other.nickname}</div>
+                        {f.status === "PENDING" ? (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {accept(f.id, "ACCEPTED"); setModal(null)}}
+                                    className="px-3 py-1.5 rounded-md bg-cyan-600/80 hover:bg-cyan-500 text-white"
+                                >
+                                    Aceptar
+                                </button>
+                                <button
+                                    onClick={() => {accept(f.id, "DECLINED"); setModal(null)}}
+                                    className="px-3 py-1.5 rounded-md border border-white/10 hover:bg-white/5"
+                                >
+                                    Rechazar
+                                </button>
+                            </div>
+                        ) : f.status === "ACCEPTED" ? (
+                            <button
+                                onClick={() => {accept(f.id, "BLOCKED"), setModal(null)}}
+                                className="px-3 py-1.5 rounded-md bg-rose-600 hover:bg-rose-500 text-white"
+                            >
+                                Bloquear
+                            </button>
+                        ) : null}
+                    </div>
+                );
+            })}
+        </div>
         </Modal>
       )}
     </>
