@@ -251,53 +251,153 @@ export default function TextViewer({ roomId }: { roomId: string }) {
   }
 
   return (
-    <div className="w-full bg-[#0b1020] text-white rounded-lg p-4">
-      <div className="flex items-center justify-between mb-4">
-        <div>Round: {round} / 3</div>
-        <div>Time left: {timeLeft}s</div>
-      </div>
-
-      <div className="h-72 overflow-y-auto mb-4 p-2 bg-[#0f1724] rounded" data-testid="messages">
-        {messages.map((m) => (
-          <div key={m.id} className={`mb-2 ${m.sender === "you" ? "text-right" : "text-left"}`}>
-            <div className="text-xs text-gray-400">{m.sender}</div>
-            <div className={m.sender === 'you' ? 'inline-block px-3 py-2 rounded bg-blue-600' : 'inline-block px-3 py-2 rounded bg-gray-700'}>{m.text}</div>
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Header with round info and timer */}
+      <div className="glass-box-one mb-4 p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-2 rounded-lg">
+              <span className="text-sm font-semibold text-white">Ronda {round} / 3</span>
+            </div>
+            {isRunning && (
+              <div className="text-sm text-subtitle animate-pulse">
+                🎮 Chateando...
+              </div>
+            )}
           </div>
-        ))}
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+            timeLeft <= 10 && timeLeft > 0 
+              ? 'bg-red-500/20 text-red-400 animate-pulse' 
+              : 'bg-slate-700/50 text-white'
+          }`}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="font-mono font-bold text-lg">{timeLeft}s</span>
+          </div>
+        </div>
       </div>
 
-      <div className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-1 p-2 rounded bg-[#081026] border border-gray-700"
-          placeholder={isRunning ? "Escribe un mensaje..." : "Start the round to chat"}
-          disabled={!isRunning}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") sendMessage();
-          }}
-        />
-        <button onClick={sendMessage} disabled={!isRunning} className="px-4 py-2 bg-blue-600 rounded">
-          Enviar
-        </button>
+      {/* Chat messages */}
+      <div className="glass-box-one mb-4 p-4 h-96 flex flex-col">
+        <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-slate-700/30" data-testid="messages">
+          {messages.length === 0 && (
+            <div className="h-full flex items-center justify-center text-subtitle">
+              <div className="text-center">
+                <svg className="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <p className="text-sm">Sin mensajes aún</p>
+              </div>
+            </div>
+          )}
+          {messages.map((m, idx) => (
+            <div 
+              key={m.id} 
+              className={`flex ${m.sender === "you" ? "justify-end" : "justify-start"} animate-in slide-in-from-bottom-2 duration-300`}
+              style={{ animationDelay: `${idx * 50}ms` }}
+            >
+              {m.sender === "system" ? (
+                <div className="w-full text-center">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-yellow-400 text-sm">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {m.text}
+                  </div>
+                </div>
+              ) : (
+                <div className={`max-w-[75%] ${m.sender === "you" ? "items-end" : "items-start"} flex flex-col gap-1`}>
+                  <div className="flex items-center gap-2 px-2">
+                    <span className={`text-xs font-medium ${
+                      m.sender === "you" ? "text-blue-400" : 
+                      m.sender === "ai" ? "text-purple-400" : "text-green-400"
+                    }`}>
+                      {m.sender === "you" ? "Tú" : m.sender === "ai" ? "🤖 IA" : "Oponente"}
+                    </span>
+                  </div>
+                  <div className={`px-4 py-3 rounded-2xl shadow-lg ${
+                    m.sender === 'you' 
+                      ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-none' 
+                      : 'bg-gradient-to-br from-slate-700 to-slate-800 text-white rounded-bl-none border border-slate-600/50'
+                  }`}>
+                    <p className="text-sm leading-relaxed break-words">{m.text}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-4 flex gap-2">
+      {/* Input area */}
+      <div className="glass-box-one p-4">
+        <div className="flex gap-3">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="flex-1 px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-600/50 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            placeholder={isRunning ? "Escribe tu mensaje..." : "Inicia la ronda para chatear"}
+            disabled={!isRunning}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") sendMessage();
+            }}
+          />
+          <button 
+            onClick={sendMessage} 
+            disabled={!isRunning || !input.trim()} 
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95 shadow-lg"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="mt-4 flex gap-3 justify-center">
         {!isRunning && round <= 3 && (
-          <button onClick={startRound} className="px-4 py-2 bg-green-600 rounded">
+          <button 
+            onClick={startRound} 
+            className="group px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold text-lg hover:from-green-700 hover:to-emerald-700 transition-all transform hover:scale-105 active:scale-95 shadow-xl flex items-center gap-3"
+          >
+            <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             Iniciar Ronda {round}
           </button>
         )}
 
         {timeLeft === 0 && (
-          <>
-            <button onClick={() => vote(true)} className="px-4 py-2 bg-red-600 rounded">
-              Es AI
-            </button>
-            <button onClick={() => vote(false)} className="px-4 py-2 bg-indigo-600 rounded">
-              Es Humano
-            </button>
-          </>
+          <div className="flex flex-col items-center gap-3 w-full max-w-md">
+            <p className="text-lg font-semibold text-white mb-2">¿Tu oponente es una IA?</p>
+            <div className="flex gap-4 w-full">
+              <button 
+                onClick={() => vote(true)} 
+                className="flex-1 group px-6 py-4 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-rose-700 transition-all transform hover:scale-105 active:scale-95 shadow-xl"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>Es IA</span>
+                </div>
+              </button>
+              <button 
+                onClick={() => vote(false)} 
+                className="flex-1 group px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-xl"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span>Es Humano</span>
+                </div>
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

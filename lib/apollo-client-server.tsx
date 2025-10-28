@@ -5,7 +5,7 @@ export function createServerApolloClient(token?: string) {
     ssrMode: true,
     link: new HttpLink({
       uri:
-        process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3010/graphql",
+        process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3011/graphql",
       headers: token ? { authorization: `Bearer ${token}` } : {},
     }),
     cache: new InMemoryCache(),
