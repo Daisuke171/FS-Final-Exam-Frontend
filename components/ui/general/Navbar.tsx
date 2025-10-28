@@ -216,7 +216,6 @@ export default function Navbar({ users, session }: NavbarProps) {
               width={100}
               height={100}
               priority
-              style={{ width: "auto", height: "auto" }}
             />
           </Link>
 
@@ -231,7 +230,6 @@ export default function Navbar({ users, session }: NavbarProps) {
                   ? pathname === "/"
                   : pathname.startsWith(link.href);
 
-              // 2. Define la clase de hover y la de activo
               const hoverClass = link.hover || "hover:text-light-blue";
               const activeClass = (
                 link.hover || "hover:text-light-blue"

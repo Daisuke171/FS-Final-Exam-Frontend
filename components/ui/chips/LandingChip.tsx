@@ -1,10 +1,11 @@
 import { Icon } from "@iconify/react";
 
 interface LandingChipProps {
-  icon: string;
+  icon?: string;
   text: string;
   color: "blue" | "purple" | "red" | "green" | "yellow";
   size?: "sm" | "md" | "lg";
+  marging?: boolean;
 }
 
 const getColor = {
@@ -26,15 +27,22 @@ export default function LandingChip({
   text,
   color,
   size = "md",
+  marging = true,
 }: LandingChipProps) {
   return (
     <div
-      className={`flex gap-1 mb-5 w-fit items-center ${getSize[size]} px-2 py-1 rounded-full border ${getColor[color]}`}
+      className={`flex gap-1 ${
+        marging && "mb-5"
+      } w-fit items-center justify-center ${
+        getSize[size]
+      } px-2 py-1 rounded-full text-center border ${getColor[color]}`}
     >
-      <Icon
-        icon={icon}
-        width="20"
-      />
+      {icon && (
+        <Icon
+          icon={icon}
+          width="20"
+        />
+      )}
       {text}
     </div>
   );

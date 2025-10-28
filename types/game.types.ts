@@ -43,3 +43,23 @@ export interface GameHistory {
     gameLogo: string;
   };
 }
+
+export interface Game {
+  id: string;
+  name: string;
+  description?: string;
+  gameLogo?: string;
+}
+
+export interface GameFavorite {
+  id: string;
+  gameId: string;
+  game: Game;
+  totalGames: number;
+  winRate: number;
+  lastPlayed: string;
+}
+
+export interface GetUserFavoritesData {
+  userFavorites: GameFavorite[];
+}
