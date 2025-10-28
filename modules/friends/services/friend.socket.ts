@@ -39,7 +39,6 @@ export function authFriendsSocket(userId: string) {
     const emit = () => {
         s.emit("auth", { userId });
         s.emit("presence:get", { userId });
-        console.log("🔑 Friends WS auth emit for user:", userId);
     };
     if (s.connected) emit();
     else s.once("connect", emit); // once hace que se llame solo una vez
@@ -67,7 +66,7 @@ export function onFriendEvent(cb: (evt: FriendEvent) => void) {
     return () => s?.off("friend:event", cb);
 }
 
-/** Tipos de eventos (ajustá según lo que emita tu bus) */
+/** Tipos de eventos */
 export type FriendEvent =
     | { type: "friend:request"; userId: string; friendId: string }
     | { type: "friend:accepted"; userId: string; friendId: string }

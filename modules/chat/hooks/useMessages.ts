@@ -1,14 +1,12 @@
 "use client";
-import type { ApolloCache } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react"
 import { useQuery, useMutation, useSubscription } from "@apollo/client/react";
 import type { Message , MessageDTO, InputMessage } from "../types/message.types";
 import { GET_MESSAGES } from "../api/chat.queries.gql";
 import { SEND_MESSAGE  } from "../api/chat.mutation";
 import { MESSAGE_ADDED, MESSAGE_UPDATED } from "../api/chat.subscritions";
-import { useUnreadStore } from "../model/unread.store";
-import { usePathname } from "next/navigation";
-// Helper opcional (si querés DTO para la UI)
+
+
 export function toDTO(m: Message, currentUserId?: string): MessageDTO {
   return {
     id: m.id,
@@ -21,8 +19,6 @@ export function toDTO(m: Message, currentUserId?: string): MessageDTO {
 /** Trae mensajes por chatId */
 export function useGetMessages(chatId?: string) {
   const client = useApolloClient();
-  const pathname = usePathname();
-  const incrementUnread = useUnreadStore((s) => s.increment);
   
   const { data, loading, error, refetch } = useQuery<
     { messages: Message[] },
@@ -120,7 +116,7 @@ export function useGetMessages(chatId?: string) {
 export function useSendMessage(currentUserId?: string) {
   const [mutate, { loading }] = useMutation<
     { sendMessage: Message },
-    { input: { chatId: string; message: string } }
+    { input: { chatId: string; message: string; senderId: string } }
   >(SEND_MESSAGE, {
     optimisticResponse: ({ input }) => ({
       sendMessage: {
@@ -160,8 +156,8 @@ export function useSendMessage(currentUserId?: string) {
     },
   });
   return {
-    send: ({ chatId, message }: InputMessage) =>
-      mutate({ variables: { input: { chatId, message } } }),
+    send: ({ chatId, message, senderId }: InputMessage) =>
+      mutate({ variables: { input: { chatId, message, senderId } } }),
     loading,
   };
 }

@@ -34,7 +34,7 @@ export default function LoginCard() {
           <div className="text-center mt-6 text-sm">
             <span className="text-subtitle">¿No tienes cuenta aún? </span>
             <Link
-              href="/login"
+              href="/register"
               className="font-bold text-shadow-blue hover:text-medium-blue transition-colors"
             >
               REGISTRATE

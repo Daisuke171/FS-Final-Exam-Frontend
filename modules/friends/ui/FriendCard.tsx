@@ -1,9 +1,9 @@
+"use client";
 import Avatar from "@/shared/ui/Avatar";
 import { Badge } from "@/shared/ui/Badge";
 import type { FriendPeer } from "../model/types";
 import { usePresenceStore } from "../model/presence.store";
-import { useUnreadStore } from "@/modules/chat/model/unread.store";
-import { useMessageAdded } from "@/modules/chat/hooks/useMessageAdded";
+import {useHandleEvents} from "../hooks/useHandleEvents";
 
 interface FriendCardProps {
 	friend: FriendPeer;
@@ -11,15 +11,10 @@ interface FriendCardProps {
 }
 
 export default function FriendCard({ friend, currentUserId }: FriendCardProps) {
+	const chatId = friend.chatId;
+	 const { unread } = useHandleEvents(chatId, currentUserId);
 	const isOnline = usePresenceStore((s) => s.isOnline(friend.peer.id));
-	const messageAdded = useMessageAdded(friend.chatId);
-	const unread = useUnreadStore((s) => s.getCount(friend.chatId));
 
-
-	console.log(messageAdded);
-	
-	console.log(isOnline, "isOnline");
-	
 
 	return (
 		<div
