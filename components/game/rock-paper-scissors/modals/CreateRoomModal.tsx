@@ -94,7 +94,7 @@ export default function CreateRoomModal({
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0 }}
-        className="glass-box-one fixed p-10 top-1/2 left-1/2 z-10 transform -translate-x-1/2 -translate-y-1/2 w-130"
+        className="glass-box-one fixed p-10 top-1/2 left-1/2 z-10 transform -translate-x-1/2 w-[90%] -translate-y-1/2 max-w-130"
       >
         <Icon
           icon="material-symbols:close"
@@ -102,7 +102,9 @@ export default function CreateRoomModal({
           className="absolute top-4 right-4 cursor-pointer hover:text-shadow-blue transition-all"
           onClick={setCloseModal}
         />
-        <h2 className="text-4xl font-bold text-font">Crea tu sala</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-font">
+          Crea tu sala
+        </h2>
         <form
           onSubmit={handleSubmit}
           className="mt-10 flex flex-col gap-5 w-full justify-center"
@@ -157,7 +159,7 @@ export default function CreateRoomModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed top-0 left-0 w-full h-full bg-black/50"
+        className="fixed top-0 left-0 w-full h-full bg-black/50 backdrop-blur-md"
         onClick={setCloseModal}
       ></motion.div>
     </>

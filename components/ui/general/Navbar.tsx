@@ -13,7 +13,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 interface NavbarProps {
-  users: number;
+  users: string;
   session: Session | null;
 }
 
@@ -127,7 +127,7 @@ export default function Navbar({ users, session }: NavbarProps) {
     >
       <div
         className="absolute top-0 left-0 w-full h-full 
-                     bg-white/4 backdrop-blur-md
+                     backdrop-blur-md
                      border-b-2 border-white/10
                      shadow-lg
                      "
@@ -194,15 +194,20 @@ export default function Navbar({ users, session }: NavbarProps) {
             />
           </div>
 
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-md border border-[var(--light-blue)] bg-[var(--light-blue)]/10 text-white text-sm font-semibold shadow-[0_0_6px_rgba(76,201,240,0.4)]">
-            <span className="w-2 h-2 rounded-full bg-green-500"></span>
+          <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-transparent-success/90 text-font text-base font-semibold">
+            <Icon
+              icon="gridicons:user"
+              className="text-xl text-light-success"
+            />
             {users}
           </div>
         </div>
 
         <div className="hidden md:flex w-full items-center">
           <Link
-            className="flex items-center w-25"
+            className={`flex items-center ${
+              isAuthenticated ? "w-38.5" : "w-25"
+            }`}
             href="/"
           >
             <Image
@@ -218,7 +223,7 @@ export default function Navbar({ users, session }: NavbarProps) {
           <nav
             className={`flex items-center ${
               isAuthenticated ? "max-w-[70%]" : "max-w-[75%]"
-            } gap-10 text-font font-semibold text-sm mx-auto justify-between`}
+            } gap-5 lg:gap-8 text-font font-semibold text-sm mx-auto justify-between`}
           >
             {links.map((link) => {
               const isActive =
@@ -238,7 +243,7 @@ export default function Navbar({ users, session }: NavbarProps) {
                   className={`flex items-center py-3  px-4 gap-2 rounded-lg cursor-pointer ${
                     link.isComingSoon && "opacity-50 pointer-events-none"
                   } transition-colors duration-300 ease-in-out ${
-                    isActive ? `${activeClass + " bg-white/3"}` : hoverClass
+                    isActive ? `${activeClass + " bg-white/4"}` : hoverClass
                   }`}
                 >
                   <Icon
@@ -279,8 +284,11 @@ export default function Navbar({ users, session }: NavbarProps) {
 
           <div className="flex items-center gap-4 justify-end">
             {isAuthenticated && (
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-md border border-[var(--light-blue)] bg-[var(--light-blue)]/10 text-white text-xs font-semibold shadow-[0_0_6px_rgba(76,201,240,0.4)]">
-                <span className="w-2 h-2 rounded-full bg-light-success"></span>
+              <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-transparent-success/90 text-font text-base font-semibold">
+                <Icon
+                  icon="gridicons:user"
+                  className="text-xl text-light-success"
+                />
                 {users}
               </div>
             )}

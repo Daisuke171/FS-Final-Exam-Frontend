@@ -45,27 +45,27 @@ export default function HealthBar({
             >
               <div
                 key={id}
-                className="space-y-2 w-60"
+                className="space-y-2 w-38 sm:w-60"
               >
-                <div className="flex justify-between items-center px-1">
+                <div className="flex flex-col items-start md:flex-row md:justify-between md:items-center px-1">
                   <span
-                    className={`font-medium ${
+                    className={`font-medium text-sm md:text-base ${
                       isPlayer ? "text-medium-blue" : "text-error"
                     }`}
                   >
                     {isPlayer ? "Tu Vida" : "Vida del Rival"}
                   </span>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm line-through text-light-gray">
+                    <span className="text-xs md:text-sm line-through text-light-gray">
                       100 HP
                     </span>
-                    <span className="text-sm font-bold text-error">
+                    <span className="text-xs md:text-sm  font-bold text-error">
                       <NumbersAnimation value={newHealth} /> HP
                     </span>
                   </div>
                 </div>
                 <div
-                  className={`relative w-full h-6 mb-2 bg-slate-900 rounded-full overflow-hidden border-2 border-indigo-200 ${
+                  className={`relative w-full h-4 sm:h-6 mb-2 bg-slate-900 rounded-full overflow-hidden border-2 border-indigo-200 ${
                     newHealth > 20 && newHealth <= 40
                       ? "animate-[vibrate-2_linear_0.4s_infinite]"
                       : newHealth <= 20
@@ -105,7 +105,7 @@ export default function HealthBar({
                   >
                     {winner !== id && (
                       <span
-                        className={`inline-block px-3 py-1 rounded-full text-sm font-bold bg-rose-300 text-rose-800`}
+                        className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold bg-transparent-error text-light-error`}
                       >
                         -{healthDamage[id] || 0} HP
                       </span>

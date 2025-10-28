@@ -5,6 +5,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { getSocket } from "@/app/socket";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
+import { Icon } from "@iconify/react";
 
 interface LogsProps {
   id: string;
@@ -27,10 +28,12 @@ export default function ChatComponent({
   roomId,
   players,
   playerNickname,
+  handleClose,
 }: {
   roomId: string | string[];
   players: { id: string }[];
   playerNickname: string | undefined;
+  handleClose?: () => void;
 }) {
   const { data: session } = useSession();
   const socket = getSocket(session?.accessToken);
@@ -40,6 +43,9 @@ export default function ChatComponent({
     new Set()
   );
   const [isInitialized, setIsInitialized] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(0);
+  const prevLogsLengthRef = useRef(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   console.log(`📦 ChatComponent renderizado: ${players}`);
   console.log(`Nickname enviado por props: ${playerNickname}`);
@@ -56,9 +62,6 @@ export default function ChatComponent({
     return timeA - timeB;
   });
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
   const formatTime = (timestamp: string | number) => {
     const date =
       typeof timestamp === "string" ? new Date(timestamp) : new Date(timestamp);
@@ -68,8 +71,19 @@ export default function ChatComponent({
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, logs]);
+    const messagesIncreased = messages.length > prevMessagesLengthRef.current;
+    const logsIncreased =
+      logs.length > prevLogsLengthRef.current && logs.length > 1;
+
+    if ((messagesIncreased || logsIncreased) && containerRef.current) {
+      // Usar scrollTop en lugar de scrollIntoView para no afectar el navegador
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+
+    // Actualizar las referencias
+    prevMessagesLengthRef.current = messages.length;
+    prevLogsLengthRef.current = logs.length;
+  }, [messages.length, logs.length]);
 
   useEffect(() => {
     console.log("🧠 playerNickname en el cliente:", playerNickname);
@@ -224,33 +238,49 @@ export default function ChatComponent({
     }
   };
   return (
-    <div className="w-2/7  flex flex-col border-2 border-light-gray rounded-xl">
-      <div className="bg-background rounded-t-xl">
-        <h2 className="text-2xl font-bold p-4  text-slate-200">Chat</h2>
-      </div>
-      <div
-        className=" pb-2 bg-white/7 backdrop-blur-md  relative flex-1 overflow-y-auto scrollbar-thin [&::-webkit-scrollbar]:w-2
+    <>
+      <motion.div
+        initial={{ opacity: 0, x: 200 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 200 }}
+        className="fixed top-1/2 z-80 left-1/2 -translate-x-1/2 -translate-y-1/2 md:static
+     w-[90%] md:w-[40%] h-120 md:h-full flex flex-col border-2 border-light-gray rounded-xl
+     md:-translate-x-0 md:-translate-y-0"
+      >
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 text-2xl text-font md:hidden"
+        >
+          <Icon icon="material-symbols:close-rounded" />
+        </button>
+        <div className="bg-background rounded-t-xl">
+          <h2 className="text-2xl font-bold p-4  text-slate-200">Chat</h2>
+        </div>
+        <div
+          ref={containerRef}
+          className=" pb-2 bg-white/7 md:backdrop-blur-md  relative flex-1 overflow-y-auto scrollbar-thin [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-slate-300
   [&::-webkit-scrollbar-thumb]:bg-slate-700"
-      >
-        <div className="mt-2">
-          <div className="flex flex-col gap-2 px-2">
-            {allItems.map((item, index) => renderItem(item, index))}
-            <div ref={messagesEndRef} />
+        >
+          <div className="mt-2">
+            <div className="flex flex-col gap-2 px-2">
+              {allItems.map((item, index) => renderItem(item, index))}
+              <div ref={messagesEndRef} />
+            </div>
           </div>
         </div>
-      </div>
-      <div className="pb-4 rounded-b-xl bg-white/7 backdrop-blur-md">
-        <div className="px-4">
-          <CustomTextInput
-            action={handleSendMessage}
-            placeholder="Escribe tu mensaje"
-            name="message"
-            icon="material-symbols:send-rounded"
-            size="sm"
-          />
+        <div className="pb-4 rounded-b-xl bg-white/7 backdrop-blur-md">
+          <div className="px-4">
+            <CustomTextInput
+              action={handleSendMessage}
+              placeholder="Escribe tu mensaje"
+              name="message"
+              icon="material-symbols:send-rounded"
+              size="sm"
+            />
+          </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </>
   );
 }

@@ -108,7 +108,7 @@ export default function GameComponent() {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
-            className="flex flex-col items-center mt-[calc(72px+2.5rem)] mb-10 w-150 m-auto rounded-xl border-2 border-subtitle"
+            className="flex flex-col items-center mt-[calc(72px+2.5rem)] mb-10 w-[90%] max-w-150 m-auto rounded-xl border-2 border-subtitle"
           >
             <div className="rounded-t-xl h-80 w-full flex flex-col">
               <div className="relative w-full">
@@ -147,7 +147,7 @@ export default function GameComponent() {
                     exit={{ height: 0, opacity: 0 }}
                     className="w-full flex flex-col items-center "
                   >
-                    <p className="text-2xl mt-2 text-font">
+                    <p className="text-xl md:text-2xl mt-2 text-font">
                       Tiempo restante: {timeLeft}s
                     </p>
                     <div className="w-full h-2 rounded-full mt-2 bg-light-gray relative overflow-hidden">
@@ -161,7 +161,7 @@ export default function GameComponent() {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div className="flex gap-5 w-full items-center justify-center z-10 my-10">
+              <div className="flex gap-3 sm:gap-5 w-full items-center justify-center z-10 my-10">
                 {Buttons.map((b) => (
                   <Card
                     key={b.title}

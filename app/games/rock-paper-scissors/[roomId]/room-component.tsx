@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 import PlayersInRoom from "@/components/game/rock-paper-scissors/general/PlayersInRoom";
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
 import { AnimatePresence, motion } from "motion/react";
@@ -15,17 +15,21 @@ import { useGameSocket } from "@/hooks/rock-paper-scissors/useGameSocket";
 import JoinByPassword from "@/components/game/rock-paper-scissors/general/JoinByPassword";
 import { useSession } from "next-auth/react";
 import { getSocket } from "@/app/socket";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 export default function RoomComponent() {
   const { data: session, status } = useSession();
   const [clicked, setClicked] = useState<boolean>(false);
   const [countDown, setCountDown] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [openChat, setOpenChat] = useState(false);
   const playerNickname = session?.user?.nickname;
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
   const params = useParams();
   const roomId = params.roomId || "";
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === "mobile";
 
   const {
     handleJoinRoomByPassword,
@@ -75,6 +79,10 @@ export default function RoomComponent() {
     } else {
       router.push("/games/rock-paper-scissors");
     }
+  };
+
+  const handleChatOpen = () => {
+    setOpenChat(!openChat);
   };
 
   if (status === "loading") {
@@ -127,14 +135,26 @@ export default function RoomComponent() {
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex gap-5 w-[95%] h-100 justify-center"
+          className="flex gap-5 w-[90%] max-w-230 h-100 justify-center mt-10"
         >
-          <div className="flex flex-col glass-box-one h-full min-w-120 ">
-            <div className="flex items-center justify-between mb-5">
+          <div className="flex flex-col glass-box-one h-full w-full max-w-120 md:w-[60%]">
+            {isMobile && (
+              <button
+                onClick={handleChatOpen}
+                className="absolute top-5 right-5"
+              >
+                <Icon
+                  icon="material-symbols:chat"
+                  className="text-font text-3xl"
+                />
+              </button>
+            )}
+
+            <div className="flex items-center flex-col md:flex-row justify-center md:justify-between mb-5">
               <h1 className="text-3xl font-bold text-font">
                 Sala {roomInfo.name}
               </h1>
-              <p className="text-subtitle mr-3">
+              <p className="text-subtitle mt-2 md:mr-3">
                 {players.length}/{roomInfo.maxPlayers} Jugadores en sala
               </p>
             </div>
@@ -187,12 +207,38 @@ export default function RoomComponent() {
           <AnimatePresence mode="popLayout">
             {modalOpen && <CopiedLinkModal />}
           </AnimatePresence>
-          <ChatComponent
-            playerNickname={playerNickname}
-            roomId={roomId}
-            players={players}
-          />
+          {isMobile ? null : (
+            <ChatComponent
+              playerNickname={playerNickname}
+              roomId={roomId}
+              players={players}
+            />
+          )}
         </motion.div>
+        <AnimatePresence mode="popLayout">
+          {openChat && isMobile && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              onClick={handleChatOpen}
+              className="fixed top-0 z-20 left-0 bg-black/50 backdrop-blur-sm w-full h-full"
+            ></motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence mode="popLayout">
+          {openChat && isMobile && (
+            <div>
+              <ChatComponent
+                handleClose={handleChatOpen}
+                playerNickname={playerNickname}
+                roomId={roomId}
+                players={players}
+              />
+            </div>
+          )}
+        </AnimatePresence>
       </>
     );
   }

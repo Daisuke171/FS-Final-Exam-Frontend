@@ -139,7 +139,7 @@
 
 /* Miscelaneo */
 .glass-box-one {
-  @apply p-8 border-2 bg-white/7 backdrop-blur-md border-light-gray rounded-xl;
+  @apply p-6 md:p-8 border-2 bg-white/7 backdrop-blur-md border-light-gray rounded-xl;
 }
 
 .glass-box-two {

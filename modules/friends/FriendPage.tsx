@@ -14,6 +14,7 @@ import type { FriendPeer } from "@modules/friends/model/types";
 import { useFriends } from "@modules/friends/model/useFriends";
 import { useFriendsWS } from "@modules/friends/model/useFriendsWS";
 import { getFriendsSocket, authFriendsSocket } from "./services/friend.socket";
+import GlobalLoader from "@/components/ui/loaders/GlobalLoader";
 
 interface FriendsPageProps {
   session: Session | null;
@@ -63,11 +64,7 @@ export default function FriendsPage({
   });
 
   if (!session || loading) {
-    return (
-      <main className="w-[90%] max-w-300 mx-auto px-4 pb-20 md:pb-6 pt-8">
-        <Loader text="Cargando amigos..." />
-      </main>
-    );
+    return <GlobalLoader />;
   }
 
   return (

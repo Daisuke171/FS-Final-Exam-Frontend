@@ -55,7 +55,7 @@ export default function ProfileDropdown({
       </div>
       <Link
         href="/profile"
-        className="flex font-medium items-center gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-1.5"
+        className="flex font-medium items-center gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-2"
       >
         <Icon
           icon="mdi:user"
@@ -65,7 +65,7 @@ export default function ProfileDropdown({
       </Link>
       <Link
         href="/profile/settings"
-        className="flex font-medium items-center gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-1.5"
+        className="flex font-medium items-center gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-2"
       >
         <Icon
           icon="material-symbols:settings"
@@ -76,7 +76,7 @@ export default function ProfileDropdown({
       <button
         disabled={isLoading}
         onClick={() => logout()}
-        className={`flex cursor-pointer font-medium items-center w-full text-light-error gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-1.5`}
+        className={`flex cursor-pointer font-medium items-center w-full text-light-error gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-2`}
       >
         {isLoading ? (
           <Icon
