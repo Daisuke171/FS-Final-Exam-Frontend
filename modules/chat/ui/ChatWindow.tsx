@@ -26,7 +26,7 @@ export default function ChatWindow({
   const { send } = useSendMessage(currentUserId);
   const [isTyping, setIsTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
-  
+
   // Get unread store methods
   const clearUnread = useUnreadStore((s) => s.clear);
   const incrementUnread = useUnreadStore((s) => s.increment);
@@ -60,9 +60,9 @@ export default function ChatWindow({
     if (!friend?.chatId) return;
     // marca como leído todos los mensajes del otro
     const messagesNews = messages.filter((m) => m.from === "friend" && !m.read);
-		
+
     if (messagesNews.length > 0) {
-			console.log("CANTIDAD DE MENSAJES",messagesNews);
+      console.log("CANTIDAD DE MENSAJES", messagesNews);
       messagesNews.map((m) => readMessage(friend.chatId, m.id));
     }
   }, [friend?.chatId, messages]);
@@ -142,7 +142,7 @@ export default function ChatWindow({
       console.log("📨 New message received via WebSocket:", data);
       // Immediately refetch to show new message
       refetch?.();
-      
+
       // If the message is not from the current user and chat is not visible, increment unread
       if (data.senderId !== currentUserId && !visible) {
         incrementUnread(chatId);
@@ -197,7 +197,11 @@ export default function ChatWindow({
           <div className="font-semibold">{friend.nickname}</div>
         </div>
         <div className="flex items-center gap-5">
-          <IconBtn icon="mdi:phone" sizeIcon={16} className="p-2 hidden" />
+          <IconBtn
+            icon="mdi:phone"
+            sizeIcon={16}
+            className="p-2 hidden"
+          />
           <IconBtn
             icon="mdi:close"
             onClick={onClose}
