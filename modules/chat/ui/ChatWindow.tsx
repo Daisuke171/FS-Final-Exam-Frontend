@@ -11,6 +11,7 @@ import type { Msg, ChatWindowProps } from "../types/chatUI.types";
 import { InputMessage } from "../types/message.types";
 import { getSocket } from "@shared/lib/socket";
 import { useUnreadStore } from "../model/unread.store";
+import { motion } from "motion/react";
 
 export default function ChatWindow({
   friend,
@@ -122,21 +123,17 @@ export default function ChatWindow({
     const socket = getSocket("/chat");
     if (!socket) return;
 
-   
     socket.emit("chat:join", { chatId });
 
-   
     if (currentUserId) {
       socket.emit("chat:set_user", { id: currentUserId });
     }
 
-    
     clearUnread(chatId);
 
-
     const handleNewMessage = (data: any) => {
-       refetch?.();
-            
+      refetch?.();
+
       if (data.senderId !== currentUserId && !visible) {
         incrementUnread(chatId);
       }
@@ -160,7 +157,6 @@ export default function ChatWindow({
     };
   }, [chatId, visible, currentUserId, clearUnread, incrementUnread, refetch]);
 
-  
   if (!visible || !friend) return null;
 
   const sendMessage = (text: string) => {
@@ -170,7 +166,10 @@ export default function ChatWindow({
   };
 
   return (
-    <section
+    <motion.section
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.5 }}
       className={cn(
         "flex flex-col rounded-2xl border border-cyan-300/30",
         "bg-gradient-to-b from-white/5 to-white/0 shadow-[0_0_20px_rgba(76,201,240,.15)]",
@@ -224,7 +223,9 @@ export default function ChatWindow({
             {g.msgs.map((m) => {
               const isMe = m.from === "me";
               return (
-                <div
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   key={m.id}
                   className={cn(
                     "box-border px-4 py-2 m-4 w-fit max-w-[66%] min-h-9 rounded-2xl shadow-lg/5",
@@ -259,7 +260,7 @@ export default function ChatWindow({
                       />
                     )}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -284,6 +285,6 @@ export default function ChatWindow({
       <div className="p-3 shrink-0 bg-gradient-to-t from-black/10 to-transparent">
         <MessageInput onSend={sendMessage} />
       </div>
-    </section>
+    </motion.section>
   );
 }
