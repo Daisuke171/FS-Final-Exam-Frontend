@@ -1,0 +1,454 @@
+{
+  "users": [
+    {
+      "username": "shadowhunter92",
+      "lvl": 24,
+      "scores": {
+        "rockPaperScissors": 1050,
+        "codeWar": 920,
+        "ticTacToe": 877
+      }
+    },
+    {
+      "username": "pixelwarrior",
+      "lvl": 18,
+      "scores": {
+        "rockPaperScissors": 890,
+        "codeWar": 1100,
+        "ticTacToe": 701
+      }
+    },
+    {
+      "username": "cosmicninja",
+      "lvl": 29,
+      "scores": {
+        "rockPaperScissors": 780,
+        "codeWar": 980,
+        "ticTacToe": 763
+      }
+    },
+    {
+      "username": "thunderbolt88",
+      "lvl": 15,
+      "scores": {
+        "rockPaperScissors": 920,
+        "codeWar": 750,
+        "ticTacToe": 775
+      }
+    },
+    {
+      "username": "mysticdragon",
+      "lvl": 22,
+      "scores": {
+        "rockPaperScissors": 850,
+        "codeWar": 890,
+        "ticTacToe": 649
+      }
+    },
+    {
+      "username": "neonphoenix",
+      "lvl": 27,
+      "scores": {
+        "rockPaperScissors": 760,
+        "codeWar": 820,
+        "ticTacToe": 696
+      }
+    },
+    {
+      "username": "cybersamurai",
+      "lvl": 12,
+      "scores": {
+        "rockPaperScissors": 690,
+        "codeWar": 880,
+        "ticTacToe": 628
+      }
+    },
+    {
+      "username": "stormrider",
+      "lvl": 30,
+      "scores": {
+        "rockPaperScissors": 720,
+        "codeWar": 710,
+        "ticTacToe": 704
+      }
+    },
+    {
+      "username": "quantumleap",
+      "lvl": 19,
+      "scores": {
+        "rockPaperScissors": 650,
+        "codeWar": 790,
+        "ticTacToe": 627
+      }
+    },
+    {
+      "username": "blazeking",
+      "lvl": 26,
+      "scores": {
+        "rockPaperScissors": 680,
+        "codeWar": 670,
+        "ticTacToe": 639
+      }
+    },
+    {
+      "username": "lunawolf",
+      "lvl": 14,
+      "scores": {
+        "rockPaperScissors": 620,
+        "codeWar": 720,
+        "ticTacToe": 583
+      }
+    },
+    {
+      "username": "vortexmaster",
+      "lvl": 21,
+      "scores": {
+        "rockPaperScissors": 590,
+        "codeWar": 680,
+        "ticTacToe": 586
+      }
+    },
+    {
+      "username": "echohawk",
+      "lvl": 17,
+      "scores": {
+        "rockPaperScissors": 610,
+        "codeWar": 630,
+        "ticTacToe": 552
+      }
+    },
+    {
+      "username": "frostbyte",
+      "lvl": 25,
+      "scores": {
+        "rockPaperScissors": 580,
+        "codeWar": 620,
+        "ticTacToe": 534
+      }
+    },
+    {
+      "username": "phoenixfire",
+      "lvl": 11,
+      "scores": {
+        "rockPaperScissors": 550,
+        "codeWar": 610,
+        "ticTacToe": 518
+      }
+    },
+    {
+      "username": "steelfalcon",
+      "lvl": 28,
+      "scores": {
+        "rockPaperScissors": 540,
+        "codeWar": 570,
+        "ticTacToe": 502
+      }
+    },
+    {
+      "username": "ghostrider99",
+      "lvl": 16,
+      "scores": {
+        "rockPaperScissors": 520,
+        "codeWar": 560,
+        "ticTacToe": 487
+      }
+    },
+    {
+      "username": "titanforce",
+      "lvl": 23,
+      "scores": {
+        "rockPaperScissors": 500,
+        "codeWar": 540,
+        "ticTacToe": 458
+      }
+    },
+    {
+      "username": "silverfox",
+      "lvl": 20,
+      "scores": {
+        "rockPaperScissors": 480,
+        "codeWar": 520,
+        "ticTacToe": 445
+      }
+    },
+    {
+      "username": "darkknightx",
+      "lvl": 13,
+      "scores": {
+        "rockPaperScissors": 460,
+        "codeWar": 500,
+        "ticTacToe": 429
+      }
+    },
+    {
+      "username": "crimsonviper",
+      "lvl": 29,
+      "scores": {
+        "rockPaperScissors": 440,
+        "codeWar": 480,
+        "ticTacToe": 414
+      }
+    },
+    {
+      "username": "novastrike",
+      "lvl": 18,
+      "scores": {
+        "rockPaperScissors": 420,
+        "codeWar": 470,
+        "ticTacToe": 388
+      }
+    },
+    {
+      "username": "ironwolf",
+      "lvl": 24,
+      "scores": {
+        "rockPaperScissors": 410,
+        "codeWar": 450,
+        "ticTacToe": 363
+      }
+    },
+    {
+      "username": "blazerunner",
+      "lvl": 10,
+      "scores": {
+        "rockPaperScissors": 390,
+        "codeWar": 430,
+        "ticTacToe": 347
+      }
+    },
+    {
+      "username": "shadowstep",
+      "lvl": 27,
+      "scores": {
+        "rockPaperScissors": 370,
+        "codeWar": 410,
+        "ticTacToe": 332
+      }
+    },
+    {
+      "username": "thunderclaw",
+      "lvl": 15,
+      "scores": {
+        "rockPaperScissors": 350,
+        "codeWar": 390,
+        "ticTacToe": 316
+      }
+    },
+    {
+      "username": "crystalvision",
+      "lvl": 22,
+      "scores": {
+        "rockPaperScissors": 340,
+        "codeWar": 370,
+        "ticTacToe": 293
+      }
+    },
+    {
+      "username": "stormchaser",
+      "lvl": 19,
+      "scores": {
+        "rockPaperScissors": 320,
+        "codeWar": 360,
+        "ticTacToe": 287
+      }
+    },
+    {
+      "username": "nighthawk77",
+      "lvl": 26,
+      "scores": {
+        "rockPaperScissors": 310,
+        "codeWar": 340,
+        "ticTacToe": 262
+      }
+    },
+    {
+      "username": "flamestrike",
+      "lvl": 12,
+      "scores": {
+        "rockPaperScissors": 290,
+        "codeWar": 330,
+        "ticTacToe": 258
+      }
+    },
+    {
+      "username": "icephoenix",
+      "lvl": 30,
+      "scores": {
+        "rockPaperScissors": 280,
+        "codeWar": 310,
+        "ticTacToe": 244
+      }
+    },
+    {
+      "username": "voltwave",
+      "lvl": 17,
+      "scores": {
+        "rockPaperScissors": 260,
+        "codeWar": 300,
+        "ticTacToe": 229
+      }
+    },
+    {
+      "username": "razorwing",
+      "lvl": 21,
+      "scores": {
+        "rockPaperScissors": 250,
+        "codeWar": 280,
+        "ticTacToe": 215
+      }
+    },
+    {
+      "username": "stargazer",
+      "lvl": 14,
+      "scores": {
+        "rockPaperScissors": 230,
+        "codeWar": 270,
+        "ticTacToe": 198
+      }
+    },
+    {
+      "username": "wildcard23",
+      "lvl": 25,
+      "scores": {
+        "rockPaperScissors": 220,
+        "codeWar": 250,
+        "ticTacToe": 186
+      }
+    },
+    {
+      "username": "nexuspoint",
+      "lvl": 9,
+      "scores": {
+        "rockPaperScissors": 210,
+        "codeWar": 230,
+        "ticTacToe": 172
+      }
+    },
+    {
+      "username": "bladedancer",
+      "lvl": 28,
+      "scores": {
+        "rockPaperScissors": 190,
+        "codeWar": 220,
+        "ticTacToe": 157
+      }
+    },
+    {
+      "username": "venomstrike",
+      "lvl": 16,
+      "scores": {
+        "rockPaperScissors": 180,
+        "codeWar": 200,
+        "ticTacToe": 143
+      }
+    },
+    {
+      "username": "skybreaker",
+      "lvl": 20,
+      "scores": {
+        "rockPaperScissors": 160,
+        "codeWar": 190,
+        "ticTacToe": 128
+      }
+    },
+    {
+      "username": "oceanwave",
+      "lvl": 11,
+      "scores": {
+        "rockPaperScissors": 150,
+        "codeWar": 170,
+        "ticTacToe": 114
+      }
+    },
+    {
+      "username": "fireflyzen",
+      "lvl": 23,
+      "scores": {
+        "rockPaperScissors": 130,
+        "codeWar": 160,
+        "ticTacToe": 99
+      }
+    },
+    {
+      "username": "thunderpulse",
+      "lvl": 8,
+      "scores": {
+        "rockPaperScissors": 120,
+        "codeWar": 140,
+        "ticTacToe": 85
+      }
+    },
+    {
+      "username": "moonwalker",
+      "lvl": 19,
+      "scores": {
+        "rockPaperScissors": 100,
+        "codeWar": 130,
+        "ticTacToe": 71
+      }
+    },
+    {
+      "username": "solarbeam",
+      "lvl": 13,
+      "scores": {
+        "rockPaperScissors": 90,
+        "codeWar": 110,
+        "ticTacToe": 56
+      }
+    },
+    {
+      "username": "nightshade",
+      "lvl": 24,
+      "scores": {
+        "rockPaperScissors": 70,
+        "codeWar": 90,
+        "ticTacToe": 52
+      }
+    },
+    {
+      "username": "frostwind",
+      "lvl": 10,
+      "scores": {
+        "rockPaperScissors": 60,
+        "codeWar": 70,
+        "ticTacToe": 37
+      }
+    },
+    {
+      "username": "sparkplug",
+      "lvl": 15,
+      "scores": {
+        "rockPaperScissors": 40,
+        "codeWar": 60,
+        "ticTacToe": 23
+      }
+    },
+    {
+      "username": "quicksilver",
+      "lvl": 7,
+      "scores": {
+        "rockPaperScissors": 30,
+        "codeWar": 40,
+        "ticTacToe": 19
+      }
+    },
+    {
+      "username": "newbie2024",
+      "lvl": 12,
+      "scores": {
+        "rockPaperScissors": 20,
+        "codeWar": 15,
+        "ticTacToe": 10
+      }
+    },
+    {
+      "username": "rookie_player",
+      "lvl": 8,
+      "scores": {
+        "rockPaperScissors": 5,
+        "codeWar": 4,
+        "ticTacToe": 3
+      }
+    }
+  ]
+}
