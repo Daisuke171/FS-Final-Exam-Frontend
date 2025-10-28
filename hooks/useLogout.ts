@@ -18,7 +18,6 @@ export function useLogout() {
       await signOut({
         redirect: false,
       });
-
       if (redirectTo) {
         router.push(redirectTo);
       } else {

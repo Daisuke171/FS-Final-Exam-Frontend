@@ -12,7 +12,7 @@ const getBaseUrl = () => {
 
   // Else build from host + port
   // Backend default (see backend src/main.ts) is 3011; prefer env override
-  const port = process.env.NEXT_PUBLIC_API_PORT || "3011";
+  const port = process.env.NEXT_PUBLIC_API_PORT || "3010";
   const host =
     typeof window !== "undefined" ? window.location.hostname : "localhost";
   return `http://${host}:${port}`;
@@ -34,7 +34,7 @@ export const getSocket = (token?: string) => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      withCredentials: true,    
+      withCredentials: true,
       auth: {
         token,
       },
@@ -68,10 +68,13 @@ export const isSocketConnected = () => socket?.connected ?? false;
 export const getCodingWarSocket = (token?: string) => {
   // update stored token if provided, so later reuse remains authenticated
   if (token) {
-    console.log("🔑 Token recibido para Coding War socket (primeros 20 chars):", token.substring(0, 20) + "...");
+    console.log(
+      "🔑 Token recibido para Coding War socket (primeros 20 chars):",
+      token.substring(0, 20) + "..."
+    );
     lastCodingWarToken = token;
   }
-  
+
   // Recreate socket if it's present but disconnected, mirroring getSocket behavior
   if (codingWarSocket && codingWarSocket.disconnected) {
     console.log("♻️ Socket desconectado detectado, limpiando...");
@@ -111,7 +114,10 @@ export const getCodingWarSocket = (token?: string) => {
       return null as any;
     }
     const baseUrl = getBaseUrl();
-    console.log("🔌 Creando nuevo socket Coding War con token a:", `${baseUrl}/coding-war`);
+    console.log(
+      "🔌 Creando nuevo socket Coding War con token a:",
+      `${baseUrl}/coding-war`
+    );
     codingWarSocket = io(`${baseUrl}/coding-war`, {
       transports: ["websocket", "polling"],
       reconnection: true,
@@ -163,11 +169,17 @@ export const getCodingWarSocket = (token?: string) => {
             }
           : error;
       if (
-        details && typeof details === "object" &&
-        !details.name && !details.message && !details.description && !details.data
+        details &&
+        typeof details === "object" &&
+        !details.name &&
+        !details.message &&
+        !details.description &&
+        !details.data
       ) {
         // Ignore extremely noisy empty socket error events
-        console.warn("⚠️ Evento 'error' de Coding War sin detalles recibido y omitido.");
+        console.warn(
+          "⚠️ Evento 'error' de Coding War sin detalles recibido y omitido."
+        );
         return;
       }
       console.error("❌ Error de Socket (Coding War):", details);
@@ -222,14 +234,13 @@ export const disconnectSocket = () => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const onNewFriend = (callback: (data: any) => void) => {
   const s = getSocket();
-  s?.on("newFriend", callback);   
+  s?.on("newFriend", callback);
   return () => s?.off("newFriend", callback);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const onNewMessage = (callback: (data: any) => void) => {
   const s = getSocket();
-  s?.on("newMessage", callback);  
+  s?.on("newMessage", callback);
   return () => s?.off("newMessage", callback);
 };
-

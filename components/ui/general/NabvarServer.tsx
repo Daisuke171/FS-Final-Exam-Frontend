@@ -7,7 +7,7 @@ export default async function NavbarServer() {
   return (
     <Navbar
       session={session}
-      users={120}
+      users={"1.4K"}
     />
   );
 }

@@ -1,5 +1,4 @@
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
-import { signIn } from "next-auth/react";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 
@@ -21,7 +20,7 @@ export default function AuthDropdown() {
           variant="outlined"
           icon={"material-symbols:login-rounded"}
           color="white"
-          action={() => signIn()}
+          action={() => router.push("/login")}
         />
         <CustomButtonOne
           full
