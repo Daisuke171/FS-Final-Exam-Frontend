@@ -104,9 +104,9 @@ export default function Navbar({ users, session }: NavbarProps) {
       hover: "hover:text-ranking",
     },
     {
-      name: "Foro",
-      href: "/forum",
-      icon: "mdi:forum",
+      name: "Tienda",
+      href: "/store",
+      icon: "material-symbols:store",
       isComingSoon: true,
     },
   ];
@@ -162,7 +162,11 @@ export default function Navbar({ users, session }: NavbarProps) {
                   </div>
                 ) : (
                   <div className="h-12 w-12 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
-                    <Icon icon="mdi:user" width="28" className="text-font" />
+                    <Icon
+                      icon="mdi:user"
+                      width="28"
+                      className="text-font"
+                    />
                   </div>
                 ))}
             </div>
@@ -246,7 +250,10 @@ export default function Navbar({ users, session }: NavbarProps) {
                     isActive ? `${activeClass + " bg-white/4"}` : hoverClass
                   }`}
                 >
-                  <Icon icon={link.icon} className="text-lg" />
+                  <Icon
+                    icon={link.icon}
+                    className="text-lg"
+                  />
                   {link.name}
                 </Link>
               );
@@ -254,7 +261,10 @@ export default function Navbar({ users, session }: NavbarProps) {
           </nav>
 
           {!isAuthenticated && (
-            <div ref={dropdownRef} className="relative">
+            <div
+              ref={dropdownRef}
+              className="relative"
+            >
               <div
                 onClick={handleDropdownOpen}
                 className="flex items-center gap-2 cursor-pointer w-25"
@@ -309,7 +319,10 @@ export default function Navbar({ users, session }: NavbarProps) {
                       </div>
                     ) : (
                       <div className="h-11 w-11 border border-white/10 rounded-full overflow-hidden bg-background flex items-center justify-center">
-                        <Icon icon="mdi:user" className="text-font text-2xl" />
+                        <Icon
+                          icon="mdi:user"
+                          className="text-font text-2xl"
+                        />
                       </div>
                     )}
                     <Icon
