@@ -94,7 +94,7 @@ export default function GameOver({
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.5 }}
-        className="flex flex-col relative items-center glass-box-one m-auto mt-[calc(72px+2.5rem)] w-100"
+        className="flex flex-col relative items-center justify-center glass-box-one mt-[calc(75px+2.5rem)] mb-10 w-[90%] max-w-100"
       >
         <button
           className="absolute hover:text-font transition-all top-5 cursor-pointer left-4 flex items-center gap-2 text-subtitle text-sm font-medium"
@@ -117,7 +117,7 @@ export default function GameOver({
               width={100}
               className={r.icon.styles}
             />
-            <p className="text-4xl font-bold">{r.text}</p>
+            <p className="text-3xl sm:text-4xl font-bold">{r.text}</p>
             <div className="flex gap-5 my-5">
               <motion.p
                 initial={{ y: 50, opacity: 0 }}

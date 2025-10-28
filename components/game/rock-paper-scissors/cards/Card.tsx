@@ -1,4 +1,4 @@
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 import { Galindo } from "next/font/google";
 import type { CardProps } from "@/types/rock-paper-scissors/CardProps";
 
@@ -35,8 +35,7 @@ export default function Card({
       >
         <Icon
           icon={img}
-          width={90}
-          className={`pointer-events-none ${
+          className={`pointer-events-none text-6xl sm:text-8xl ${
             disableCards && isClicked
               ? "scale-110 rotate-12 text-shadow-purple"
               : disableCards
@@ -47,7 +46,7 @@ export default function Card({
           } transition-all`}
         />
         <h2
-          className={`text-2xl ${galindo.className} ${
+          className={`text-lg sm:text-2xl ${galindo.className} ${
             disableCards && isClicked
               ? "text-shadow-purple"
               : disableCards

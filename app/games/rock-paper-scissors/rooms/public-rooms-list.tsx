@@ -57,9 +57,9 @@ export default function PublicRoomsList() {
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full  max-w-2xl mx-auto"
+      className="w-[90%] max-w-2xl mx-auto"
     >
-      <div className="w-full glass-box-two px-6 border border-dark-gray py-4 text-xl font-semibold flex items-center justify-between">
+      <div className="w-full glass-box-two px-6 border border-dark-gray py-4 text-lg md:text-xl font-semibold flex items-center justify-between">
         <span className="flex items-center text-font gap-2">
           <Icon
             icon="mdi:account-group"

@@ -1,8 +1,11 @@
+"use client";
+
 import { Easing, motion } from "motion/react";
 import { Icon } from "@iconify-icon/react";
 import FistIcon from "@iconify-icons/game-icons/fist";
 import HandIcon from "@iconify-icons/game-icons/hand";
 import ScissorsIcon from "@iconify-icons/game-icons/scissors";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 interface Props {
   showBattleAnimation: boolean;
@@ -19,6 +22,8 @@ export default function RenderBattleAnimation({
   battleStage,
   winner,
 }: Props) {
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === "mobile";
   if (!showBattleAnimation || playedMovements.length !== 2) return null;
 
   const playerMove = playedMovements.find((p) => p.id === playerId);
@@ -36,7 +41,9 @@ export default function RenderBattleAnimation({
         };
       case "impact":
         return {
-          x: [0, -8, -12, -15, -16, 180, -5, 0, -1, 0, -1, 0],
+          x: isMobile
+            ? [0, -8, -12, -15, -16, 130, -5, 0, -1, 0, -1, 0]
+            : [0, -8, -12, -15, -16, 180, -5, 0, -1, 0, -1, 0],
           y: [0, -40, -50, -55, -55, -50, 0],
           rotate:
             playerMove.move === "piedra"
@@ -70,7 +77,9 @@ export default function RenderBattleAnimation({
         };
       case "impact":
         return {
-          x: [0, 8, 12, 15, 16, -180, 5, 0, 1, 0, 1, 0],
+          x: isMobile
+            ? [0, 8, 12, 15, 16, -130, 5, 0, 1, 0, 1, 0]
+            : [0, 8, 12, 15, 16, -180, 5, 0, 1, 0, 1, 0],
           y: [0, -40, -50, -55, -55, -50, 0],
           rotate:
             opponentMove.move === "piedra"
@@ -130,7 +139,9 @@ export default function RenderBattleAnimation({
       case "impact":
         return {
           scale: [1, 0.9, 0.9, 0.9, 0.9, 1],
-          x: [0, -8, -12, -15, -16, 180, -5, 0, -1, 0, -1, 0],
+          x: isMobile
+            ? [0, -8, -12, -15, -16, 130, -5, 0, -1, 0, -1, 0]
+            : [0, -8, -12, -15, -16, 180, -5, 0, -1, 0, -1, 0],
           opacity: 0.3,
         };
       case "damage":
@@ -150,7 +161,9 @@ export default function RenderBattleAnimation({
       case "impact":
         return {
           scale: [1, 0.9, 0.9, 0.9, 0.9, 1],
-          x: [0, 8, 12, 15, 16, -180, 5, 0, 1, 0, 1, 0],
+          x: isMobile
+            ? [0, 8, 12, 15, 16, -130, 5, 0, 1, 0, 1, 0]
+            : [0, 8, 12, 15, 16, -180, 5, 0, 1, 0, 1, 0],
           opacity: 0.3,
         };
       case "damage":
@@ -189,7 +202,7 @@ export default function RenderBattleAnimation({
     <div className="w-full">
       <motion.div
         layoutId="battle-container"
-        className="flex justify-center w-full items-center gap-25 absolute top-40 left-1/2 transform -translate-x-1/2"
+        className="flex justify-center w-full items-center gap-17 md:gap-25 absolute top-40 left-1/2 transform -translate-x-1/2"
       >
         <div className="text-center w-full">
           <motion.div
@@ -202,7 +215,7 @@ export default function RenderBattleAnimation({
           >
             <Icon
               icon={getMoveIcon(playerMove.move)}
-              width={80}
+              width={isMobile ? 60 : 80}
               className={`text-bright-purple ${
                 playerMove.id !== winner && battleStage === "damage"
                   ? "animate-[blink-1_.5s_ease-in-out_.4s]"
@@ -214,7 +227,7 @@ export default function RenderBattleAnimation({
             initial={{ scale: 1, opacity: 0, x: 0 }}
             animate={getShadowAnimation()}
             transition={getTransition()}
-            className="w-22 h-22 -bottom-4 left-9 rounded-full absolute mt-2
+            className="w-22 h-22 -bottom-6  sm:-bottom-4 left-2 sm:left-9 rounded-full absolute mt-2
              bg-black [transform:rotateX(60deg)_rotateY(0deg)]"
             style={{
               filter: "blur(8px)",
@@ -227,7 +240,7 @@ export default function RenderBattleAnimation({
             initial={{ opacity: 0, y: 20 }}
             animate={getTextAnimation()}
             transition={getTextTransition()}
-            className="text-lg font-semibold text-font mt-2 relative"
+            className="text-base sm:text-lg font-semibold text-font mt-2 relative"
             style={{ zIndex: 20 }}
           >
             Tú: {playerMove.move}
@@ -242,7 +255,7 @@ export default function RenderBattleAnimation({
         >
           <Icon
             icon="game-icons:crossed-swords"
-            width={70}
+            width={isMobile ? 50 : 70}
             className="text-font"
           />
         </motion.div>
@@ -257,7 +270,7 @@ export default function RenderBattleAnimation({
           >
             <Icon
               icon={getMoveIcon(opponentMove.move)}
-              width={80}
+              width={isMobile ? 60 : 80}
               className={`text-error transform scale-x-[-1] ${
                 opponentMove.id !== winner && battleStage === "damage"
                   ? "animate-[blink-1_.5s_ease-in-out_.4s]"
@@ -269,7 +282,7 @@ export default function RenderBattleAnimation({
             initial={{ scale: 1, opacity: 0, x: 0 }}
             animate={getOpponentShadowAnimation()}
             transition={getTransition()}
-            className="w-22 h-22 -bottom-4 right-9 rounded-full absolute mt-2
+            className="w-22 h-22 -bottom-6 sm:-bottom-4 right-2 sm:right-9 rounded-full absolute mt-2
              bg-black [transform:rotateX(60deg)_rotateY(0deg)]"
             style={{
               filter: "blur(8px)",
@@ -282,7 +295,7 @@ export default function RenderBattleAnimation({
             initial={{ opacity: 0, y: 20 }}
             animate={getTextAnimation()}
             transition={getTextTransition()}
-            className="text-lg font-semibold text-font mt-2 relative z-20"
+            className="text-base sm:text-lg font-semibold text-font mt-2 relative z-20"
           >
             Rival: {opponentMove.move}
           </motion.p>
