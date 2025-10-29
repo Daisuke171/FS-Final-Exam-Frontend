@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import CustomButtonOne from "../buttons/CustomButtonOne";
 import CustomCheckbox from "../inputs/checkbox/CustomCheckbox";
 import { useSession } from "next-auth/react";
+import { useLockBodyScroll } from "@/hooks/useBlockBodyScroll";
 
 const formSchema = z
   .object({
@@ -35,6 +36,7 @@ export default function CreateRoomModal({
 }: {
   setCloseModal: () => void;
 }) {
+  useLockBodyScroll();
   const { data: session } = useSession();
   const socket = getSocket(session?.accessToken);
   const [formData, setFormData] = useState<FormData>({
@@ -94,7 +96,7 @@ export default function CreateRoomModal({
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0 }}
-        className="glass-box-one fixed p-10 top-1/2 left-1/2 z-10 transform -translate-x-1/2 w-[90%] -translate-y-1/2 max-w-130"
+        className="glass-box-one fixed p-10 top-1/2 left-1/2 z-200 transform -translate-x-1/2 w-[90%] -translate-y-1/2 max-w-130"
       >
         <Icon
           icon="material-symbols:close"
@@ -159,7 +161,7 @@ export default function CreateRoomModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed top-0 left-0 w-full h-full bg-black/50 backdrop-blur-md"
+        className="fixed top-0 left-0 w-full h-full bg-black/50 backdrop-blur-md z-190"
         onClick={setCloseModal}
       ></motion.div>
     </>

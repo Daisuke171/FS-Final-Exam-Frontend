@@ -58,7 +58,7 @@ export default function RankingHeader({
           </button>
         ))}
       </div>
-      <div className="flex sm:hidden w-[70%]">
+      <div className="flex py-1 sm:hidden w-[70%]">
         <CustomSelect
           full
           options={filterOptions}

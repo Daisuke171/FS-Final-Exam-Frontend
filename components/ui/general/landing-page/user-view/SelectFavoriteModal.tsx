@@ -4,6 +4,7 @@ import { Game } from "@/types/game.types";
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
 import { useLockBodyScroll } from "@/hooks/useBlockBodyScroll";
 import { motion } from "motion/react";
+import Image from "next/image";
 
 interface Games {
   games: Game[];
@@ -18,7 +19,7 @@ export default function SelectFavoriteModal({
   onClose: () => void;
   toggling: boolean;
 }) {
-  const { data, loading, error } = useQuery<Games>(GET_GAMES);
+  const { data, loading } = useQuery<Games>(GET_GAMES);
   useLockBodyScroll();
   const games = data?.games || [];
 
@@ -62,9 +63,11 @@ export default function SelectFavoriteModal({
                   }}
                   className="p-4 cursor-pointer bg-black/15 min-w-55 rounded-lg hover:bg-white/10 transition-all"
                 >
-                  <img
+                  <Image
                     src={game.gameLogo || "/logos/default-game.webp"}
                     alt={game.name}
+                    width={120}
+                    height={160}
                     className="w-full h-32 object-cover rounded mb-2"
                   />
                   <p className="text-center text-font font-medium mb-2 text-lg">

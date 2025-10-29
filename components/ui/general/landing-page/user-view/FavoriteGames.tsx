@@ -55,7 +55,7 @@ export default function FavoriteGames() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const { favoriteGames, loading, error, toggleFavorite, toggling } =
+  const { favoriteGames, loading, toggleFavorite, toggling } =
     useFavoriteGames();
 
   const checkScroll = () => {

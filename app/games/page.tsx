@@ -73,28 +73,29 @@ export default function GamesHub() {
               integrado y grandes recompensas
             </p>
           </motion.header>
-
-          <motion.section
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="flex flex-wrap justify-center gap-6 w-full"
-          >
-            {games.map((g, i) => (
-              <GameCard
-                key={i}
-                title={g.title}
-                description={g.description}
-                image={g.image}
-                players={g.players}
-                difficulty={g.difficulty}
-                xpReward={g.xpReward}
-                gameType={g.gameType}
-                isComingSoon={g.isComingSoon}
-                href={g.href}
-              />
-            ))}
-          </motion.section>
+          <div className="w-full flex justify-center">
+            <motion.section
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="flex flex-wrap justify-center min-[1231px]:justify-start gap-6 max-w-300"
+            >
+              {games.map((g, i) => (
+                <GameCard
+                  key={i}
+                  title={g.title}
+                  description={g.description}
+                  image={g.image}
+                  players={g.players}
+                  difficulty={g.difficulty}
+                  xpReward={g.xpReward}
+                  gameType={g.gameType}
+                  isComingSoon={g.isComingSoon}
+                  href={g.href}
+                />
+              ))}
+            </motion.section>
+          </div>
         </div>
       </div>
     </>
