@@ -30,6 +30,7 @@ export default function MainCard() {
   } = useGameSocket(roomId || "");
 
   useEffect(() => {
+    if (!socket) return;
     socket.on("isPrivate", (data) => {
       setRoomId(data.roomId);
     });
