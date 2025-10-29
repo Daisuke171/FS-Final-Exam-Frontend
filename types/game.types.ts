@@ -49,6 +49,9 @@ export interface Game {
   name: string;
   description?: string;
   gameLogo?: string;
+  category?: string;
+  minPlayers?: number;
+  maxPlayers?: number;
 }
 
 export interface GameFavorite {
