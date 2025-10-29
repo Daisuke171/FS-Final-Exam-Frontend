@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "motion/react";
 import FavouriteGame from "./FavouriteGame";
 import { useFavoriteGames } from "@/hooks/useFavoriteGames";
 import SelectFavoriteModal from "./SelectFavoriteModal";
-import { T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 
 // const favoriteGames = [
 //   {
@@ -165,6 +164,7 @@ export default function FavoriteGames() {
                     games={game.games}
                     lastgame={game.lastgame}
                     onToggleFavorite={() => toggleFavorite(game.id)}
+                    toggling={toggling}
                   />
                 </motion.div>
               ))}
