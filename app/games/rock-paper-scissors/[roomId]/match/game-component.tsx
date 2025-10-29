@@ -10,13 +10,14 @@ import CustomButton from "@/components/game/rock-paper-scissors/buttons/CustomBu
 import { useGameSocket } from "@/hooks/rock-paper-scissors/useGameSocket";
 import { useParams } from "next/navigation";
 import CountdownCard from "@/components/game/rock-paper-scissors/cards/CountdownCard";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getSocket } from "@/app/socket";
 import RenderBattleAnimation from "@/components/game/rock-paper-scissors/general/RenderBattleAnimation";
 import GameOver from "@/components/game/rock-paper-scissors/general/GameOver";
 import HealthBar from "@/components/game/rock-paper-scissors/general/HealthBar";
 import { useSession } from "next-auth/react";
 import ReconnectionModal from "@/components/game/rock-paper-scissors/modals/ReconnectionModal";
+import HamsterLoader from "@/components/ui/loaders/HamsterLoader";
 
 interface ButtonProps {
   title: string;
@@ -27,6 +28,7 @@ interface ButtonProps {
 export default function GameComponent() {
   const { data: session } = useSession();
   const playerNickname = session?.user?.nickname;
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const params = useParams();
   const roomId = params.roomId || "";
   const socket = getSocket(session?.accessToken);
@@ -65,6 +67,20 @@ export default function GameComponent() {
     };
   }, [socket, roomId]);
 
+  useEffect(() => {
+    if (state === "FinishedState") {
+      const hasGameData =
+        gameWinner !== null &&
+        gameWinner !== undefined &&
+        score &&
+        Object.keys(score).length > 0;
+
+      setIsTransitioning(!hasGameData);
+    } else {
+      setIsTransitioning(false);
+    }
+  }, [state, gameWinner, score]);
+
   const Buttons: ButtonProps[] = [
     {
       title: "Piedra",
@@ -89,7 +105,7 @@ export default function GameComponent() {
 
   return (
     <AnimatePresence mode="popLayout">
-      {state === "FinishedState" ? (
+      {state === "FinishedState" && !isTransitioning ? (
         <GameOver
           gameWinner={gameWinner}
           playerId={playerNickname}
@@ -101,6 +117,8 @@ export default function GameComponent() {
           showXp={showXp}
           setShowXp={setShowXp}
         />
+      ) : state === "FinishedState" && isTransitioning ? (
+        <HamsterLoader text="Cargando resultado..." />
       ) : state === "PlayingState" || state === "RevealingState" ? (
         <>
           <motion.div
