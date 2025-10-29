@@ -59,7 +59,7 @@ export default function ProfileHeaderInfo({
             />
           )}
 
-          <div className="w-full hidden lg:block h-full absolute transition-all duration-300 opacity-0 group-hover:opacity-100 bg-black/95 rounded-full"></div>
+          <div className="w-full hidden lg:block h-full absolute transition-all duration-500  opacity-0 group-hover:opacity-100 bg-black/60 backdrop-blur-sm"></div>
           <Icon
             icon="mdi:account-cog"
             width="50"
@@ -69,7 +69,7 @@ export default function ProfileHeaderInfo({
         <div className="flex flex-col  [@media(min-width:458px)_and_(max-width:1024px)]:gap-5 [@media(min-width:458px)_and_(max-width:1024px)]:flex-row">
           <div className="flex flex-col justify-center">
             <div className="flex items-center gap-5">
-              <h2 className="text-lg text-font font-medium flex items-center gap-1">
+              <h2 className="text-xl text-font font-medium flex items-center gap-1">
                 {user?.nickname}
                 <Icon
                   icon="material-symbols:verified"

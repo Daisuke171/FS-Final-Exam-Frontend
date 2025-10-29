@@ -20,8 +20,8 @@ export default function ProfileHeader() {
   };
   return (
     <>
-      <section className="bg-white/4 backdrop-blur-md max-w-350 p-4 py-6 lg:p-8 xl:px-10 xl:py-8 rounded-b-2xl w-[95%]">
-        <div className="md:items-center flex flex-col  md:flex-row gap-y-5 lg:flex lg:flex-row justify-center lg:justify-between w-full">
+      <section className="bg-white/4 backdrop-blur-md max-w-350 p-4 py-6 lg:p-8 xl:px-8 xl:py-8 rounded-b-2xl w-[95%]">
+        <div className="md:items-center flex flex-col md:flex-row gap-y-5 lg:flex lg:flex-row justify-center lg:justify-between w-full">
           <ProfileHeaderInfo
             user={user}
             error={error}

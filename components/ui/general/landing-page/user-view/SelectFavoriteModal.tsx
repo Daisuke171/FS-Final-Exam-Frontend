@@ -38,10 +38,12 @@ export default function SelectFavoriteModal({
         rounded-xl p-6 z-90 w-[90%] max-w-190"
       >
         <div className="w-full">
-          <h3 className="text-2xl font-bold text-font mb-4">
+          <h3 className="text-2xl font-bold text-font text-center md:text-left mb-0 md:mb-4">
             Añadir juego favorito
           </h3>
-
+          <p className="text-xs text-center text-subtitle italic md:hidden mb-4">
+            *Tapea encima de un juego para añadirlo a favoritos*
+          </p>
           {loading ? (
             <div className="grid grid-cols-3 gap-4 mb-5 w-full">
               {Array.from({ length: skeletons }, (_, index) => (
