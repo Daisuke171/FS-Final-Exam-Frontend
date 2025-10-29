@@ -61,6 +61,17 @@ export default function GameComponent() {
   } = useGameSocket(roomId);
 
   useEffect(() => {
+    if (!socket) return;
+
+    if (socket.disconnected) {
+      socket.connect();
+    }
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
+
+  useEffect(() => {
     socket.emit("requestGameState", { roomId });
     return () => {
       socket.off("requestGameState");

@@ -135,7 +135,7 @@ export default function RoomComponent() {
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex gap-5 w-[90%] max-w-230 h-100 justify-center mt-10"
+          className="flex gap-5 w-[90%] max-w-230 h-100 justify-center mt-15"
         >
           <div className="flex flex-col glass-box-one h-full w-full max-w-120 md:w-[60%]">
             {isMobile && (
