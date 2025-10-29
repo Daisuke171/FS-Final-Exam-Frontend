@@ -9,7 +9,7 @@ export default function MatchHistoryLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white/7 p-4 py-6 md:p-6 lg:p-8 w-[52%] rounded-2xl flex-1 flex flex-col ">
+    <section className="bg-white/4 backdrop-blur-md p-4 py-6 md:p-6 lg:p-8 w-[52%] rounded-2xl flex-1 flex flex-col ">
       <div className="flex items-center gap-3 md:gap-0 flex-col md:flex-row justify-between">
         <h2 className="text-xl lg:text-2xl font-medium text-font flex  items-center gap-2 ">
           <Icon

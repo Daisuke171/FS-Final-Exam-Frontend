@@ -9,7 +9,7 @@ interface StatsLayoutProps {
 export default function StatsLayout({ children, margin }: StatsLayoutProps) {
   return (
     <article
-      className={`w-full bg-white/7 p-4 py-6 md:p-6 lg:p-8 rounded-2xl ${
+      className={`w-full bg-white/4 backdrop-blur-md p-4 py-6 md:p-6 lg:p-8 rounded-2xl ${
         margin && "mt-5"
       }`}
     >
