@@ -98,7 +98,7 @@ export default function FavoriteGames() {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7 }}
-      className="w-[90%] flex flex-col items-center max-w-300"
+      className="w-[90%] flex flex-col z-20 items-center max-w-300"
     >
       <div className="flex items-start gap-5 xs:gap-0 xs:items-center flex-col xs:flex-row xs:justify-between mb-5 w-full">
         <h2 className="text-xl md:text-2xl text-font pb-3 font-medium flex items-center relative gap-2 after:h-0.5 after:absolute after:w-2/3 after:bg-gradient-to-r after:from-light-blue after:to-medium-blue after:-bottom-1 after:left-0 after:rounded-full">
@@ -120,7 +120,7 @@ export default function FavoriteGames() {
         </button>
       </div>
       {loading ? (
-        <div className="relative group w-[100%] max-w-300 bg-white/2 p-4 rounded-xl h-51">
+        <div className="relative group w-[100%] max-w-300 bg-white/2 backdrop-blur-sm  p-4 rounded-xl h-51">
           <div className="flex items-center gap-6 overflow-x-auto w-full h-full">
             {Array.from({ length: skeletons }).map((_, index) => (
               <FavoriteGameSkeleton key={index} />
@@ -128,7 +128,7 @@ export default function FavoriteGames() {
           </div>
         </div>
       ) : favoriteGames.length > 0 ? (
-        <div className="relative group w-[100%] max-w-300 bg-white/2 p-4 rounded-xl">
+        <div className="relative group w-[100%] max-w-300 bg-white/2 backdrop-blur-sm p-4 rounded-xl">
           {canScrollLeft && (
             <button
               onClick={() => scroll("left")}
@@ -188,7 +188,7 @@ export default function FavoriteGames() {
       ) : (
         <div
           className="flex flex-col items-center justify-center text-font
-           font-medium w-full max-w-300 h-51 bg-white/2 rounded-xl"
+           font-medium w-full max-w-300 h-51 backdrop-blur-sm  bg-white/2 rounded-xl"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}

@@ -49,7 +49,7 @@ export default function LevelBar({
       <div className="relative w-full h-3 overflow-hidden rounded-2xl bg-background">
         <div
           style={{ width: `${user?.levelProgress}%` }}
-          className="h-3 absolute bg-gradient-to-r from-light-purple to-light-blue rounded-2xl"
+          className="h-3 absolute bg-gradient-to-r from-light-purple to-light-blue rounded-2xl animate-[shine_1.5s_ease-in-out_infinite]"
         ></div>
       </div>
       <div className="flex justify-between items-center mt-1">
