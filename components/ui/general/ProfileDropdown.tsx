@@ -64,8 +64,8 @@ export default function ProfileDropdown({
         Perfil
       </Link>
       <Link
-        href="/profile/settings"
-        className="flex font-medium items-center gap-2 hover:bg-white/7 transition-colors duration-300 ease-in-out px-4 py-2"
+        href="#"
+        className="flex font-medium items-center pointer-events-none bg-white/3 text-light-gray/60 gap-2 transition-colors duration-300 ease-in-out px-4 py-2"
       >
         <Icon
           icon="material-symbols:settings"

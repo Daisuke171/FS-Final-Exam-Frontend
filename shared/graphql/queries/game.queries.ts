@@ -44,6 +44,11 @@ export const GET_LEADERBOARD = gql`
         userId
         nickname
         name
+        skin {
+          id
+          name
+          img
+        }
         totalScore
         level
       }
@@ -61,6 +66,11 @@ export const GET_GLOBAL_LEADERBOARD = gql`
         userId
         nickname
         name
+        skin {
+          id
+          name
+          img
+        }
         totalScore
         level
       }

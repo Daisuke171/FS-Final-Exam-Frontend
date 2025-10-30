@@ -60,16 +60,16 @@ export default function GameComponent() {
     reconnectiontTimer,
   } = useGameSocket(roomId);
 
-  useEffect(() => {
-    if (!socket) return;
+  // useEffect(() => {
+  //   if (!socket) return;
 
-    if (socket.disconnected) {
-      socket.connect();
-    }
-    return () => {
-      socket.disconnect();
-    };
-  }, [socket]);
+  //   if (socket.disconnected) {
+  //     socket.connect();
+  //   }
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, [socket]);
 
   useEffect(() => {
     socket.emit("requestGameState", { roomId });
@@ -115,9 +115,10 @@ export default function GameComponent() {
   }
 
   return (
-    <AnimatePresence mode="popLayout">
+    <AnimatePresence mode="wait">
       {state === "FinishedState" && !isTransitioning ? (
         <GameOver
+          key="game-over"
           gameWinner={gameWinner}
           playerId={playerNickname}
           players={players}
@@ -129,9 +130,15 @@ export default function GameComponent() {
           setShowXp={setShowXp}
         />
       ) : state === "FinishedState" && isTransitioning ? (
-        <HamsterLoader text="Cargando resultado..." />
+        <HamsterLoader
+          key="loading"
+          text="Cargando resultado..."
+        />
       ) : state === "PlayingState" || state === "RevealingState" ? (
-        <>
+        <motion.div
+          className="w-full"
+          key="game-active"
+        >
           <motion.div
             key="game"
             initial={{ opacity: 0, scale: 0.5 }}
@@ -217,7 +224,7 @@ export default function GameComponent() {
               player={reconnectiontTimer.player}
             />
           )}
-        </>
+        </motion.div>
       ) : null}
     </AnimatePresence>
   );

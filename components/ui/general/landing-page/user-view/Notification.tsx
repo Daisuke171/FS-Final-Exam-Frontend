@@ -40,7 +40,7 @@ export default function Notification({
 }: NotificationProps) {
   return (
     <div
-      className={`flex items-start relative gap-4 md:gap-5 p-4 md:p-5 border rounded-xl ${containerColor[type]}`}
+      className={`flex items-start relative backdrop-blur-sm  gap-4 md:gap-5 p-4 md:p-5 border rounded-xl ${containerColor[type]}`}
     >
       {unread && (
         <span className="absolute top-3 right-3 w-3 h-3 bg-error rounded-full" />

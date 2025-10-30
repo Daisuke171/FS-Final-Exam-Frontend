@@ -14,45 +14,94 @@ import {
 } from "./types/auth.types";
 
 async function refreshAccessToken(token: any) {
-  try {
-    console.log("🔄 Refrescando access token...");
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 2000;
 
-    const { data, error } =
-      await apolloClientServer.mutate<RefreshTokenResponse>({
-        mutation: REFRESH_TOKEN_MUTATION,
-        variables: {
-          refreshToken: token.refreshToken,
-        },
-        errorPolicy: "all",
-      });
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(
+        `🔄 Refrescando access token (intento ${attempt}/${MAX_RETRIES})...`
+      );
 
-    if (error || !data?.refreshAccessToken) {
-      console.error("❌ Error al refrescar token:", error);
+      const { data, error } =
+        await apolloClientServer.mutate<RefreshTokenResponse>({
+          mutation: REFRESH_TOKEN_MUTATION,
+          variables: {
+            refreshToken: token.refreshToken,
+          },
+          errorPolicy: "all",
+          context: {
+            fetchOptions: {
+              signal: AbortSignal.timeout(30000),
+            },
+          },
+        });
+
+      if (error || !data?.refreshAccessToken) {
+        const errorMessage = error?.message?.toLowerCase() || "";
+        const isAuthError =
+          errorMessage.includes("invalid") ||
+          errorMessage.includes("expired") ||
+          errorMessage.includes("unauthorized") ||
+          errorMessage.includes("unauthenticated") ||
+          errorMessage.includes("forbidden");
+
+        if (isAuthError) {
+          console.error(
+            "❌ Refresh token inválido o expirado:",
+            error?.message
+          );
+          return {
+            ...token,
+            error: "RefreshAccessTokenError",
+          };
+        }
+        if (attempt < MAX_RETRIES) {
+          console.warn(
+            `⚠️ Intento ${attempt} falló, reintentando en ${RETRY_DELAY}ms...`
+          );
+          console.warn("Error:", error?.message);
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+          continue;
+        }
+
+        console.error(
+          "❌ Error al refrescar token después de todos los intentos:",
+          error
+        );
+        return {
+          ...token,
+          error: "RefreshAccessTokenError",
+        };
+      }
+
+      const { accessToken, refreshToken } = data.refreshAccessToken;
+
+      console.log("✅ Token refrescado exitosamente");
+
       return {
         ...token,
-        error: "RefreshAccessTokenError",
+        accessToken,
+        refreshToken,
+        accessTokenExpires: Date.now() + 14 * 60 * 1000,
+        error: undefined,
       };
+    } catch (error) {
+      console.error(`❌ Error en intento ${attempt}:`, error);
+      if (attempt === MAX_RETRIES) {
+        return {
+          ...token,
+          error: "RefreshAccessTokenError",
+        };
+      }
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
     }
-
-    const { accessToken, refreshToken } = data.refreshAccessToken;
-
-    console.log("✅ Token refrescado exitosamente");
-
-    return {
-      ...token,
-      accessToken,
-      refreshToken,
-      accessTokenExpires: Date.now() + 14 * 60 * 1000,
-      error: undefined,
-    };
-  } catch (error) {
-    console.error("❌ Error en refreshAccessToken:", error);
-
-    return {
-      ...token,
-      error: "RefreshAccessTokenError",
-    };
   }
+
+  return {
+    ...token,
+    error: "RefreshAccessTokenError",
+  };
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -183,6 +232,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (session.user.avatar) {
           token.avatar = session.user.avatar;
         }
+        return token;
+      }
+
+      if (token.error === "RefreshAccessTokenError") {
         return token;
       }
 
