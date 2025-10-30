@@ -27,8 +27,8 @@ export default function Ranking() {
   const gameIds: Record<GameFilter, string | null> = {
     general: null,
     rockPaperScissors:
-      process.env.RPS_ID || "98384b44-ff7a-4587-a419-af14536170fb",
-    codeWar: process.env.CW_ID || "e9e852ab-4546-4cec-9e7d-18946069b748",
+      process.env.RPS_ID || "f54fc05c-5bad-4d4c-a564-67aee3d7dd17",
+    codeWar: process.env.CW_ID || "b33a67d5-521f-4fb6-a73b-fded938a1327",
     ticTacToe: "tictactoe-game-id",
   };
 
