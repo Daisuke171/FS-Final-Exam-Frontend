@@ -65,7 +65,7 @@ export default function LevelBar({
           <p className="text-font font-medium">{user?.level.name}</p>
         </div>
         <p className="text-subtitle text-sm font-medium">
-          {user?.levelProgress}%
+          {user?.levelProgress.toFixed(1)}%
         </p>
         <div className="w-20"></div>
       </div>
