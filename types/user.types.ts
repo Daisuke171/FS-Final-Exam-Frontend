@@ -3,6 +3,7 @@ export interface SkinWithStatus {
   name: string;
   img: string;
   level: number;
+  category: string;
   isUnlocked: boolean;
   isOwned: boolean;
   isActive: boolean;
