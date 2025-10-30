@@ -70,7 +70,23 @@ export const registerSchema = z
           message: "Debe ser un username valido",
         }
       ),
-    birthday: z.string().min(1, "El campo es obligatorio"),
+    birthday: z
+      .string()
+      .min(1, "El campo es obligatorio")
+      .refine(
+        (val) => {
+          const date = new Date(val);
+          if (isNaN(date.getTime())) return false;
+          const today = new Date();
+          const minDate = new Date(
+            today.getFullYear() - 7,
+            today.getMonth(),
+            today.getDate()
+          );
+          return date <= minDate;
+        },
+        { message: "Debes tener al menos 7 años para registrarte" }
+      ),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
     path: ["passwordConfirmation"],

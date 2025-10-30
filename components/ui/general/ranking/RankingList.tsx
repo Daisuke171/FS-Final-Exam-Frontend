@@ -11,6 +11,17 @@ interface RankingListProps {
 }
 
 export default function RankingList({ users }: RankingListProps) {
+  const filledUsers = Array.from({ length: 47 }, (_, i) => {
+    return (
+      users[i] || {
+        nickname: "N/A",
+        level: 0,
+        totalScore: 0,
+        rank: i + 4,
+        skin: null,
+      }
+    );
+  });
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -19,13 +30,13 @@ export default function RankingList({ users }: RankingListProps) {
       className="bg-white/7  px-2 sm:px-3 py-2 z-10 backdrop-blur-md w-[95%] md:w-[90%] max-w-[800px] shadow-[0_-4px_6px_rgba(0,0,0,0.35)] rounded-2xl"
     >
       <div className="max-h-[600px] custom-scrollbar overflow-y-auto px-4">
-        {users.map((user, index) => (
+        {filledUsers.map((user, index) => (
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: (index + 2) * 0.1 }}
-            key={user.nickname}
-            className="flex justify-between py-3 sm:py-5 items-center border-b border-dark-gray last:border-none"
+            key={index}
+            className={`flex justify-between py-3 sm:py-5 items-center border-b border-dark-gray last:border-none `}
           >
             <div className="flex items-center gap-3">
               <div className="h-17 w-17 rounded-full flex items-center justify-center bg-background border border-dark-gray ">
@@ -35,7 +46,7 @@ export default function RankingList({ users }: RankingListProps) {
                     alt={user.skin.name}
                     width={70}
                     height={70}
-                    className="w-full h-full rounded-full"
+                    className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
                   <Icon
