@@ -29,21 +29,37 @@ const authLink = new SetContextLink(async (headers) => {
 });
 
 // Error link for better debugging
-const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) =>
+const errorLink = onError((errorHandler) => {
+  console.error('Apollo Error Handler called:', errorHandler);
+  
+  // Check what's available in the error handler with proper type casting
+  const anyErrorHandler = errorHandler as {
+    graphQLErrors?: Array<{
+      message: string;
+      locations?: unknown;
+      path?: unknown;
+    }>;
+    networkError?: {
+      name: string;
+      message: string;
+      stack?: string;
+    };
+  };
+  
+  if (anyErrorHandler.graphQLErrors) {
+    anyErrorHandler.graphQLErrors.forEach(({ message, locations, path }) =>
       console.error(
         `🔴 GraphQL error: Message: ${message}, Location: ${locations}, Path: ${path}`,
       ),
     );
   }
 
-  if (networkError) {
-    console.error(`🌐 Network error: ${networkError}`);
+  if (anyErrorHandler.networkError) {
+    console.error(`🌐 Network error: ${anyErrorHandler.networkError}`);
     console.error('Network error details:', {
-      name: networkError.name,
-      message: networkError.message,
-      stack: networkError.stack,
+      name: anyErrorHandler.networkError.name,
+      message: anyErrorHandler.networkError.message,
+      stack: anyErrorHandler.networkError.stack,
     });
   }
 });
