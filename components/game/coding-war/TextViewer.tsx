@@ -11,6 +11,16 @@ import { getCodingWarSocket } from "@/app/socket";
 import CustomButtonTwo from "./buttons/CustomButtonTwo";
 import OpponentDisconnectedModal from "./modals/OpponentDisconnectedModal";
 
+// Helper function to safely emit socket events
+const safeEmit = (token: string | undefined, event: string, data: any) => {
+  const socket = getCodingWarSocket(token);
+  if (socket && typeof socket.emit === 'function') {
+    socket.emit(event, data);
+  } else {
+    console.warn(`⚠️ No se pudo emitir evento "${event}": socket no disponible`);
+  }
+};
+
 type Problem = { lang: string; code: string };
 
 export default function TextViewer({ roomId }: { roomId?: string }) {
@@ -146,7 +156,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
     }) => {
       // If server transitions to PlayingState, send readiness once
       if (state?.state === "PlayingState" && room && !readySentRef.current) {
-        getCodingWarSocket(session?.accessToken).emit("playerReadyForMatch", { roomId: room });
+        safeEmit(session?.accessToken, "playerReadyForMatch", { roomId: room });
         readySentRef.current = true;
       }
       if (state?.players && Array.isArray(state.players)) {
@@ -467,7 +477,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       setInputValueP1(value);
       // Emit typing progress for P1 when local player is P1
       if (localPlayer !== null && localPlayer === player) {
-        getCodingWarSocket(session?.accessToken).emit("typingProgress", {
+        safeEmit(session?.accessToken, "typingProgress", {
           roomId: room,
           lineIndex: currentLine,
           input: value,
@@ -477,7 +487,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       setColoredLinesP2((prev) => ({ ...prev, [currentLine]: newColoredLine }));
       setInputValueP2(value);
       if (localPlayer !== null && localPlayer === player) {
-        getCodingWarSocket(session?.accessToken).emit("typingProgress", {
+        safeEmit(session?.accessToken, "typingProgress", {
           roomId: room,
           lineIndex: currentLine,
           input: value,
@@ -529,7 +539,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
         }, 750);
         // Broadcast line commit for opponent mirror
         if (localPlayer !== null && localPlayer === player) {
-          getCodingWarSocket(session?.accessToken).emit("lineCommit", {
+          safeEmit(session?.accessToken, "lineCommit", {
             roomId: room,
             lineIndex: currentLine,
             input: trimmedInput,
@@ -546,7 +556,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
           setFloatersP2((prev) => prev.filter((f) => f.id !== id));
         }, 750);
         if (localPlayer !== null && localPlayer === player) {
-          getCodingWarSocket(session?.accessToken).emit("lineCommit", {
+          safeEmit(session?.accessToken, "lineCommit", {
             roomId: room,
             lineIndex: currentLine,
             input: trimmedInput,
@@ -600,7 +610,7 @@ export default function TextViewer({ roomId }: { roomId?: string }) {
       // If this player reached the last line, request next problem only for this player
       const atLastLine = currentLine >= originalLines.length - 1;
       if (atLastLine && localPlayer !== null && localPlayer === player) {
-  getCodingWarSocket(session?.accessToken).emit("problemCompleted", { roomId: room });
+        safeEmit(session?.accessToken, "problemCompleted", { roomId: room });
       }
     }
   };

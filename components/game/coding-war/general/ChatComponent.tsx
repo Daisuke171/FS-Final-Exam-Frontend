@@ -41,9 +41,17 @@ export default function ChatComponent({
   const previousPlayerIdsRef = useRef<Set<string>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatContainerRef.current) {
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+      });
+    }
   };
 
   const allItems: ChatItem[] = [...logs, ...messages].sort((a, b) => {
@@ -61,7 +69,12 @@ export default function ChatComponent({
   // Create the socket only once we have a token
   useEffect(() => {
     if (status !== "authenticated" || !session?.accessToken) return;
-    socketRef.current = getCodingWarSocket(session.accessToken);
+    const socket = getCodingWarSocket(session.accessToken);
+    if (!socket) {
+      console.warn("⚠️ ChatComponent: No se pudo obtener el socket");
+      return;
+    }
+    socketRef.current = socket;
   }, [status, session?.accessToken]);
   const formatTime = (timestamp: string | number) => {
     const date =
@@ -72,12 +85,21 @@ export default function ChatComponent({
   };
 
   useEffect(() => {
-    scrollToBottom();
+    // Only scroll if the user is already at or near the bottom
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight - 50; // 50px threshold
+      
+      if (isNearBottom) {
+        scrollToBottom();
+      }
+    }
   }, [messages, logs]);
 
   useEffect(() => {
     if (status !== "authenticated" || !session?.accessToken) return;
     const s = getCodingWarSocket(session.accessToken);
+    if (!s) return;
     socketRef.current = s;
     const handleRoomChatMessages = (data: ChatMessage) => {
       console.log("Received messages:", data);
@@ -148,7 +170,14 @@ export default function ChatComponent({
     ) as HTMLInputElement;
     const message = input.value.trim();
     if (message.length === 0) return;
-    socketRef.current?.emit("roomChat", { roomId, message });
+    
+    const socket = socketRef.current;
+    if (!socket || typeof socket.emit !== 'function') {
+      console.warn("⚠️ No hay socket disponible para enviar mensaje");
+      return;
+    }
+    
+    socket.emit("roomChat", { roomId, message });
     input.value = "";
   }, [roomId]);
 
@@ -224,12 +253,13 @@ export default function ChatComponent({
     }
   };
   return (
-    <div className="w-2/7 h-[30rem] flex flex-col border-2 border-light-gray rounded-xl">
-      <div className="bg-background rounded-t-xl">
-        <h2 className="text-2xl font-bold p-4  text-slate-200">Chat</h2>
+    <div className="w-2/7 h-[25rem] flex flex-col border-2 border-light-gray rounded-xl overflow-hidden">
+      <div className="bg-background rounded-t-xl shrink-0">
+        <h2 className="text-2xl font-bold p-4 text-slate-200">Chat</h2>
       </div>
       <div
-        className=" pb-2 bg-white/7 backdrop-blur-md  relative flex-1 overflow-y-auto scrollbar-thin [&::-webkit-scrollbar]:w-2
+        ref={chatContainerRef}
+        className="pb-2 bg-white/7 backdrop-blur-md relative flex-1 overflow-y-auto scrollbar-thin [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-slate-300
   [&::-webkit-scrollbar-thumb]:bg-slate-700"
       >
@@ -240,7 +270,7 @@ export default function ChatComponent({
           </div>
         </div>
       </div>
-      <div className="pb-4 rounded-b-xl bg-white/7 backdrop-blur-md">
+      <div className="pb-4 rounded-b-xl bg-white/7 backdrop-blur-md shrink-0">
         <div className="px-4">
           <CustomTextInput
             action={handleSendMessage}

@@ -1,27 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { getCodingWarSocket } from "@/app/socket";
-import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Icon } from "@iconify-icon/react";
 import PlayersInRoom from "@/components/game/coding-war/general/PlayersInRoom";
 import CustomButtonOne from "@/components/game/coding-war/buttons/CustomButtonOne";
 import { AnimatePresence, motion } from "motion/react";
 import CopiedLinkModal from "@/components/game/coding-war/modals/CopiedLinkModal";
-import LoaderCard from "@/components/game/coding-war/cards/LoaderCard";
 import ChatComponent from "@/components/game/coding-war/general/ChatComponent";
 import CountdownCard from "@/components/game/coding-war/cards/CountdownCard";
 import RoomErrorCard from "@/components/game/coding-war/cards/RoomErrorCard";
 import { useRoomSocket } from "@/hooks/coding-war/useRoomSocket";
 import JoinByPassword from "@/components/game/coding-war/general/JoinByPassword";
+import { useSession } from "next-auth/react";
+import { getCodingWarSocket } from "@/app/socket";
+import useBreakpoint from "@/hooks/useBreakpoint";
+import LoaderCard from "@/components/game/coding-war/cards/LoaderCard";
 
 export default function RoomComponent() {
   const { data: session, status } = useSession();
-  const socketRef = useRef<ReturnType<typeof getCodingWarSocket> | null>(null);
   const [clicked, setClicked] = useState<boolean>(false);
   const [countDown, setCountDown] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [openChat, setOpenChat] = useState(false);
+  const playerNickname = session?.user?.nickname;
   const [playerId, setPlayerId] = useState<string | undefined>(undefined);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
@@ -29,14 +31,8 @@ export default function RoomComponent() {
   const roomId = Array.isArray(params.roomId)
     ? params.roomId[0]
     : (params.roomId as string | undefined) || "";
-  useEffect(() => {
-    if (status !== "authenticated" || !session?.accessToken) return;
-    socketRef.current = getCodingWarSocket(session.accessToken);
-  }, [status, session?.accessToken]);
-
-  useEffect(() => {
-    console.log("[RoomComponent] roomId:", roomId);
-  }, [roomId]);
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === "mobile";
 
   const {
     handleJoinRoomByPassword,
@@ -47,6 +43,7 @@ export default function RoomComponent() {
     players,
     confirmedPlayers,
   } = useRoomSocket(roomId || "");
+
   useEffect(() => {
     if (!roomId) return; // wait until param is available
 
@@ -59,38 +56,61 @@ export default function RoomComponent() {
         router.push(`/games/coding-war/${roomId}/match`);
       }
     };
-  const s = socketRef.current;
-  if (!s) return;
-  const onGameState = () => setPlayerId(s.id);
+    
+    const socket = getCodingWarSocket(session?.accessToken);
+    if (!socket) return;
+    
+    const onGameState = () => setPlayerId(socket.id);
 
-  s.on("countDown", onCountDown);
-  s.on("gameState", onGameState);
+    socket.on("countDown", onCountDown);
+    socket.on("gameState", onGameState);
+    
     // Join only after we have a valid roomId, and avoid duplicate emits across StrictMode remounts
-    const anySocket = s as unknown as { _cwJoinedRooms?: Set<string> };
+    const anySocket = socket as unknown as { _cwJoinedRooms?: Set<string> };
     if (!anySocket._cwJoinedRooms) anySocket._cwJoinedRooms = new Set<string>();
     if (!anySocket._cwJoinedRooms.has(roomId)) {
-      s.emit("joinRoom", { roomId });
+      socket.emit("joinRoom", { roomId });
       anySocket._cwJoinedRooms.add(roomId);
       // After joining, request the current room state to populate UI
       setTimeout(() => {
-        s.emit("requestGameState", { roomId });
+        socket.emit("requestGameState", { roomId });
       }, 50);
     } else {
       // Already joined previously, safe to request state
-      s.emit("requestGameState", { roomId });
+      socket.emit("requestGameState", { roomId });
     }
 
     return () => {
-      s.off("gameState", onGameState);
-      s.off("joinRoomError");
-      s.off("countDown", onCountDown);
+      if (socket && typeof socket.off === 'function') {
+        socket.off("gameState", onGameState);
+        socket.off("joinRoomError");
+        socket.off("countDown", onCountDown);
+      }
     };
   }, [roomId, router, status, session?.accessToken]);
 
   const handleConfirmPlayers = () => {
+    const socket = getCodingWarSocket(session?.accessToken);
+    if (!socket || typeof socket.emit !== 'function') {
+      console.warn("⚠️ No hay socket disponible para confirmar jugadores");
+      return;
+    }
     const next = !clicked;
-    socketRef.current?.emit("confirmReady", { roomId, ready: next });
+    socket.emit("confirmReady", { roomId, ready: next });
     setClicked(next);
+  };
+
+  const handleLeaveRoom = () => {
+    const socket = getCodingWarSocket(session?.accessToken);
+    if (socket && roomId) {
+      socket.emit("leaveRoom", { roomId });
+
+      setTimeout(() => {
+        router.push("/games/coding-war");
+      }, 100);
+    } else {
+      router.push("/games/coding-war");
+    }
   };
 
   const shareRoomLink = () => {
@@ -99,6 +119,25 @@ export default function RoomComponent() {
     setModalOpen(true);
     setTimeout(() => setModalOpen(false), 2000);
   };
+
+  const handleChatOpen = () => {
+    setOpenChat(!openChat);
+  };
+
+  // Prevent body scroll when mobile chat is open
+  useEffect(() => {
+    if (openChat && isMobile) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [openChat, isMobile]);
+
+  if (status === "loading") {
+    return <LoaderCard />;
+  }
 
   if (countDown !== null && countDown > 0) {
     return <CountdownCard countDown={countDown} />;
@@ -146,14 +185,26 @@ export default function RoomComponent() {
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex gap-5 w-[95%] h-100 justify-center"
+          className="flex gap-5 w-[90%] max-w-230 h-100 justify-center mt-15"
         >
-          <div className="flex flex-col glass-box-one h-full min-w-120 ">
-            <div className="flex items-center justify-between mb-5">
+          <div className="flex flex-col glass-box-one h-full w-full max-w-120 md:w-[60%]">
+            {isMobile && (
+              <button
+                onClick={handleChatOpen}
+                className="absolute top-5 right-5"
+              >
+                <Icon
+                  icon="material-symbols:chat"
+                  className="text-font text-3xl"
+                />
+              </button>
+            )}
+
+            <div className="flex items-center flex-col md:flex-row justify-center md:justify-between mb-5">
               <h1 className="text-3xl font-bold text-font">
                 Sala {roomInfo.name}
               </h1>
-              <p className="text-subtitle mr-3">
+              <p className="text-subtitle mt-2 md:mr-3">
                 {players.length}/{roomInfo.maxPlayers} Jugadores en sala
               </p>
             </div>
@@ -173,7 +224,7 @@ export default function RoomComponent() {
                 <PlayersInRoom
                   players={players}
                   confirmedPlayers={confirmedPlayers}
-                  playerId={playerId}
+                  playerId={playerNickname}
                   label
                 />
               </div>
@@ -190,7 +241,6 @@ export default function RoomComponent() {
                       text={clicked ? "Cancelar" : "Confirmar"}
                       action={handleConfirmPlayers}
                       icon={clicked ? "mage:user-cross" : "mage:user-check"}
-                      // loading={loading}
                     />
                   </motion.div>
                 )}
@@ -199,7 +249,7 @@ export default function RoomComponent() {
                 text="Salir de la sala"
                 variant="outlined"
                 color="secondary"
-                action={() => router.push("/games/coding-war")}
+                action={handleLeaveRoom}
                 icon="streamline:return-2"
               />
             </div>
@@ -207,12 +257,56 @@ export default function RoomComponent() {
           <AnimatePresence mode="popLayout">
             {modalOpen && <CopiedLinkModal />}
           </AnimatePresence>
-          <ChatComponent
-            roomId={roomId}
-            playerId={playerId}
-            players={players}
-          />
+          {isMobile ? null : (
+            <ChatComponent
+              roomId={roomId}
+              playerId={playerId}
+              players={players}
+            />
+          )}
         </motion.div>
+        <AnimatePresence mode="popLayout">
+          {openChat && isMobile && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              onClick={handleChatOpen}
+              className="fixed top-0 z-20 left-0 bg-black/50 backdrop-blur-sm w-full h-full"
+            ></motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence mode="popLayout">
+          {openChat && isMobile && (
+            <motion.div
+              initial={{ opacity: 0, y: "100%" }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: "100%" }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-x-0 bottom-0 z-30 h-[80vh] bg-background border-t-2 border-light-gray rounded-t-xl"
+            >
+              <div className="h-full p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-font">Chat</h2>
+                  <button
+                    onClick={handleChatOpen}
+                    className="text-font hover:text-subtitle"
+                  >
+                    <Icon icon="mdi:close" className="text-2xl" />
+                  </button>
+                </div>
+                <div className="h-[calc(100%-4rem)]">
+                  <ChatComponent
+                    roomId={roomId}
+                    playerId={playerId}
+                    players={players}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </>
     );
   }

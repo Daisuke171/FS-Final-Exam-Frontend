@@ -29,10 +29,14 @@ export default function MainCard() {
   useEffect(() => {
     const s = socketRef.current;
     if (!s) return;
+    
     const onIsPrivate = (data: { roomId: string }) => setRoomId(data.roomId);
     s.on("isPrivate", onIsPrivate);
+    
     return () => {
-      s.off("isPrivate", onIsPrivate);
+      if (s && typeof s.off === 'function') {
+        s.off("isPrivate", onIsPrivate);
+      }
     };
   }, [status, session?.accessToken]);
 
