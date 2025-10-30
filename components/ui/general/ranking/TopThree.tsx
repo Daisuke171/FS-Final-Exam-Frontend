@@ -4,6 +4,7 @@ import { Icon } from "@iconify/react";
 import LvlChip from "../../chips/ranking/LvlChip";
 import { motion } from "motion/react";
 import { LeaderboardEntry } from "@/types/game.types";
+import Image from "next/image";
 
 interface TopThreeProps {
   firstPlace: LeaderboardEntry;
@@ -28,11 +29,21 @@ export default function TopThree({
       >
         <div className="absolute -top-12 sm:-top-15 flex flex-col items-center">
           <div className="rounded-full flex items-center justify-center relative border-4 border-medium-blue bg-background w-21 h-21 sm:w-25 sm:h-25">
-            <Icon
-              icon="mdi:user"
-              width="80"
-              className="text-subtitle"
-            />
+            {secondPlace.skin ? (
+              <Image
+                src={secondPlace.skin.img}
+                alt={secondPlace.skin.name}
+                width={100}
+                height={100}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              <Icon
+                icon="mdi:user"
+                width="60"
+                className="text-subtitle"
+              />
+            )}
             <div className="rounded-md rotate-45 absolute -bottom-3 left-1/2 -translate-x-1/2 bg-shadow-blue w-6 h-6">
               <p className="text-lg font-bold text-font -rotate-45 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 2
@@ -72,11 +83,21 @@ export default function TopThree({
             className="text-medium-ranking  drop-shadow-[0_0_8px_var(--color-medium-ranking)]"
           />
           <div className="rounded-full flex items-center justify-center relative border-4 border-medium-ranking bg-background w-24 h-24 sm:w-28 sm:h-28">
-            <Icon
-              icon="mdi:user"
-              width="90"
-              className="text-subtitle"
-            />
+            {firstPlace.skin ? (
+              <Image
+                src={firstPlace.skin.img}
+                alt={firstPlace.skin.name}
+                width={100}
+                height={100}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              <Icon
+                icon="mdi:user"
+                width="70"
+                className="text-subtitle"
+              />
+            )}
             <div className="rounded-md rotate-45 absolute -bottom-3 left-1/2 -translate-x-1/2 bg-shadow-ranking w-6 h-6">
               <p className="text-lg font-bold text-font -rotate-45 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 1
@@ -112,11 +133,21 @@ export default function TopThree({
       >
         <div className="absolute -top-12 sm:-top-15 flex flex-col items-center">
           <div className="rounded-full flex items-center justify-center relative border-4 border-light-purple bg-background w-21 h-21 sm:w-25 sm:h-25">
-            <Icon
-              icon="mdi:user"
-              width="80"
-              className="text-subtitle"
-            />
+            {thirdPlace.skin ? (
+              <Image
+                src={thirdPlace.skin.img}
+                alt={thirdPlace.skin.name}
+                width={100}
+                height={100}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              <Icon
+                icon="mdi:user"
+                width="60"
+                className="text-subtitle"
+              />
+            )}
             <div className="rounded-md rotate-45 absolute -bottom-3 left-1/2 -translate-x-1/2 bg-shadow-purple w-6 h-6">
               <p className="text-lg font-bold text-font -rotate-45 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 3

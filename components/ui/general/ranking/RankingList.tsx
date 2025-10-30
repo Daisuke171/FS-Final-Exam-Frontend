@@ -4,6 +4,7 @@ import { Icon } from "@iconify-icon/react";
 import { motion } from "motion/react";
 import LvlChip from "../../chips/ranking/LvlChip";
 import { LeaderboardEntry } from "@/types/game.types";
+import Image from "next/image";
 
 interface RankingListProps {
   users: LeaderboardEntry[];
@@ -28,11 +29,21 @@ export default function RankingList({ users }: RankingListProps) {
           >
             <div className="flex items-center gap-3">
               <div className="h-17 w-17 rounded-full flex items-center justify-center bg-background border border-dark-gray ">
-                <Icon
-                  icon="mdi:user"
-                  width="47"
-                  className="text-subtitle"
-                />
+                {user.skin ? (
+                  <Image
+                    src={user.skin.img}
+                    alt={user.skin.name}
+                    width={70}
+                    height={70}
+                    className="w-full h-full rounded-full"
+                  />
+                ) : (
+                  <Icon
+                    icon="mdi:user"
+                    width="47"
+                    className="text-subtitle"
+                  />
+                )}
               </div>
               <div className="flex flex-col items-start gap-2">
                 <p className="text-sm text-font font-medium">{user.nickname}</p>

@@ -1,3 +1,5 @@
+import { Skin } from "./user.types";
+
 export interface UserStats {
   winRate: number;
   totalTime: string;
@@ -19,6 +21,7 @@ export interface LeaderboardEntry {
   totalScore: number;
   bestScore: number;
   wins: number;
+  skin?: Skin;
   totalGames: number;
   level: number;
 }
