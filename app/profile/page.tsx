@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import GlobalLoader from "@/components/ui/loaders/GlobalLoader";
 import { motion } from "motion/react";
+import Image from "next/image";
 
 export default function Profile() {
   const breakpoint = useBreakpoint();
@@ -27,8 +28,15 @@ export default function Profile() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.7 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="absolute inset-0  bg-[url('/backgrounds/sun-tornado.svg')] bg-repeat bg-center bg-auto opacity-70 pointer-events-none"
-      ></motion.div>
+        className="absolute top-0 left-0 w-full h-full"
+      >
+        <Image
+          src="/backgrounds/sun-tornado.svg"
+          fill
+          alt="background"
+          className="opacity-70"
+        />
+      </motion.div>
       <div className="flex flex-col w-full items-center">
         <div className="w-[95%] relative max-w-350 h-30 bg-dark-blue rounded-t-xl overflow-hidden inset-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
           <div className="absolute inset-0 z-20 bg-[url('/backgrounds/pattern.svg')] bg-repeat bg-center bg-auto opacity-70 pointer-events-none"></div>

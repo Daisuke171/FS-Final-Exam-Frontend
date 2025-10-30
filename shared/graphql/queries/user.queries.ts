@@ -41,6 +41,7 @@ export const GET_USER_SKINS_WITH_STATUS = gql`
       name
       img
       level
+      category
       isUnlocked
       isOwned
       isActive
