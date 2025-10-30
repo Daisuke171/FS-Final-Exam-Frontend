@@ -64,7 +64,7 @@ export default function FavouriteGame({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="flex flex-col py-1 bg-white/3 backdrop-blur-md
+            className="flex flex-col py-1 bg-background
           rounded-lg absolute top-10 right-3 w-40 shadow-lg z-10 text-sm text-subtitle items-start"
           >
             <button

@@ -262,6 +262,18 @@ body {
   }
 }
 
+@keyframes shine {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.4);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
 @keyframes shimmer {
   0% {
     left: -75%;

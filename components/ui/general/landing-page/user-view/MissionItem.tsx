@@ -47,7 +47,7 @@ export default function MissionItem({
   difficulty = "easy",
 }: MissionItemProps) {
   return (
-    <div className="flex flex-col bg-white/4 p-4 md:p-6 rounded-xl">
+    <div className="flex flex-col bg-white/4 backdrop-blur-sm  p-4 md:p-6 rounded-xl">
       <div className="flex items-start gap-3 md:gap-5 justify-between">
         <div className="flex flex-col gap-8 md:gap-5 items-center min-w-[57.73px]">
           <Icon
