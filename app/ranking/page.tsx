@@ -12,6 +12,7 @@ import { Leaderboard } from "@/types/game.types";
 import GenericErrorCard from "@/components/ui/cards/GenericErrorCard";
 import RankingHeader from "@/components/ui/general/ranking/RankingHeader";
 import { Icon } from "@iconify/react";
+import { motion } from "motion/react";
 
 const TWO_MINUTES = 2 * 60 * 1000;
 
@@ -59,12 +60,12 @@ export default function Ranking() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen items-center mb-[calc(57px+2.5rem)] md:mb-10 mt-[75px]">
+      <div className="flex flex-col min-h-screen items-center mt-[75px]">
         <RankingHeader
           filter={filter}
           setFilter={setFilter}
         />
-        <div className="h-screen w-full flex justify-center items-center">
+        <div className="h-[calc(100vh-48px)] w-full flex justify-center items-center">
           <Icon
             icon="line-md:loading-twotone-loop"
             className="text-medium-blue text-6xl lg:text-[80px]"
@@ -76,12 +77,12 @@ export default function Ranking() {
 
   if (error) {
     return (
-      <div className="flex flex-col min-h-screen items-center mb-[calc(57px+2.5rem)] md:mb-10 mt-[75px]">
+      <div className="flex flex-col min-h-screen items-center mt-[75px]">
         <RankingHeader
           filter={filter}
           setFilter={setFilter}
         />
-        <div className="h-screen w-full flex justify-center items-center">
+        <div className="h-[calc(100vh-48px)] w-full flex justify-center items-center">
           <GenericErrorCard
             title="Error al cargar el ranking"
             message={error.message}
@@ -97,13 +98,17 @@ export default function Ranking() {
 
   if (entries.length < 3) {
     return (
-      <div className="flex flex-col min-h-screen items-center mb-[calc(57px+2.5rem)] md:mb-10 mt-[75px]">
+      <div className="flex flex-col min-h-screen items-center  mt-[75px]">
         <RankingHeader
           filter={filter}
           setFilter={setFilter}
         />
-        <div className="h-screen w-full flex justify-center items-center max-w-[95%] ">
-          <div className="flex flex-col items-center p-6 md:p-8 lg:p-10 bg-white/7  rounded-xl">
+        <div className="h-[calc(100vh-48px)] w-full flex justify-center items-center max-w-[95%] ">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center p-6 md:p-8 lg:p-10 bg-white/7  rounded-xl"
+          >
             <Icon
               icon="solar:ranking-line-duotone"
               className="text-8xl text-font mb-5"
@@ -114,7 +119,7 @@ export default function Ranking() {
             <p className="text-subtitle text-center text-base font-medium">
               Al menos 3 jugadores son necesarios
             </p>
-          </div>
+          </motion.div>
         </div>
       </div>
     );

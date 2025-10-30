@@ -9,17 +9,31 @@ import {
   CREATE_FRIEND_INVITE_BY_USERNAME,
   CREATE_FRIEND_INVITE,
   REQUEST_FRIEND_BY_USERNAME,
-  ACCEPT_INVITE_FRIEND
+  ACCEPT_INVITE_FRIEND,
+  UPDATE_FRIEND_STATUS
 } from "../api/friend.mutation";
 
 
 export function useFriends(currentUserId: string) {  
   const { data, loading, refetch, error } = useQuery<{ friendPeersOfUser: FriendPeer[] }>(FRIEND_PEERS_OF_USER, {
     variables: { userId: currentUserId }
-  });
+  }); 
   
   return {
     list: data?.friendPeersOfUser ?? [],
+    loading,
+    refetch,
+    error,
+  };
+}
+
+export function useFriendsPendings(currentUserId: string) {  
+  const { data, loading, refetch, error } = useQuery<{ friendPeersOfUser: FriendPeer[] }>(FRIEND_PEERS_OF_USER, {
+    variables: { userId: currentUserId }
+  });
+  const friendsPendings =  data?.friendPeersOfUser.filter((friend) => friend.status === "PENDING");
+  return {
+    list: friendsPendings ?? [],
     loading,
     refetch,
     error,
@@ -88,6 +102,22 @@ export function useAcceptInviteFriend() {
     accept: (receiverId: string, token: string) =>
       mutate({ variables: { input: { receiverId, token } } }),
     friend: data?.acceptFriendInvite ?? null,
+    loading,
+    error,
+    reset,
+  };
+}
+
+export function useAcceptFriend() {
+  const [mutate, { data, loading, error, reset }] = useMutation<
+    { updateFriendStatus: FriendPayload },
+    { input: { id: string; status: string } }
+  >(UPDATE_FRIEND_STATUS);
+
+  return {
+    accept: (id: string, status: string = "ACCEPTED") =>
+      mutate({ variables: { input: { id, status } } }),
+    friend: data?.updateFriendStatus ?? null,
     loading,
     error,
     reset,

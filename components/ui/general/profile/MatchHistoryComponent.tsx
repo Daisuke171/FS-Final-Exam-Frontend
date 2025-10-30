@@ -57,23 +57,23 @@ export default function MatchHistoryComponent({
   };
   return (
     <div
-      className={`w-full flex items-center justify-between px-3 xl:px-5 
+      className={`w-full flex items-center justify-between px-3 pl-0 xl:px-5 xl:pl-0 
       ${background[result]} backdrop-blur-md rounded-xl gap-2
     `}
     >
       <div className="gap-3 sm:gap-4 md:gap-5 flex items-center">
-        <div className="h-25 rounded-l-xl w-20 sm:w-24 xl:w-28 px-1 xl:px-2">
+        <div className="h-25 rounded-lg w-22 sm:w-24 xl:w-28 px-1 xl:px-2 py-2">
           <Image
             src={logo}
             alt="game"
             width={100}
             height={100}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover rounded-lg"
           />
         </div>
         <div>
           <h3
-            className={`text-font textl-base xl:text-lg pb-2 after:rounded-full font-medium after:mt-4 relative after:h-1 after:left-0 after:bottom-0 after:absolute after:w-1/3 ${detailsColor[result]}`}
+            className={`text-font line-clamp-1 textl-base xl:text-lg pb-2 after:rounded-full font-medium after:mt-4 relative after:h-1 after:left-0 after:bottom-0 after:absolute after:w-1/3 ${detailsColor[result]}`}
           >
             {game}
           </h3>

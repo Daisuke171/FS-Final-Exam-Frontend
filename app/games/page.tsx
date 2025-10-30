@@ -57,8 +57,15 @@ const games: GameCardProps[] = [
 export default function GamesHub() {
   return (
     <>
-      <div className="bg-gradient-to-b flex flex-col justify-center items-center from-black-blue to-dark-blue/30 min-h-screen w-full pt-[calc(75px+2.5rem)] pb-10">
-        <div className="flex flex-col items-center mx-auto px-4">
+      <div className="relative flex flex-col justify-center items-center min-h-screen w-full pt-[calc(75px+2.5rem)] pb-10">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.1 }}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="absolute inset-0 z-20 bg-[url('/backgrounds/hollowed-boxes.svg')] bg-repeat bg-center 
+          bg-auto opacity-10 pointer-events-none"
+        ></motion.div>
+        <div className="flex flex-col items-center z-30 mx-auto px-4">
           <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -73,28 +80,29 @@ export default function GamesHub() {
               integrado y grandes recompensas
             </p>
           </motion.header>
-
-          <motion.section
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="flex flex-wrap justify-center gap-6 w-full"
-          >
-            {games.map((g, i) => (
-              <GameCard
-                key={i}
-                title={g.title}
-                description={g.description}
-                image={g.image}
-                players={g.players}
-                difficulty={g.difficulty}
-                xpReward={g.xpReward}
-                gameType={g.gameType}
-                isComingSoon={g.isComingSoon}
-                href={g.href}
-              />
-            ))}
-          </motion.section>
+          <div className="w-full flex justify-center">
+            <motion.section
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="flex flex-wrap justify-center min-[1231px]:justify-start gap-6 max-w-300"
+            >
+              {games.map((g, i) => (
+                <GameCard
+                  key={i}
+                  title={g.title}
+                  description={g.description}
+                  image={g.image}
+                  players={g.players}
+                  difficulty={g.difficulty}
+                  xpReward={g.xpReward}
+                  gameType={g.gameType}
+                  isComingSoon={g.isComingSoon}
+                  href={g.href}
+                />
+              ))}
+            </motion.section>
+          </div>
         </div>
       </div>
     </>

@@ -20,15 +20,15 @@ export default function ProfileHeader() {
   };
   return (
     <>
-      <section className="bg-white/7 backdrop-blur-md max-w-350 p-4 py-6 lg:p-8 xl:px-10 xl:py-8 rounded-b-2xl w-[95%]">
-        <div className="md:items-center flex flex-col  md:flex-row gap-y-5 lg:flex lg:flex-row justify-center lg:justify-between w-full">
+      <section className="bg-white/4 backdrop-blur-md max-w-350 p-4 py-6 lg:p-8 xl:px-8 xl:py-8 rounded-b-2xl w-[95%]">
+        <div className="md:items-center flex flex-col md:flex-row gap-y-5 lg:flex lg:flex-row justify-center lg:justify-between w-full">
           <ProfileHeaderInfo
             user={user}
             error={error}
             loading={loading}
             action={handleModalOpen}
           />
-          <div className="w-[90%] h-0.5 bg-white/10 mx-auto md:hidden rounded-full"></div>
+          <div className="w-[90%] h-0.5 bg-white/6 mx-auto md:hidden rounded-full"></div>
           <LevelBar
             user={user}
             error={error}

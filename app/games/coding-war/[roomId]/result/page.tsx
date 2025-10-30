@@ -36,6 +36,7 @@ export default function ResultPage() {
 
   useEffect(() => {
     const s = getCodingWarSocket(session?.accessToken);
+    if (!s) return;
     const onGS = (data: Partial<GameStateData>) => {
       if (Array.isArray(data.players)) setPlayers(data.players);
       if (data?.ready) {
@@ -62,13 +63,19 @@ export default function ResultPage() {
     // Ask for current state so we can show readiness right away
     if (roomId) s.emit("requestGameState", { roomId });
     return () => {
-      s.off("gameState", onGS);
-      s.off("countDown", onCountDown);
+      if (s && typeof s.off === 'function') {
+        s.off("gameState", onGS);
+        s.off("countDown", onCountDown);
+      }
     };
   }, [roomId, playerId, router, session?.accessToken]);
 
   const handleReplayToggle = () => {
     const s = getCodingWarSocket(session?.accessToken);
+    if (!s || typeof s.emit !== 'function') {
+      console.warn("⚠️ No hay socket disponible para toggle de replay");
+      return;
+    }
     const next = !isReady;
     setIsReady(next);
     s.emit("confirmReady", { roomId, ready: next });

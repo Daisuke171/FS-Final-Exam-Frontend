@@ -5,6 +5,11 @@ let codingWarSocket: Socket | null = null;
 let turingSocket: Socket | null = null;
 let lastCodingWarToken: string | undefined;
 let lastTuringToken: string | undefined;
+let lastRpsToken: string | undefined;
+
+interface SocketAuth {
+  token: string;
+}
 
 // Resolve a single base URL for all sockets
 const getBaseUrl = () => {
@@ -21,27 +26,49 @@ const getBaseUrl = () => {
 };
 
 export const getSocket = (token?: string) => {
+  if (token) {
+    lastRpsToken = token;
+  }
+
   if (socket && socket.disconnected) {
     socket.offAny();
     socket = null;
   }
-  if (!socket) {
-    const baseUrl = getBaseUrl();
 
+  if (socket && lastRpsToken) {
+    if (typeof socket.auth === "object" && socket.auth !== null) {
+      const currentToken = (socket.auth as SocketAuth).token;
+
+      if (currentToken !== lastRpsToken) {
+        console.log("🔄 Actualizando token en socket RPS existente...");
+        socket.auth = { token: lastRpsToken };
+        if (socket.connected) {
+          socket.disconnect();
+          socket.connect();
+        }
+      }
+    }
+  }
+
+  if (!socket) {
+    if (!lastRpsToken) {
+      console.warn("⚠️ getSocket (RPS): no se puede crear socket sin token.");
+      return null;
+    }
+
+    const baseUrl = getBaseUrl();
     console.log("🔌 Intentando conectar a:", `${baseUrl}/rps`);
 
     socket = io(`${baseUrl}/rps`, {
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      withCredentials: true,
       auth: {
-        token,
+        token: lastRpsToken,
       },
     });
 
+    socket.on("heartbeat-ping", () => {
+      console.log("💓 Heartbeat ping recibido, respondiendo...");
+      socket?.emit("heartbeat-response");
+    });
     socket.on("connect", () => {
       console.log("✅ Socket conectado:", socket?.id);
     });
@@ -97,9 +124,15 @@ export const getCodingWarSocket = (token?: string) => {
       (codingWarSocket as any).auth = { token: lastCodingWarToken };
       // If we're connected with wrong/empty auth, reconnect so server sees the new token
       if (codingWarSocket?.connected) {
-        // use optional chaining to avoid race conditions where the socket was nulled concurrently
-        codingWarSocket.disconnect?.();
-        codingWarSocket.connect?.();
+        // Store reference before disconnecting to avoid null reference
+        const socketToReconnect = codingWarSocket;
+        socketToReconnect.disconnect?.();
+        // Use a small delay to ensure clean disconnection before reconnecting
+        setTimeout(() => {
+          if (socketToReconnect && !socketToReconnect.connected) {
+            socketToReconnect.connect?.();
+          }
+        }, 100);
       }
     } else {
       console.log("✓ Socket existente con token correcto, reutilizando...");
@@ -112,25 +145,30 @@ export const getCodingWarSocket = (token?: string) => {
       console.warn(
         "⚠️ getCodingWarSocket: no se puede crear socket sin token. Esperando autenticación..."
       );
-      // Return a dummy socket-like object that won't connect (or return null and guard all usages)
-      // For safety, we return null and let components handle it
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return null as any;
+      // Return null to let components handle gracefully
+      return null;
     }
+    
     const baseUrl = getBaseUrl();
     console.log(
       "🔌 Creando nuevo socket Coding War con token a:",
       `${baseUrl}/coding-war`
     );
-    codingWarSocket = io(`${baseUrl}/coding-war`, {
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      withCredentials: true,
-      auth: { token: lastCodingWarToken },
-    });
+    
+    try {
+      codingWarSocket = io(`${baseUrl}/coding-war`, {
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        withCredentials: true,
+        auth: { token: lastCodingWarToken },
+      });
+    } catch (error) {
+      console.error("❌ Error al crear socket Coding War:", error);
+      return null;
+    }
 
     codingWarSocket.on("connect", () => {
       console.log(
@@ -157,7 +195,11 @@ export const getCodingWarSocket = (token?: string) => {
 
     codingWarSocket.on("disconnect", (reason: string) => {
       console.warn("⚠️ Desconectado (Coding War):", reason);
-      codingWarSocket = null;
+      // Only set to null for intentional disconnects or permanent failures
+      // Keep socket reference for automatic reconnection attempts
+      if (reason === "io client disconnect" || reason === "transport error") {
+        codingWarSocket = null;
+      }
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -206,10 +248,13 @@ export const getCodingWarSocket = (token?: string) => {
 export const getTuringSocket = (token?: string) => {
   // update stored token if provided, so later reuse remains authenticated
   if (token) {
-    console.log("🔑 Token recibido para Turing socket (primeros 20 chars):", token.substring(0, 20) + "...");
+    console.log(
+      "🔑 Token recibido para Turing socket (primeros 20 chars):",
+      token.substring(0, 20) + "..."
+    );
     lastTuringToken = token;
   }
-  
+
   // Recreate socket if it's present but disconnected, mirroring getSocket behavior
   if (turingSocket && turingSocket.disconnected) {
     console.log("♻️ Socket desconectado detectado, limpiando...");
@@ -249,7 +294,10 @@ export const getTuringSocket = (token?: string) => {
       return null as any;
     }
     const baseUrl = getBaseUrl();
-    console.log("🔌 Creando nuevo socket Turing Detective con token a:", `${baseUrl}/turing-detective`);
+    console.log(
+      "🔌 Creando nuevo socket Turing Detective con token a:",
+      `${baseUrl}/turing-detective`
+    );
     turingSocket = io(`${baseUrl}/turing-detective`, {
       transports: ["websocket", "polling"],
       reconnection: true,
@@ -301,11 +349,17 @@ export const getTuringSocket = (token?: string) => {
             }
           : error;
       if (
-        details && typeof details === "object" &&
-        !details.name && !details.message && !details.description && !details.data
+        details &&
+        typeof details === "object" &&
+        !details.name &&
+        !details.message &&
+        !details.description &&
+        !details.data
       ) {
         // Ignore extremely noisy empty socket error events
-        console.warn("⚠️ Evento 'error' de Turing Detective sin detalles recibido y omitido.");
+        console.warn(
+          "⚠️ Evento 'error' de Turing Detective sin detalles recibido y omitido."
+        );
         return;
       }
       console.error("❌ Error de Socket (Turing Detective):", details);

@@ -86,7 +86,7 @@ export const achievements: ArchievementCardProps[] = [
 
 export default function AchievementsComponent() {
   return (
-    <article className="w-full bg-white/7 p-4 py-6 md:p-6 lg:p-8 rounded-2xl">
+    <article className="w-full backdrop-blur-md bg-white/4 p-4 py-6 md:p-6 lg:p-8 rounded-2xl">
       <div className="flex items-center justify-between">
         <h2 className="text-xl lg:text-2xl text-font flex items-center gap-2 font-medium">
           <Icon

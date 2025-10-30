@@ -40,7 +40,7 @@ const GameCard = ({
 
   return (
     <div
-      className={`relative w-full max-w-sm overflow-hidden rounded-2xl ${
+      className={`relative w-full backdrop-blur-md max-w-sm overflow-hidden rounded-2xl ${
         isComingSoon
           ? "bg-dark-gray/25"
           : "bg-gradient-to-br from-black/10 via-black/20 to-black/30"

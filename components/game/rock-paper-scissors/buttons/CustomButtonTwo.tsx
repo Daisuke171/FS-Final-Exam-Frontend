@@ -10,7 +10,6 @@ interface CustomButtonProps {
   full?: boolean;
   color?: "primary" | "secondary";
   size?: "sm" | "md" | "lg";
-  disabled?: boolean;
 }
 
 export default function CustomButtonTwo({
@@ -23,7 +22,6 @@ export default function CustomButtonTwo({
   full,
   color = "primary",
   size = "md",
-  disabled,
 }: CustomButtonProps) {
   const selectedSize =
     size === "sm"

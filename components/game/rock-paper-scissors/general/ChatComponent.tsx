@@ -76,11 +76,9 @@ export default function ChatComponent({
       logs.length > prevLogsLengthRef.current && logs.length > 1;
 
     if ((messagesIncreased || logsIncreased) && containerRef.current) {
-      // Usar scrollTop en lugar de scrollIntoView para no afectar el navegador
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
 
-    // Actualizar las referencias
     prevMessagesLengthRef.current = messages.length;
     prevLogsLengthRef.current = logs.length;
   }, [messages.length, logs.length]);
@@ -150,7 +148,6 @@ export default function ChatComponent({
         }
       });
 
-      // Retorna el nuevo estado
       return currentPlayerIds;
     });
   }, [players, isInitialized, playerNickname]);

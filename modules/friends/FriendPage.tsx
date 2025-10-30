@@ -13,15 +13,15 @@ import { useFriends } from "@modules/friends/model/useFriends";
 import { useFriendsWS } from "@modules/friends/model/useFriendsWS";
 import { getFriendsSocket, authFriendsSocket } from "./services/friend.socket";
 import GlobalLoader from "@/components/ui/loaders/GlobalLoader";
+import { AnimatePresence } from "motion/react";
 
 interface FriendsPageProps {
   session: Session | null;
   userId: string | null;
 }
 
-export default function FriendsPage({session, userId}: FriendsPageProps) {
-
-  const { list, loading, refetch } = useFriends(userId ?? "");  
+export default function FriendsPage({ session, userId }: FriendsPageProps) {
+  const { list, loading, refetch } = useFriends(userId ?? "");
 
   const [selected, setSelected] = useState<FriendPeer | null>(null);
   const handleCloseChat = () => setSelected(null);
@@ -40,7 +40,7 @@ export default function FriendsPage({session, userId}: FriendsPageProps) {
     if (userId) getFriendsSocket().emit("presence:get", { userId });
   }, [userId]);
 
-    //  ✅ Conectar WS sólo si hay userId
+  //  ✅ Conectar WS sólo si hay userId
   useFriendsWS(userId, {
     onEvent: (e) => {
       console.log("friend:event", e);

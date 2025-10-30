@@ -86,6 +86,7 @@ export default function RegisterApp() {
   const [countdown, setCountdown] = useState(3);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isRegistered, setIsRegistered] = useState(false);
 
   const router = useRouter();
 
@@ -94,7 +95,7 @@ export default function RegisterApp() {
     register,
     handleSubmit,
 
-    formState: { errors, isSubmitting, touchedFields, isSubmitSuccessful },
+    formState: { errors, isSubmitting, touchedFields },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     mode: "onBlur",
@@ -146,6 +147,7 @@ export default function RegisterApp() {
         },
       });
 
+      setIsRegistered(true);
       console.log("✅ Registro exitoso:", response);
     } catch (err) {
       console.error("❌ Error en el registro:", err);
@@ -156,7 +158,7 @@ export default function RegisterApp() {
     let timer: NodeJS.Timeout | null = null;
     let redirectTimer: NodeJS.Timeout | null = null;
 
-    if (isSubmitSuccessful) {
+    if (isRegistered) {
       // 1. Iniciar el contador
       timer = setInterval(() => {
         setCountdown((prevCount) => {
@@ -177,9 +179,9 @@ export default function RegisterApp() {
       if (timer) clearInterval(timer);
       if (redirectTimer) clearTimeout(redirectTimer);
     };
-  }, [isSubmitSuccessful, router]);
+  }, [isRegistered, router]);
 
-  if (isSubmitSuccessful) {
+  if (isRegistered) {
     return <RegisterSuccess countdown={countdown} />;
   }
 

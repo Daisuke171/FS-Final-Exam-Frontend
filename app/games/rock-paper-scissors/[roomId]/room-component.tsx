@@ -7,7 +7,6 @@ import PlayersInRoom from "@/components/game/rock-paper-scissors/general/Players
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
 import { AnimatePresence, motion } from "motion/react";
 import CopiedLinkModal from "@/components/game/rock-paper-scissors/modals/CopiedLinkModal";
-import LoaderCard from "@/components/game/rock-paper-scissors/cards/LoaderCard";
 import ChatComponent from "@/components/game/rock-paper-scissors/general/ChatComponent";
 import CountdownCard from "@/components/game/rock-paper-scissors/cards/CountdownCard";
 import RoomErrorCard from "@/components/game/rock-paper-scissors/cards/RoomErrorCard";
@@ -16,6 +15,7 @@ import JoinByPassword from "@/components/game/rock-paper-scissors/general/JoinBy
 import { useSession } from "next-auth/react";
 import { getSocket } from "@/app/socket";
 import useBreakpoint from "@/hooks/useBreakpoint";
+import GlobalLoader from "@/components/ui/loaders/GlobalLoader";
 
 export default function RoomComponent() {
   const { data: session, status } = useSession();
@@ -86,7 +86,7 @@ export default function RoomComponent() {
   };
 
   if (status === "loading") {
-    return <LoaderCard />;
+    return <GlobalLoader />;
   }
 
   if (countDown !== null && countDown > 0) {
@@ -94,7 +94,7 @@ export default function RoomComponent() {
   }
 
   if (isRedirecting) {
-    return <LoaderCard />;
+    return <GlobalLoader />;
   }
 
   if (isPrivate) {
@@ -135,7 +135,7 @@ export default function RoomComponent() {
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex gap-5 w-[90%] max-w-230 h-100 justify-center mt-10"
+          className="flex gap-5 w-[90%] max-w-230 h-100 justify-center mt-15"
         >
           <div className="flex flex-col glass-box-one h-full w-full max-w-120 md:w-[60%]">
             {isMobile && (

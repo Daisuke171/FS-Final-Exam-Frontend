@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import FavouriteGame from "./FavouriteGame";
 import { useFavoriteGames } from "@/hooks/useFavoriteGames";
 import SelectFavoriteModal from "./SelectFavoriteModal";
-import { T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
+import FavoriteGameSkeleton from "@/components/ui/skeletons/landing-page/user-view/FavoriteGameSkeleton";
 
 // const favoriteGames = [
 //   {
@@ -56,7 +56,7 @@ export default function FavoriteGames() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const { favoriteGames, loading, error, toggleFavorite, toggling } =
+  const { favoriteGames, loading, toggleFavorite, toggling } =
     useFavoriteGames();
 
   const checkScroll = () => {
@@ -92,6 +92,7 @@ export default function FavoriteGames() {
   const handleOpenModal = () => {
     setOpenModal(!openModal);
   };
+  const skeletons = 4;
   return (
     <motion.section
       initial={{ opacity: 0, y: -10 }}
@@ -121,10 +122,9 @@ export default function FavoriteGames() {
       {loading ? (
         <div className="relative group w-[100%] max-w-300 bg-white/2 p-4 rounded-xl h-51">
           <div className="flex items-center gap-6 overflow-x-auto w-full h-full">
-            <div className="h-full min-w-68.5 animate-pulse bg-white/10 rounded-xl"></div>
-            <div className="h-full min-w-68.5 animate-pulse bg-white/10 rounded-xl"></div>
-            <div className="h-full min-w-68.5 animate-pulse bg-white/10 rounded-xl"></div>
-            <div className="h-full min-w-68.5 animate-pulse bg-white/10 rounded-xl"></div>
+            {Array.from({ length: skeletons }).map((_, index) => (
+              <FavoriteGameSkeleton key={index} />
+            ))}
           </div>
         </div>
       ) : favoriteGames.length > 0 ? (
@@ -165,6 +165,7 @@ export default function FavoriteGames() {
                     games={game.games}
                     lastgame={game.lastgame}
                     onToggleFavorite={() => toggleFavorite(game.id)}
+                    toggling={toggling}
                   />
                 </motion.div>
               ))}
@@ -213,6 +214,7 @@ export default function FavoriteGames() {
             onClose={handleOpenModal}
             onAdd={toggleFavorite}
             toggling={toggling}
+            favoriteGames={favoriteGames}
           />
         )}
       </AnimatePresence>

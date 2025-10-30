@@ -28,7 +28,13 @@ export function useRoomSocket(roomId: string | string[]) {
 
   useEffect(() => {
     if (status !== "authenticated" || !session?.accessToken) return;
+    
     const socket = getCodingWarSocket(session.accessToken);
+    if (!socket) {
+      console.warn("⚠️ useRoomSocket: No se pudo obtener el socket");
+      return;
+    }
+    
     socketRef.current = socket;
 
     // Game/room state updates
@@ -69,10 +75,12 @@ export function useRoomSocket(roomId: string | string[]) {
     });
 
     return () => {
-      socket.off("gameState");
-      socket.off("isPrivate");
-      socket.off("joinRoomError");
-      socket.off("joinRoomSuccess");
+      if (socket && typeof socket.off === 'function') {
+        socket.off("gameState");
+        socket.off("isPrivate");
+        socket.off("joinRoomError");
+        socket.off("joinRoomSuccess");
+      }
     };
   }, [roomIdStr, status, session?.accessToken]);
 
@@ -85,7 +93,14 @@ export function useRoomSocket(roomId: string | string[]) {
       setError("El campo no puede estar vacío");
       return;
     }
-  socketRef.current?.emit("joinRoom", { roomId: value });
+    
+    const socket = socketRef.current;
+    if (!socket || typeof socket.emit !== 'function') {
+      setError("Conexión no disponible. Intenta recargar la página.");
+      return;
+    }
+    
+    socket.emit("joinRoom", { roomId: value });
   };
 
   const handleJoinRoomByPassword = () => {
@@ -97,7 +112,14 @@ export function useRoomSocket(roomId: string | string[]) {
       setError("El campo no puede estar vacío");
       return;
     }
-  socketRef.current?.emit("joinRoom", { roomId: roomIdStr, password });
+    
+    const socket = socketRef.current;
+    if (!socket || typeof socket.emit !== 'function') {
+      setError("Conexión no disponible. Intenta recargar la página.");
+      return;
+    }
+    
+    socket.emit("joinRoom", { roomId: roomIdStr, password });
   };
 
   return {

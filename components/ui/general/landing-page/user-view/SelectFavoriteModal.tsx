@@ -4,6 +4,8 @@ import { Game } from "@/types/game.types";
 import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/CustomButtonOne";
 import { useLockBodyScroll } from "@/hooks/useBlockBodyScroll";
 import { motion } from "motion/react";
+import Image from "next/image";
+import { Icon } from "@iconify/react";
 
 interface Games {
   games: Game[];
@@ -13,12 +15,14 @@ export default function SelectFavoriteModal({
   onAdd,
   onClose,
   toggling,
+  favoriteGames,
 }: {
   onAdd: (gameId: string) => void;
   onClose: () => void;
   toggling: boolean;
+  favoriteGames: Game[];
 }) {
-  const { data, loading, error } = useQuery<Games>(GET_GAMES);
+  const { data, loading } = useQuery<Games>(GET_GAMES);
   useLockBodyScroll();
   const games = data?.games || [];
 
@@ -34,10 +38,12 @@ export default function SelectFavoriteModal({
         rounded-xl p-6 z-90 w-[90%] max-w-190"
       >
         <div className="w-full">
-          <h3 className="text-2xl font-bold text-font mb-4">
+          <h3 className="text-2xl font-bold text-font text-center md:text-left mb-0 md:mb-4">
             Añadir juego favorito
           </h3>
-
+          <p className="text-xs text-center text-subtitle italic md:hidden mb-4">
+            *Tapea encima de un juego para añadirlo a favoritos*
+          </p>
           {loading ? (
             <div className="grid grid-cols-3 gap-4 mb-5 w-full">
               {Array.from({ length: skeletons }, (_, index) => (
@@ -52,29 +58,58 @@ export default function SelectFavoriteModal({
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-4 mb-5 w-full">
-              {games?.map((game: Game) => (
-                <button
-                  key={game.id}
-                  onClick={() => {
-                    onAdd(game.id);
-                    onClose();
-                  }}
-                  className="p-4 cursor-pointer bg-black/15 min-w-55 rounded-lg hover:bg-white/10 transition-all"
-                >
-                  <img
-                    src={game.gameLogo || "/logos/default-game.webp"}
-                    alt={game.name}
-                    className="w-full h-32 object-cover rounded mb-2"
-                  />
-                  <p className="text-center text-font font-medium mb-2 text-lg">
-                    {game.name}
-                  </p>
-                  <p className="text-sm text-subtitle line-clamp-3">
-                    {game.description}
-                  </p>
-                </button>
-              ))}
+            <div className="flex  gap-4 mb-5 w-full max-w-190 overflow-x-auto">
+              {games?.map((game: Game) => {
+                const isFavorite = favoriteGames.some(
+                  (favoriteGame) => favoriteGame.id === game.id
+                );
+                return (
+                  <div
+                    key={game.id}
+                    className={`${
+                      isFavorite ? "grayscale pointer-events-none" : ""
+                    } cursor-pointer relative group  bg-black-blue/60 w-full min-w-55 rounded-lg overflow-hidden transition-all`}
+                  >
+                    <div
+                      className="absolute top-0 opacity-0 group-hover:opacity-100 
+                    transition-all duration-300 left-0 w-full h-full bg-white/4 backdrop-blur-sm"
+                    >
+                      <button
+                        onClick={() => {
+                          onAdd(game.id);
+                          onClose();
+                        }}
+                        className="absolute top-20 left-1/2 -translate-x-1/2
+                      text-font w-full h-full flex flex-col items-center gap-1 cursor-pointer text-3xl rounded-lg font-medium"
+                      >
+                        <Icon
+                          icon="formkit:add"
+                          className="text-7xl"
+                        />
+                        Añadir
+                      </button>
+                    </div>
+                    <div className="w-full h-32 overflow-hidden rounded-t-lg">
+                      <Image
+                        src={game.gameLogo || "/logos/default-game.webp"}
+                        alt={game.name}
+                        width={170}
+                        height={160}
+                        className="w-full object-cover h-full pbject-top rounded-t-lg block"
+                      />
+                    </div>
+                    <div className="p-4 flex flex-col items-center">
+                      <p className="text-center text-font font-medium text-lg">
+                        {game.name}
+                      </p>
+                      <p className="text-xs mb-2">{game.category}</p>
+                      <p className="text-sm text-subtitle line-clamp-3">
+                        {game.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
