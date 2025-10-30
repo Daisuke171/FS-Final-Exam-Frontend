@@ -3,7 +3,6 @@
 import GameCard from "@/components/ui/cards/GameCard";
 import { GameCardProps } from "@/components/ui/cards/GameCard";
 import { motion } from "motion/react";
-import Image from "next/image";
 
 const games: GameCardProps[] = [
   {

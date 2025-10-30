@@ -12,7 +12,7 @@ import CustomButtonTwo from "./buttons/CustomButtonTwo";
 import OpponentDisconnectedModal from "./modals/OpponentDisconnectedModal";
 
 // Helper function to safely emit socket events
-const safeEmit = (token: string | undefined, event: string, data: any) => {
+const safeEmit = (token: string | undefined, event: string, data: unknown) => {
   const socket = getCodingWarSocket(token);
   if (socket && typeof socket.emit === 'function') {
     socket.emit(event, data);
