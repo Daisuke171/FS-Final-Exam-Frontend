@@ -143,11 +143,12 @@ export default function RegisterApp() {
       setCaptchaError(true);
       return;
     }
-    if (error) {
-      setRegisterError(error.message);
-      return;
-    }
+    
+    setRegisterError(null); // Clear previous errors
+    
     console.log("Datos recibidos:", data);
+    console.log("GraphQL endpoint:", process.env.NEXT_PUBLIC_GRAPHQL_URL || `${process.env.NEXT_PUBLIC_API_URL}/graphql`);
+    
     try {
       const { data: response } = await registerUser({
         variables: {
@@ -167,6 +168,19 @@ export default function RegisterApp() {
       console.log("✅ Registro exitoso:", response);
     } catch (err) {
       console.error("❌ Error en el registro:", err);
+      
+      // Better error handling for network issues
+      if (err instanceof Error) {
+        if (err.message.includes('Network Error') || err.message.includes('CORS')) {
+          setRegisterError("Error de conexión. Por favor verifica tu conexión a internet e intenta nuevamente.");
+        } else if (err.message.includes('Failed to fetch')) {
+          setRegisterError("No se pudo conectar al servidor. Por favor intenta más tarde.");
+        } else {
+          setRegisterError(err.message || "Error desconocido durante el registro");
+        }
+      } else {
+        setRegisterError("Error desconocido durante el registro");
+      }
     }
   };
 
@@ -308,13 +322,26 @@ export default function RegisterApp() {
               Por favor completa la verificación humana antes de registrarte
             </motion.div>
           )}
-          {registerError && (
+          {(registerError || error) && (
             <motion.div
-              initial={{ height: 0 }}
-              animate={{ height: "auto" }}
-              exit={{ height: 0 }}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg"
             >
-              <p className="text-light-error">{registerError}</p>
+              <p className="text-red-400 text-sm font-medium">
+                {registerError || error?.message}
+              </p>
+              {process.env.NODE_ENV === 'development' && error && (
+                <details className="mt-2">
+                  <summary className="text-red-300 text-xs cursor-pointer">
+                    Detalles técnicos (desarrollo)
+                  </summary>
+                  <pre className="text-red-300 text-xs mt-1 whitespace-pre-wrap">
+                    {JSON.stringify(error, null, 2)}
+                  </pre>
+                </details>
+              )}
             </motion.div>
           )}
 
