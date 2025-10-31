@@ -1,6 +1,6 @@
 "use client";
 
-import { GameFilter } from "@/app/ranking/page";
+import { GameFilter } from "@/app/ranking/ranking-component";
 import CustomSelect from "../../inputs/CustomSelect";
 import { motion } from "motion/react";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
