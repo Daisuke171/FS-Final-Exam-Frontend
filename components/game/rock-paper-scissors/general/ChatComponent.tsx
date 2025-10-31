@@ -240,7 +240,7 @@ export default function ChatComponent({
         initial={{ opacity: 0, x: 200 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 200 }}
-        className="fixed top-1/2 z-80 left-1/2 -translate-x-1/2 -translate-y-1/2 md:static
+        className="fixed top-1/2 z-40 left-1/2 -translate-x-1/2 -translate-y-1/2 md:static
      w-[90%] md:w-[40%] h-120 md:h-full flex flex-col border-2 border-light-gray rounded-xl
      md:-translate-x-0 md:-translate-y-0"
       >
