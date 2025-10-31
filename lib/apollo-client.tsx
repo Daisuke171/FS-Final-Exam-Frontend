@@ -41,7 +41,7 @@ const httpLink = new HttpLink({
   },
 });
 
-const errorLink = new ErrorLink(({ error, operation, forward }) => {
+const errorLink = new ErrorLink(({ error, operation }) => {
   if (CombinedGraphQLErrors.is(error)) {
     error.errors.forEach(({ message, extensions }) => {
       console.error(
@@ -68,7 +68,7 @@ const errorLink = new ErrorLink(({ error, operation, forward }) => {
   } else {
     console.error(`[Network error]: ${error}`);
     if (error && "statusCode" in error) {
-      const statusCode = (error as any).statusCode;
+      const statusCode = (error as { statusCode: number }).statusCode;
       if (statusCode === 401 || statusCode === 403) {
         console.error("❌ Error 401/403 detectado");
         if (
