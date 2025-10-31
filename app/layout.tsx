@@ -10,6 +10,7 @@ import BottomBar from "@/components/ui/general/BottomBar";
 import { auth } from "@/auth";
 import Footer from "@/components/ui/general/Footer";
 import AIChatbot from "@/components/ui/ai-chatbot/AIChatbot";
+import { ToastProvider } from "@/context/ToastContext";
 
 const raleway = Raleway({
   variable: "--font-raleway",
@@ -36,11 +37,13 @@ export default async function RootLayout({
         className={`${raleway.variable} min-h-screen bg-gradient-one font-sans antialiased`}
       >
         <Providers session={session}>
-          <NavbarServer />
-          {children}
-          <BottomBar />
-          <Footer/>
-          <AIChatbot />
+          <ToastProvider>
+            <NavbarServer />
+            {children}
+            <BottomBar />
+            <Footer />
+            <AIChatbot />
+          </ToastProvider>
         </Providers>
       </body>
     </html>
