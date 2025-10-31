@@ -14,17 +14,17 @@ export function useLogout() {
   const handleLogout = async (redirectTo?: string) => {
     setIsLoading(true);
     try {
-      await logout();
-      await signOut({
-        redirect: false,
+      await logout().catch((err) => {
+        console.warn("⚠️ Error al cerrar sesión en backend:", err);
       });
-      if (redirectTo) {
-        router.push(redirectTo);
-      } else {
-        window.location.href = "/";
-      }
+
+      await signOut({ redirect: false });
+      if (redirectTo) router.push(redirectTo);
+      else window.location.href = "/";
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
+      await signOut({ redirect: false });
+      window.location.href = "/";
     } finally {
       setIsLoading(false);
     }

@@ -266,6 +266,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       const now = Date.now();
       const timeUntilExpiry = (token.accessTokenExpires as number) - now;
 
+      if (timeUntilExpiry < -5 * 60 * 1000) {
+        console.warn("⚠️ Token expirado hace mucho tiempo, refrescando...");
+        return refreshAccessToken(token);
+      }
+
       if (timeUntilExpiry > 60 * 1000) {
         return token;
       }
