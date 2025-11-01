@@ -3,6 +3,7 @@
 import GameCard from "@/components/ui/cards/GameCard";
 import { GameCardProps } from "@/components/ui/cards/GameCard";
 import { motion } from "motion/react";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 const games: GameCardProps[] = [
   {
@@ -55,6 +56,14 @@ const games: GameCardProps[] = [
 ];
 
 export default function GamesHub() {
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === "mobile";
+  const isTablet = breakpoint === "tablet";
+  const getCardsToPreload = () => {
+    if (isMobile) return 1;
+    if (isTablet) return 2;
+    return 3;
+  };
   return (
     <>
       <div className="relative flex flex-col justify-center items-center min-h-screen w-full pt-[calc(75px+2.5rem)] pb-10">
@@ -99,6 +108,7 @@ export default function GamesHub() {
                   gameType={g.gameType}
                   isComingSoon={g.isComingSoon}
                   href={g.href}
+                  priority={i < getCardsToPreload()}
                 />
               ))}
             </motion.section>

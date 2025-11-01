@@ -71,7 +71,7 @@ export default function AboutCard({
     <motion.div
       onHoverStart={handleHoverStart}
       onHoverEnd={handleHoverEnd}
-      className={`relative hover:transform group hover:-translate-y-7 ${glowColor[color]} transition-all
+      className={`relative hover:transform group md:hover:-translate-y-7 ${glowColor[color]} transition-all
        duration-500 overflow-hidden p-6 text-center w-fit max-w-79.5 rounded-2xl flex flex-col items-center
         bg-white/5 hover:bg-white/7 
       border-2 ${borderColor[color]}`}

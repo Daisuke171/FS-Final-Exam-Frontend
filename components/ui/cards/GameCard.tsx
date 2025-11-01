@@ -16,6 +16,7 @@ export interface GameCardProps {
   gameType?: string;
   isComingSoon?: boolean;
   href?: string;
+  priority?: boolean;
 }
 
 const getDifficultyColor = {
@@ -34,15 +35,16 @@ const GameCard = ({
   gameType = "Estrategia",
   isComingSoon = false,
   href = "#",
+  priority = false,
 }: GameCardProps) => {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
-      className={`relative w-full backdrop-blur-md max-w-sm overflow-hidden rounded-2xl ${
+      className={`relative w-full bg-background max-w-sm overflow-hidden rounded-2xl ${
         isComingSoon
-          ? "bg-dark-gray/25"
+          ? "bg-neutral-900"
           : "bg-gradient-to-br from-black/10 via-black/20 to-black/30"
       } border border-light-gray/20 shadow-2xl transition-all duration-300 ${
         isComingSoon
@@ -53,18 +55,24 @@ const GameCard = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {isComingSoon && (
-        <div className="absolute top-4 right-4 z-20 bg-light-purple backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-white/80">
+        <div className="absolute top-4 right-4 z-20 bg-light-purple  px-3 py-1 rounded-full text-xs font-bold text-white/80">
           Próximamente
         </div>
       )}
 
       <div className="relative h-48 overflow-hidden bg-black/60">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/90 z-10" />
+        <div
+          className={`absolute inset-0 bg-gradient-to-b from-transparent ${
+            isComingSoon ? "to-neutral-900/60" : "to-background/90"
+          } z-10`}
+        />
         <Image
           src={image}
           alt={title}
-          width={300}
-          height={350}
+          width={350}
+          height={200}
+          priority={priority}
+          loading={priority ? "eager" : "lazy"}
           className={`w-full h-full object-cover transition-transform duration-500 ${
             isHovered ? "scale-110" : "scale-100"
           } ${isComingSoon ? "opacity-40 grayscale" : ""}`}
@@ -85,7 +93,7 @@ const GameCard = ({
         <div
           className={`absolute ${
             isComingSoon ? "grayscale" : ""
-          } top-4 left-4 z-20 bg-transparent-blue backdrop-blur-sm px-3 py-1 rounded-full text-xs 
+          } top-4 left-4 z-20 bg-transparent-blue md:backdrop-blur-sm px-3 py-1 rounded-full text-xs 
           font-semibold text-bright-blue border border-light-blue`}
         >
           {gameType}

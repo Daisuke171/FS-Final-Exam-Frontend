@@ -118,6 +118,7 @@ export default function ProgressArticle({
           } h-full w-full object-cover`}
           width={800}
           height={800}
+          loading="lazy"
         />
       </div>
     </motion.article>
