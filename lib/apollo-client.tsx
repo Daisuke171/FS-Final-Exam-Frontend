@@ -68,7 +68,7 @@ const errorLink = new ErrorLink(({ error, operation }) => {
   } else {
     console.error(`[Network error]: ${error}`);
     if (error && "statusCode" in error) {
-      const statusCode = (error as { statusCode: number }).statusCode;
+      const statusCode = error.statusCode;
       if (statusCode === 401 || statusCode === 403) {
         console.error("❌ Error 401/403 detectado");
         if (

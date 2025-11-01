@@ -57,7 +57,7 @@ const badges = [
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col items-center justify-center w-full pb-[calc(57px+2rem)] pt-8 md:py-8 px-10 bg-gradient-to-b from-black/40 to-black/10">
+    <footer className="flex flex-col items-center justify-center w-full pb-[calc(69px+2rem)] pt-8 md:py-8 px-10 bg-gradient-to-b from-black/40 to-black/10">
       <div className="flex md:flex-row flex-col items-center justify-around lg:justify-between gap-10 md:gap-5 w-full max-w-300 mb-8">
         <div className="flex flex-col items-start lg:gap-2">
           <h2 className="text-[2.8rem] leading-none tracking-widest font-extrabold text-transparent text-clip bg-clip-text bg-gradient-to-r from-light-blue to-bright-purple">
