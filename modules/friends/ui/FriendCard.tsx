@@ -23,7 +23,7 @@ export default function FriendCard({ friend, currentUserId }: FriendCardProps) {
 		>
 			<div className="flex items-center gap-3">
 				<Avatar
-					src={friend.peer.activeSkin?.img || "/avatars/derpy.svg"}
+					src={friend.peer.activeSkin?.img || "/default-pfp.jpg"}
 					alt={friend.peer.nickname}
 					size={10}
 				/>

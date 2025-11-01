@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery, useMutation, useSubscription } from "@apollo/client/react";
-import { FriendPeer, CreateFriendInviteInputByUsername, CreateFriendInviteInput, FriendPayload } from "./types";
-import {                  
-  FRIEND_PEERS_OF_USER,  
+import { FriendPeer, CreateFriendInviteInputByUsername, CreateFriendInviteInput, FriendPayload, RequestFriendByUsernameInput } from "./types";
+import {
+  FRIEND_PEERS_OF_USER,
 } from "../api/friend.queries";
-import { 
+import {
   CREATE_FRIEND_INVITE_BY_USERNAME,
   CREATE_FRIEND_INVITE,
   REQUEST_FRIEND_BY_USERNAME,
@@ -14,11 +14,11 @@ import {
 } from "../api/friend.mutation";
 
 
-export function useFriends(currentUserId: string) {  
+export function useFriends(currentUserId: string) {
   const { data, loading, refetch, error } = useQuery<{ friendPeersOfUser: FriendPeer[] }>(FRIEND_PEERS_OF_USER, {
     variables: { userId: currentUserId }
-  }); 
-  
+  });
+
   return {
     list: data?.friendPeersOfUser ?? [],
     loading,
@@ -27,11 +27,11 @@ export function useFriends(currentUserId: string) {
   };
 }
 
-export function useFriendsPendings(currentUserId: string) {  
+export function useFriendsPendings(currentUserId: string) {
   const { data, loading, refetch, error } = useQuery<{ friendPeersOfUser: FriendPeer[] }>(FRIEND_PEERS_OF_USER, {
     variables: { userId: currentUserId }
   });
-  const friendsPendings =  data?.friendPeersOfUser.filter((friend) => friend.status === "PENDING");
+  const friendsPendings = data?.friendPeersOfUser.filter((friend) => friend.status === "PENDING");
   return {
     list: friendsPendings ?? [],
     loading,
@@ -43,14 +43,14 @@ export function useFriendsPendings(currentUserId: string) {
 /** Crea link y devuelve la URL como string */
 export function useCreateLink() {
   const [mutate, { data, loading, error, reset }] = useMutation<
-    { createFriendInvite: string },                            
+    { createFriendInvite: string },
     { input: { inviterId: string; ttlHours?: number } }
   >(CREATE_FRIEND_INVITE);
 
   return {
     create: (input: CreateFriendInviteInput) =>
       mutate({ variables: { input: input.toDTO() } }),
-    url: data?.createFriendInvite ?? "",                        
+    url: data?.createFriendInvite ?? "",
     loading,
     error,
     reset,
@@ -60,7 +60,7 @@ export function useCreateLink() {
 /** Invita por username */
 export function useCreateInviteByUsername() {
   const [mutate, { data, loading, error, reset }] = useMutation<
-    { createFriendInviteByUsername: string | boolean },         
+    { createFriendInviteByUsername: string | boolean },
     { input: { inviterId: string; targetUsername: string } }
   >(CREATE_FRIEND_INVITE_BY_USERNAME);
 
@@ -78,12 +78,12 @@ export function useCreateInviteByUsername() {
 export function useRequestFriendByUsername() {
   const [mutate, { data, loading, error, reset }] = useMutation<
     { requestFriendByUsername: FriendPayload },
-    { input: { requesterId: string; username: string } }
+    { input: RequestFriendByUsernameInput }
   >(REQUEST_FRIEND_BY_USERNAME);
 
   return {
-    requestByUsername: (requesterId: string, username: string) =>
-      mutate({ variables: { input: { requesterId, username } } }),
+    requestByUsername: (input: RequestFriendByUsernameInput) =>
+      mutate({ variables: { input: input } }),
     friend: data?.requestFriendByUsername ?? null,
     loading,
     error,

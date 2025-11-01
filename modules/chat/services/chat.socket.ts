@@ -1,90 +1,168 @@
 import { getSocket } from "@shared/lib/socket";
 
-// Join and leave chat rooms
+// ========================
+// 🔹 JOIN / LEAVE CHAT ROOM
+// ========================
 export function joinChat(chatId: string) {
-  getSocket("/chat").emit("chat:join", { chatId });
+  const socket = getSocket("/chat");
+  socket.emit("chat:join", { chatId });
+  console.log(`🔌 Unido al chat ${chatId}`);
 }
 
 export function leaveChat(chatId: string) {
-  getSocket("/chat").emit("chat:leave", { chatId });
+  const socket = getSocket("/chat");
+  socket.emit("chat:leave", { chatId });
+  console.log(`🔌 Saliste del chat ${chatId}`);
 }
 
-// Chat history handlers
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function onChatHistory(cb: (msgs: any[]) => void) {
-  getSocket("/chat").on("chat:history", cb);
+// ========================
+// 🔹 CHAT HISTORY
+// ========================
+export function onChatHistory(
+  chatId: string,
+  cb: (msgs: any[]) => void
+) {
+  const socket = getSocket("/chat");
+
+  // Desvincula eventos anteriores para evitar duplicados
+  socket.off("chat:history");
+
+  // Escucha el evento de historial
+  const handleHistory = (payload: any) => {
+    console.log("🔍 Payload recibido:", payload);
+    
+    if (!payload) {
+      console.error("❌ Payload vacío");
+      return;
+    }
+
+    if (payload[0].chatId !== chatId) {
+      console.log("⚠️ ChatId no coincide:", payload[0].chatId, "!=", chatId);
+      return;
+    }
+
+    if (!Array.isArray(payload)) {
+      console.error("❌ El formato de mensajes no es válido:", payload.messages);
+      return;
+    }
+
+    console.log("✅ Historial válido recibido:", payload.length, "mensajes");
+    cb(payload);
+  };
+  
+  socket.on("chat:history", handleHistory);
+
+  // Solicita el historial
+  console.log("📤 Solicitando historial para chat:", chatId);
+  socket.emit("chat:history", { chatId });
+
+  console.log(`📜 Escuchando historial del chat ${chatId}`);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function offChatHistory(cb: (msgs: any[]) => void) {
-  getSocket("/chat").off("chat:history", cb);
+export function offChatHistory() {
+  const socket = getSocket("/chat");
+  socket.off("chat:history");
+  console.log("📴 Dejaste de escuchar el historial");
 }
 
-// New message handlers
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// ========================
+// 🔹 NUEVOS MENSAJES
+// ========================
+
+/*  { chatId, message, senderId } */
+export function chatNew(data: { chatId: string; message: string; senderId: string }) {
+  const socket = getSocket("/chat");
+  socket.emit("chat:new", data);
+  console.log(`💬 Nuevo mensaje enviado a chat ${data.message}`);
+}
+
 export function onChatNew(cb: (msg: any) => void) {
-  getSocket("/chat").on("chat:new", cb);
+  const socket = getSocket("/chat");
+  
+  // Desvincula el evento anterior si existe
+  socket.off("chat:new");
+  
+  // Registra el nuevo manejador
+  socket.on("chat:new", (msg) => {
+    console.log("💬 Nuevo mensaje recibido en socket:", msg);
+    cb(msg);
+    
+    // Emitir evento local para actualizar badges
+    socket.emit("local:message:new", msg);
+  });
+  
+  console.log("💬 Escuchando nuevos mensajes...");
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function offChatNew(cb: (msg: any) => void) {
-  getSocket("/chat").off("chat:new", cb);
+  const socket = getSocket("/chat");
+  socket.off("chat:new");
+  socket.off("local:message:new");
 }
 
-// Read message handlers
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function onChatRead(cb: (data: any) => void) {
-  getSocket("/chat").on("chat:read", cb);
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function offChatRead(cb: (data: any) => void) {
-  getSocket("/chat").off("chat:read", cb);
-}
-
-// Legacy functions (keeping for backward compatibility)
-export function joinChatLegacy(chatId: string) {
-  getSocket().emit("join_chat", chatId);
-}
-// New Menssge Handlers (Legacy - for backward compatibility)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function onNewMessage(cb: (msg: any) => void) {
-  getSocket().on("newMessage", cb); // on para escuchar eventos
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function offNewMessage(cb: (msg: any) => void) {
-  getSocket().off("newMessage", cb); // off para dejar de escuchar
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function NewMessage(msg: any) {
-  getSocket().emit("newMessage", msg);
-}
-
-// Handle read messages
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function onMessageRead(cb: (data: any) => void) {
-  getSocket("/chat").on("read_message", cb);
-}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function offMessageRead(cb: (data: any) => void) {
-  getSocket("/chat").off("read_message", cb);
-}
+// ========================
+// 🔹 MENSAJES LEÍDOS
+// ========================
 export function readMessage(chatId: string, messageId: string) {
-  getSocket("/chat").emit("chat:read", { chatId, messageId });
+  const socket = getSocket("/chat");
+  socket.emit("chat:read", { chatId, messageId });
+  console.log(`👀 Marcado como leído: ${messageId}`);
 }
 
-// Handle send messages
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function onSendMessage(cb: (data: any) => void) {
-  getSocket().on("send_message", cb);
-}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function offSendMessage(cb: (data: any) => void) {
-  getSocket().off("send_message", cb);
+export function readAllMessages(chatId: string, userId: string) {
+  const socket = getSocket("/chat");
+  const data = { chatId, userId };
+  socket.emit("chat:readAll", data);
+  // Emitimos el evento localmente también para actualización inmediata
+  socket.emit("chat:readAll", { ...data, local: true });
+  console.log(`👀 Todos los mensajes marcados como leídos en chat ${chatId}`);
 }
 
+export function onChatRead(cb: (data: any) => void) {
+  const socket = getSocket("/chat");
+  
+  const handleRead = (data: any) => {
+    console.log("👁️ Evento de lectura recibido:", data);
+    cb(data);
+  };
+
+  socket.on("chat:read", handleRead);
+  socket.on("chat:readAll", handleRead);
+  console.log("👂 Escuchando eventos de lectura de mensajes...");
+}
+
+export function offChatRead(cb: (data: any) => void) {
+  const socket = getSocket("/chat");
+  socket.off("chat:read", cb);
+  socket.off("chat:readAll", cb);
+  console.log("👂 Dejando de escuchar eventos de lectura");
+}
+
+// ========================
+// 🔹 ENVIAR MENSAJES
+// ========================
 export function sendMessage(chatId: string, message: string) {
-  getSocket().emit("send_message", { chatId, message });
+  const socket = getSocket("/chat");
+  socket.emit("chat:send", { chatId, message });
+  console.log(`📤 Mensaje enviado a chat ${chatId}`);
+}
+
+export function onSendMessage(cb: (data: any) => void) {
+  const socket = getSocket("/chat");
+  socket.on("chat:send", cb);
+  console.log("📡 Escuchando envío de mensajes...");
+}
+
+export function offSendMessage(cb: (data: any) => void) {
+  const socket = getSocket("/chat");
+  socket.off("chat:send", cb);
+}
+
+// ========================
+// 🔹 HELPERS (Opcional)
+// ========================
+export function cleanupChatListeners() {
+  const socket = getSocket("/chat");
+  socket.removeAllListeners();
+  console.log("🧹 Limpieza de listeners del chat completada");
 }

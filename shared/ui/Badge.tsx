@@ -22,7 +22,7 @@ export const Badge: FC<BadgeProps> = ({ children, color = "green", type = "prese
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium
                        border border-cyan-300/30 bg-cyan-300/10 text-white shadow-[0_0_6px_rgba(76,201,240,.3)]">
         {children}
-       <Icon icon="mdi:chat" color={"cyan"} width={15} height={15} />
+       <Icon icon="mdi:chat" color={"#00ffffa6"} width={15} height={15} />
       </span>
     );
   }

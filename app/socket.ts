@@ -20,6 +20,7 @@ const getBaseUrl = () => {
   // Else build from host + port
   // Backend default (see backend src/main.ts) is 3011; prefer env override
   const port = process.env.NEXT_PUBLIC_API_PORT || "3010";
+  console.log(port)
   const host =
     typeof window !== "undefined" ? window.location.hostname : "localhost";
   return `http://${host}:${port}`;
