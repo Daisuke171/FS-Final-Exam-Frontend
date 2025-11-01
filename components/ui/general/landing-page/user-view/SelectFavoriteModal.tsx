@@ -45,7 +45,7 @@ export default function SelectFavoriteModal({
             *Tapea encima de un juego para añadirlo a favoritos*
           </p>
           {loading ? (
-            <div className="grid grid-cols-3 gap-4 mb-5 w-full">
+            <div className="flex gap-4 mb-5 w-full max-w-190 overflow-x-auto">
               {Array.from({ length: skeletons }, (_, index) => (
                 <div
                   key={index}
