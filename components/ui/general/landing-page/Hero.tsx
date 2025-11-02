@@ -4,12 +4,9 @@ import CustomButtonOne from "@/components/game/rock-paper-scissors/buttons/Custo
 import Image from "next/image";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import useBreakpoint from "@/hooks/useBreakpoint";
 
 export default function Hero() {
   const router = useRouter();
-  const breakpoint = useBreakpoint();
-  const isMobile = breakpoint === "mobile";
   return (
     <div className="h-screen relative">
       <picture>
@@ -47,9 +44,8 @@ export default function Hero() {
           <Image
             src="/images/hero-img.webp"
             alt="hero"
-            width={600}
-            height={600}
-            loading="eager"
+            width={400}
+            height={400}
             priority
             className="w-full h-full object-cover"
           />
