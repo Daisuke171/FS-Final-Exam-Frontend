@@ -1,7 +1,11 @@
+"use client";
+
 import { Skin } from "@/types/user.types";
 import { Icon } from "@iconify/react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { useLockBodyScroll } from "@/hooks/useBlockBodyScroll";
+import { createPortal } from "react-dom";
 
 interface XpBarAnimationProps {
   xpGained: number;
@@ -48,12 +52,18 @@ export default function XpBarAnimation({
   newLevelColor,
   onComplete,
 }: XpBarAnimationProps) {
+  useLockBodyScroll();
   const [animatedXp, setAnimatedXp] = useState(xpInCurrentLevelBefore);
   const [animatedProgress, setAnimatedProgress] = useState(progressBefore);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [phase, setPhase] = useState<"xp-gain" | "level-up" | "skins">(
     "xp-gain"
   );
+
+  const modalRoot =
+    typeof document !== "undefined"
+      ? document.getElementById("modal-root")
+      : null;
 
   const animPropsRef = useRef({
     xpGained,
@@ -154,12 +164,12 @@ export default function XpBarAnimation({
     };
   }, []);
 
-  return (
+  return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { delay: 0.6 } }}
-      className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-9999 p-4"
     >
       <div className="max-w-2xl w-full">
         <motion.div
@@ -315,6 +325,7 @@ export default function XpBarAnimation({
           </motion.div>
         )}
       </div>
-    </motion.div>
+    </motion.div>,
+    modalRoot
   );
 }
