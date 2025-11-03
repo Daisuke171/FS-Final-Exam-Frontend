@@ -38,11 +38,13 @@ export default async function RootLayout({
       >
         <Providers session={session}>
           <ToastProvider>
-            <NavbarServer />
-            {children}
-            <BottomBar />
-            <Footer />
-            <AIChatbot />
+            <div id="modal-root">
+              <NavbarServer />
+              {children}
+              <BottomBar />
+              <Footer />
+              <AIChatbot />
+            </div>
           </ToastProvider>
         </Providers>
       </body>
