@@ -28,7 +28,7 @@ export default function RankingHeader({
       initial={{ y: 0 }}
       animate={{ y: isVisible ? 0 : -130 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="bg-white/3 shadow-lg fixed z-10 sm:p-0 sm:backdrop-blur-md px-8 flex justify-center w-full"
+      className="bg-white/3 shadow-lg fixed z-50 sm:p-0 sm:backdrop-blur-md px-8 flex justify-center w-full"
     >
       <div className="hidden sm:flex gap-3">
         {filterOptions.map((option) => (

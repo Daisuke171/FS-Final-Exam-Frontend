@@ -76,11 +76,6 @@ export default function MissionsSection() {
           Array.from({ length: skeletons }, (_, index) => (
             <MissionItemSkeleton key={index} />
           ))}
-        {loading &&
-          Array.from({ length: skeletons }, (_, index) => (
-            <MissionItemSkeleton key={index} />
-          ))}
-
         {!loading && (
           <AnimatePresence mode="wait">
             <motion.div
