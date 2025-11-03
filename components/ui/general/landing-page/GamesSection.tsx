@@ -54,13 +54,24 @@ export default function GamesSection() {
   const router = useRouter();
   return (
     <section className="relative w-full flex flex-col items-center justify-center min-h-screen py-15">
-      <Image
-        src="/images/games-section-bg.webp"
-        alt="hero"
-        width={2000}
-        height={1800}
-        className="w-full h-full object-cover absolute top-0 left-0"
-      />
+      <picture>
+        <source
+          media="(min-width: 1024px)"
+          srcSet="/images/games-section-bg.webp"
+        />
+        <source
+          media="(min-width: 768px)"
+          srcSet="/images/games-section-bg.webp"
+        />
+        <Image
+          src="/images/games-section-mobile-bg.webp"
+          alt="games"
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+      </picture>
+
       <div className="absolute top-0 left-0 w-full h-full bg-black/80"></div>
       <div className="z-10 flex flex-col items-center justify-center max-w-[90%] ">
         <motion.div

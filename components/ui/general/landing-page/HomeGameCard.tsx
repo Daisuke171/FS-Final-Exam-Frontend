@@ -23,7 +23,7 @@ const HomeGameCard = ({
 
   return (
     <div
-      className={`group relative w-full max-w-xs overflow-hidden rounded-xl bg-black/10 backdrop-blur-sm 
+      className={`group relative bg-black-blue w-full max-w-xs overflow-hidden rounded-xl md:bg-black/10 md:backdrop-blur-sm 
       border border-light-gray transition-all duration-500 ${
         !isComingSoon && "hover:border-light-blue hover:bg-medium-blue/10"
       }`}
@@ -37,6 +37,7 @@ const HomeGameCard = ({
           alt={title}
           width={500}
           height={350}
+          loading="lazy"
           className={`w-full h-full object-cover transition-all duration-700 ${
             isHovered && !isComingSoon
               ? "scale-105 opacity-80"
@@ -44,10 +45,8 @@ const HomeGameCard = ({
           } ${isComingSoon ? "grayscale" : ""}`}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-
         {isComingSoon && (
-          <div className="absolute top-3 right-3 bg-transparent-purple backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium text-purple-300 border border-shadow-purple">
+          <div className="absolute top-3 right-3 bg-transparent-purple md:backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium text-purple-300 border border-shadow-purple">
             Próximamente
           </div>
         )}

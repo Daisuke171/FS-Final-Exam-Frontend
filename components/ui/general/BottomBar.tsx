@@ -64,7 +64,7 @@ export default function BottomBar() {
             className="h-17 flex items-center justify-center relative rounded-full "
             whileTap={{
               scale: 0.95,
-              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
             }}
           >
             {isActive && (
