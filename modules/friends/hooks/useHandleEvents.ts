@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import { useGetMessages } from "@modules/chat/hooks/useMessages";
 import { getSocket } from "@shared/lib/socket";
+import type { Message } from "@/modules/chat";
 
 export function useHandleEvents(chatId: string, currentUserId: string) {
-  const [unread, setUnread] = useState(0);
+  const [ unread, setUnread] = useState(0);
+  const [ msgsUnreads, setMsgsUnreads ] = useState<Message[]>([]);
   const { list } = useGetMessages(chatId);
 
   useEffect(() => {
@@ -14,6 +16,7 @@ export function useHandleEvents(chatId: string, currentUserId: string) {
     const countUnread = () => {
       const messagesNews = list.filter((m) => m.senderId !== currentUserId && !m.read);
       setUnread(messagesNews.length);
+      setMsgsUnreads(messagesNews);
     };
 
     // Contar inicialmente
@@ -30,9 +33,10 @@ export function useHandleEvents(chatId: string, currentUserId: string) {
     };
 
     const handleReadAll = (data: any) => {
-      console.log("👀 Mensajes leídos en FriendCard:", data);
+      console.log("👀 Mensajes leídos en FriendCard:", data);        
       if (data.chatId === chatId) {
         setUnread(0);
+        setMsgsUnreads([]);
       }
     };
 
@@ -49,6 +53,7 @@ export function useHandleEvents(chatId: string, currentUserId: string) {
 
   return ({
     unread,
-    list
+    list, 
+    msgsUnreads
   });
 }

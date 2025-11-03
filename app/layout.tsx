@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { ReactNode } from "react";
 import { Raleway } from "next/font/google";
-// import { ApolloWrapper } from "@/lib/apollo-client";
 import { Providers } from "@/app/providers";
 import "./globals.css";
-//import { Providers } from "@/components/ui/general/Providers";
 import NavbarServer from "@/components/ui/general/NabvarServer";
 import BottomBar from "@/components/ui/general/BottomBar";
 import { auth } from "@/auth";
 import Footer from "@/components/ui/general/Footer";
 import AIChatbot from "@/components/ui/ai-chatbot/AIChatbot";
 import { ToastProvider } from "@/context/ToastContext";
+
+import CallLayer from "@/modules/call/ui/CallLayer";
 
 const raleway = Raleway({
   variable: "--font-raleway",
@@ -31,6 +31,9 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const session = await auth();
+  const currentUserId = session?.user?.id as string; // si no tienes usuario, no usar
+
+
   return (
     <html lang="en">
       <body
@@ -43,6 +46,7 @@ export default async function RootLayout({
             <BottomBar />
             <Footer />
             <AIChatbot />
+            <CallLayer currentUserId={currentUserId} />
           </ToastProvider>
         </Providers>
       </body>

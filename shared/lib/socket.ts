@@ -1,6 +1,6 @@
 import { io, Socket } from "socket.io-client";
 
-type Namespace = "/" | "/chat" | "/friends" | "/presence" | "/calls" | "/rps";
+type Namespace = "/" | "/chat" | "/friends" | "/presence" | "/call" | "/rps";
 
 const socketInstances: Partial<Record<Namespace, Socket>> = {};
 

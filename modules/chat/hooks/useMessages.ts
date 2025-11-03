@@ -25,7 +25,7 @@ export function toDTO(m: Message, currentUserId?: string): MessageDTO {
   };
 }
 
-export function useGetMessages(chatId?: string) {
+export function useGetMessages(chatId?: string, currentUserId?: string) {
   // const client = useApolloClient();
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -69,9 +69,9 @@ export function useGetMessages(chatId?: string) {
 
     // Escucha mensajes nuevos
     const handleNewMessage = (msg: Message) => {
+      console.log("💬 Nuevo mensaje recibido:", msg);
       if (msg.chatId === chatId) {
         setMessages((prev) => {
-          // Evitar duplicados
           const exists = prev.some(m => m.id === msg.id);
           if (exists) return prev;
           return [...prev, msg];
@@ -80,23 +80,30 @@ export function useGetMessages(chatId?: string) {
     };
     onChatNew(handleNewMessage);
 
-    //  Escucha lecturas de mensajes
+    // Escucha lecturas de mensajes
     const handleMessageRead = (data: any) => {
-      console.log("👀 Mensaje leído:", data);
-      if (data.chatId === chatId) {
-        if (data.messageId) {
-          // Actualizar mensaje individual
-          setMessages(prev => 
-            prev.map(msg => msg.id === data.messageId ? { ...msg, read: true } : msg)
-          );
-        } else {
-          // Actualizar todos los mensajes como leídos
-          setMessages(prev => 
-            prev.map(msg => ({...msg, read: true}))
-          );
-        }
-      }
+      console.log("👀 Evento de lectura recibido:", {
+        eventData: data,
+        currentChatId: chatId
+      });
       
+      if (data.chatId === chatId) {
+        setMessages(prev => {
+          return prev.map(msg => {
+            // Solo actualizamos los mensajes que fueron enviados por el usuario actual
+            // cuando el otro usuario los marca como leídos
+            if (msg.senderId === currentUserId && data.userId !== currentUserId) {
+              console.log("✅ Marcando mensaje como leído:", {
+                messageId: msg.id,
+                sender: msg.senderId,
+                reader: data.userId
+              });
+              return { ...msg, read: true };
+            }
+            return msg;
+          });
+        });
+      }
     };
     onChatRead(handleMessageRead);
 
@@ -160,6 +167,8 @@ export function useSendMessage(currentUserId?: string) {
   };
   return {
     send,
-    loading,
-  };
+    loading
+  }
 }
+
+

@@ -5,12 +5,15 @@ import IconBtn from "@shared/ui/IconBtn";
 import MessageInput from "./MessageInput";
 import { cn } from "@shared/lib/utils";
 import { useGetMessages, useSendMessage } from "../hooks/useMessages";
-import { readAllMessages } from "../services/chat.socket";
+import { readMessage } from "../services/chat.socket";
 import { Icon } from "@iconify/react";
 import type { Msg, ChatWindowProps } from "../types/chatUI.types";
 import { InputMessage } from "../types/message.types";
 import { useUnreadStore } from "../model/unread.store";
 import { motion } from "motion/react";
+import { useCallStore } from "@modules/call/model/call.store";
+import { useBoundCall } from "@modules/call/hooks/useWebRTCCall.bound";
+
 
 export default function ChatWindow({
   friend,
@@ -23,9 +26,21 @@ export default function ChatWindow({
   const chatId = friend?.chatId ?? "";
   console.log(chatId);
   
-  const { list } = useGetMessages(chatId); // ahora viene del socket
+  const { list } = useGetMessages(chatId, currentUserId); // ahora viene del socket
   
   const { send } = useSendMessage(currentUserId);
+
+  // llamadas
+  const { show } = useCallStore();
+  const { startCall } = useBoundCall(currentUserId);
+
+   const onCall = async () => {
+    if (!friend?.id) return;
+    const id = await startCall(friend.id);
+    if (id) {
+      show(id, { id: friend.id, nickname: friend.nickname, avatar: friend.skin });
+    }
+  };
 
   const [isTyping, setIsTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
@@ -70,9 +85,12 @@ export default function ChatWindow({
       const unread = messages.filter((m) => m.from === "friend" && !m.read);
       if (unread.length > 0) {
         console.log("📬 Marcando mensajes como leídos...");
-        readAllMessages(friend.chatId, currentUserId);
+        unread.map((msg) => {
+        readMessage(friend.chatId, msg.id );
+        
+        })
         clearUnread(friend.chatId);
-      }
+      }  
     };
 
     // Marcar inmediatamente y configurar un intervalo
@@ -132,7 +150,7 @@ export default function ChatWindow({
   };
 
   if (!visible || !friend) return null;
-
+visible ?? clearUnread(friend.chatId)
   return (
     <motion.section
       initial={{ opacity: 0, scale: 0.9 }}
@@ -149,12 +167,13 @@ export default function ChatWindow({
       <div className="flex items-center justify-between px-3 py-2 bg-cyan-400/15 border-b border-cyan-300/30 shrink-0">
         <div className="flex items-center gap-3">
           <Avatar
-            src={friend.skin ?? "/default-pfp.jpg"}
+            src={friend.skin ?? "/default-avatar.png"}
             alt={friend.nickname}
             size={16}
           />
           <div className="font-semibold">{friend.nickname}</div>
         </div>
+        <IconBtn icon="mdi:phone" onClick={onCall} className="p-2 rounded-full cursor-pointer" sizeIcon={16} />
         <IconBtn
           icon="mdi:close"
           onClick={onClose}

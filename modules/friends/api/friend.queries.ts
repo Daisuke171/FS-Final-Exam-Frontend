@@ -42,3 +42,15 @@ export const FRIEND_PEERS_OF_USER = gql`
         }
     }
 `;
+
+export const FRIEND_BASIC = gql`
+    query GetFriendById($id: ID!) {
+    getFriendById(id: $id) {
+        id
+        nickname
+        activeSkin {
+            img
+            name
+        }
+    }
+}`;
