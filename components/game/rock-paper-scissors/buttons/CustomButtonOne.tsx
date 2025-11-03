@@ -6,10 +6,10 @@ interface CustomButtonProps {
   icon?: IconifyIcon | string;
   full?: boolean;
   variant?: "filled" | "outlined";
-  color?: "primary" | "secondary" | "error" | "white";
+  color?: "primary" | "secondary" | "error" | "white" | "success";
   loading?: boolean;
   type?: "button" | "submit" | "reset";
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   disabled?: boolean;
   className?: string;
   center?: boolean;
@@ -33,7 +33,9 @@ export default function CustomButtonOne({
       ? "py-2 px-4 text-sm rounded-lg"
       : size === "md"
       ? "py-3 px-6 text-base rounded-lg"
-      : "py-4 px-8 text-lg rounded-xl";
+      : size === "lg"
+      ? "py-4 px-8 text-lg rounded-xl"
+      : "py-1 px-2 text-xs rounded-lg";
 
   const outlinedPrimary =
     "border-2 border-light-purple text-bright-purple bg-transparent hover:border-bright-purple";
@@ -62,6 +64,9 @@ export default function CustomButtonOne({
   const filledWhite =
     "bg-subtitle text-background border-2 border-subtitle hover:bg-font hover:border-font";
 
+  const filledSuccess =
+    "bg-shadow-success text-font border-2 border-shadow-success hover:bg-success hover:border-success";
+
   const filledLoading =
     "bg-dark-gray text-font border-2 opacity-30 border-dark-gray pointer-events-none cursor-not-allowed";
 
@@ -70,6 +75,7 @@ export default function CustomButtonOne({
     secondary: "bg-shadow-blue",
     error: "bg-shadow-error",
     white: "bg-white/30",
+    success: "bg-shadow-success",
   };
 
   const outlined =
@@ -92,6 +98,8 @@ export default function CustomButtonOne({
       ? filledSecondary
       : color === "white"
       ? filledWhite
+      : color === "success"
+      ? filledSuccess
       : filledError;
 
   const textPosition = center ? "justify-center" : "";
@@ -107,12 +115,16 @@ export default function CustomButtonOne({
         {loading ? (
           <Icon
             icon="line-md:loading-twotone-loop"
-            width={size === "sm" ? 22 : size === "md" ? 24 : 26}
+            width={
+              size === "sm" ? 22 : size === "md" ? 24 : size === "lg" ? 26 : 18
+            }
           />
         ) : icon ? (
           <Icon
             icon={icon}
-            width={size === "sm" ? 22 : size === "md" ? 24 : 26}
+            width={
+              size === "sm" ? 22 : size === "md" ? 24 : size === "lg" ? 26 : 18
+            }
           />
         ) : null}
         {text}
