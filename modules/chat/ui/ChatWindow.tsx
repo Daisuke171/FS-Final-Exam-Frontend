@@ -11,9 +11,6 @@ import type { Msg, ChatWindowProps } from "../types/chatUI.types";
 import { InputMessage } from "../types/message.types";
 import { useUnreadStore } from "../model/unread.store";
 import { motion } from "motion/react";
-import { useCallStore } from "@modules/call/model/call.store";
-import { useBoundCall } from "@modules/call/hooks/useWebRTCCall.bound";
-
 
 export default function ChatWindow({
   friend,
@@ -29,18 +26,6 @@ export default function ChatWindow({
   const { list } = useGetMessages(chatId, currentUserId); // ahora viene del socket
   
   const { send } = useSendMessage(currentUserId);
-
-  // llamadas
-  const { show } = useCallStore();
-  const { startCall } = useBoundCall(currentUserId);
-
-   const onCall = async () => {
-    if (!friend?.id) return;
-    const id = await startCall(friend.id);
-    if (id) {
-      show(id, { id: friend.id, nickname: friend.nickname, avatar: friend.skin });
-    }
-  };
 
   const [isTyping, setIsTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
@@ -173,7 +158,6 @@ visible ?? clearUnread(friend.chatId)
           />
           <div className="font-semibold">{friend.nickname}</div>
         </div>
-        <IconBtn icon="mdi:phone" onClick={onCall} className="p-2 rounded-full cursor-pointer" sizeIcon={16} />
         <IconBtn
           icon="mdi:close"
           onClick={onClose}

@@ -1,49 +1,48 @@
 "use client";
 import { create } from "zustand";
 
-type FriendLite = {
-    id: string;
-    nickname: string;
-    avatar?: string
-};
+type FriendLite = { id: string; nickname: string; skin?: string | null };
 
-type Incoming = {
-    callId: string;
-    from: string;
-    sdpOffer?: RTCSessionDescriptionInit
-};
+type Incoming = { callId: string; from: string; sdpOffer: RTCSessionDescriptionInit } | null;
 
-type CallState = {
-    active: boolean;
-    callId: string | null;
-    friend: FriendLite | null;
-    uiState: "IDLE" | "RINGING" | "IN_CALL" | "ENDED" | "REJECTED";
-    incoming: Incoming | null;
-    // funciones provenientes del hook
-    startCall?: (calleeId: string) => Promise<void | string>;
-    acceptCall?: () => Promise<void>;
-    rejectCall?: () => Promise<void>;
-    endCall?: () => Promise<void>;
+type ActionsFromHook = {
+    startCall?: (calleeId: string) => Promise<string | undefined>;
+    acceptCall?: (toUserId: string) => Promise<void>;
+    rejectCall?: (toUserId: string) => void;
+    endCall?: (peerUserId: string) => void;
     toggleMute?: () => void;
     toggleCamera?: () => void;
-    shareScreen?: () => Promise<MediaStream | void>;
-    // setters utiles
-    setFromHook: (p: Partial<CallState>) => void;
-    setUi: (ui: CallState["uiState"]) => void;
-    show: (callId: string, friend: FriendLite) => void;
-    hide: () => void;
-    setIncoming: (inc: Incoming | null) => void;
+    shareScreen?: () => Promise<MediaStream>;
 };
 
-export const useCallStore = create<CallState>((set) => ({
-    active: false,
-    callId: null,
-    friend: null,
-    uiState: "IDLE",
+type State = {
+    ui: "IDLE" | "RINGING" | "IN_CALL" | "REJECTED" | "ENDED";
+    incoming: Incoming;
+    trayVisible: boolean;
+    trayCallId: string | null;
+    trayPeer: FriendLite | null;
+    fromHook: ActionsFromHook;
+};
+
+type Mut = {
+    setUi: (u: State["ui"]) => void;
+    setIncoming: (i: Incoming) => void;
+    setFromHook: (a: ActionsFromHook) => void;
+    show: (callId: string, peer: FriendLite) => void;
+    hide: () => void;
+};
+
+export const useCallStore = create<State & Mut>((set) => ({
+    ui: "IDLE",
     incoming: null,
-    setFromHook: (p) => set(p),
-    show: (callId, friend) => set({ active: true, callId, friend }),
-    hide: () => set({ active: false, callId: null, friend: null, uiState: "IDLE" }),
-    setUi: (ui) => set({ uiState: ui }),
-    setIncoming: (inc) => set({ incoming: inc, uiState: inc ? "RINGING" : "IDLE" }),
+    trayVisible: false,
+    trayCallId: null,
+    trayPeer: null,
+    fromHook: {},
+
+    setUi: (u) => set({ ui: u }),
+    setIncoming: (i) => set({ incoming: i }),
+    setFromHook: (a) => set((s) => ({ fromHook: { ...s.fromHook, ...a } })),
+    show: (callId, peer) => set({ trayVisible: true, trayCallId: callId, trayPeer: peer }),
+    hide: () => set({ trayVisible: false, trayCallId: null, trayPeer: null }),
 }));
