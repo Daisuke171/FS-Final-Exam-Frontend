@@ -15,7 +15,7 @@ export default function LevelBar({
   if (loading) return <LevelBarSkeleton />;
   if (error)
     return (
-      <article className="w-full flex-grow text-center max-w-105 px-3 items-center place-self-center xl:max-w-90 flex flex-col justify-center md:border-l border-dark-gray  md:pl-8 xl:pl-5">
+      <article className="w-full flex-grow text-center max-w-105 px-3 items-center place-self-center flex flex-col justify-center md:border-l border-dark-gray  md:pl-8 xl:pl-5">
         <Icon
           icon="mynaui:sad-ghost"
           width="50"
@@ -36,7 +36,7 @@ export default function LevelBar({
   const xpInCurrentLevel = (user?.experience || 0) - currentLevelXp;
   const xpNeededForLevel = nextLevelXp - currentLevelXp;
   return (
-    <article className="w-full flex-grow max-w-105 px-3 place-self-center xl:max-w-105 flex flex-col justify-center gap-2 md:border-l border-dark-gray h-23 md:pl-8 xl:pl-5">
+    <article className="w-full flex-grow max-w-105 px-3 place-self-center flex flex-col justify-center gap-2 md:border-l border-dark-gray h-23 md:pl-8 xl:pl-5">
       <div className="flex justify-between items-center">
         <p className="text-font text-base font-medium">
           Level {user?.level.atomicNumber}
