@@ -1,11 +1,20 @@
 "use client";
-import { useApolloClient } from "@apollo/client/react"
-import { useQuery, useMutation, useSubscription } from "@apollo/client/react";
-import type { Message , MessageDTO, InputMessage } from "../types/message.types";
+import { useState, useEffect } from "react";
+import { useMutation } from "@apollo/client/react";
+import type { Message, MessageDTO, InputMessage } from "../types/message.types";
 import { GET_MESSAGES } from "../api/chat.queries.gql";
-import { SEND_MESSAGE  } from "../api/chat.mutation";
-import { MESSAGE_ADDED, MESSAGE_UPDATED } from "../api/chat.subscritions";
-
+import { SEND_MESSAGE } from "../api/chat.mutation";
+import { getSocket } from "@shared/lib/socket";
+import {
+  onChatNew,
+  onChatRead,
+  onChatHistory,
+  leaveChat,
+  cleanupChatListeners,
+  offChatHistory,
+  offChatNew,
+  chatNew
+} from "../services/chat.socket";
 
 export function toDTO(m: Message, currentUserId?: string): MessageDTO {
   return {
@@ -16,100 +25,89 @@ export function toDTO(m: Message, currentUserId?: string): MessageDTO {
   };
 }
 
-/** Trae mensajes por chatId */
-export function useGetMessages(chatId?: string) {
-  const client = useApolloClient();
-  
-  const { data, loading, error, refetch } = useQuery<
-    { messages: Message[] },
-    { chatId: string }
-  >(GET_MESSAGES, {
-    variables: { chatId: chatId ?? "" },
-    skip: !chatId,                       // ← evita ejecutar sin chatId
-    fetchPolicy: "network-only",         // Always fetch fresh data for real-time updates
-    nextFetchPolicy: "network-only",     // Keep fetching fresh data on subsequent requests
-    pollInterval: 0,                     // Don't poll, we have subscriptions
-  });  
+export function useGetMessages(chatId?: string, currentUserId?: string) {
+  // const client = useApolloClient();
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  // Suscripción en tiempo real para nuevos mensajes
-  useSubscription<{ messageAdded: Message }>(MESSAGE_ADDED, {
-    skip: !chatId,
-    variables: { chatId: chatId as string },
-    onData: ({ data, client: subClient }) => {
-      console.log("📨 New message via GraphQL subscription:", data);
-      const incoming = data.data?.messageAdded;
-      if (!incoming) return;
+  // Función para unirse al chat
+  const joinChat = (chatId: string) => {
+    const socket = getSocket("/chat");
+    socket.emit("chat:join", { chatId });
+    console.log(`🔌 Unido al chat ${chatId}`);
+  };
 
-      try {
-        // Read current cache
-        const existing = client.cache.readQuery<{ messages: Message[] }>({
-          query: GET_MESSAGES,
-          variables: { chatId: chatId as string },
-        });
+  useEffect(() => {
+    if (!chatId) {
+      console.log("❌ No hay chatId proporcionado");
+      return;
+    }
 
-        if (existing) {
-          const prevList = existing.messages ?? [];
-          const noTemps = prevList.filter((m) => !m.id.startsWith("tmp-"));
-          const exists = noTemps.some((m) => m.id === incoming.id);
-          
-          if (!exists) {
-            // Write updated cache
-            client.cache.writeQuery({
-              query: GET_MESSAGES,
-              variables: { chatId: chatId as string },
-              data: { messages: [...noTemps, incoming] },
-            });
-          }
-        }
-      } catch (err) {
-        console.warn("Cache update failed, refetching:", err);
-        refetch?.();
+    // Unirse al chat primero
+    joinChat(chatId);
+    console.log("📡 Conectando al chat:", chatId);
+
+    //  Escucha el historial inicial
+    onChatHistory(chatId, (receivedMessages) => {
+      if (Array.isArray(receivedMessages) && receivedMessages.length > 0) {
+        // Validar estructura de mensajes
+        const validMessages = receivedMessages.filter(msg => 
+          msg && 
+          typeof msg === 'object' && 
+          'id' in msg && 
+          'message' in msg && 
+          'senderId' in msg && 
+          'timestamp' in msg
+        );
+        setMessages(validMessages);
+      } else {
+        console.warn("⚠️ No hay mensajes en el historial o formato inválido");
+        setMessages([]);
       }
-    },
-  });
+    });
 
-  // Suscripción para actualizaciones de mensajes (read receipts)
-  useSubscription<{ messageUpdated: Message }>(MESSAGE_UPDATED, {
-    skip: !chatId,
-    variables: { chatId: chatId as string },
-    onData: ({ data }) => {
-      console.log("📬 Message updated (read receipt) via GraphQL:", data);
-      const updated = data.data?.messageUpdated;
-      if (!updated) return;
-
-      try {
-        // Read current cache
-        const existing = client.cache.readQuery<{ messages: Message[] }>({
-          query: GET_MESSAGES,
-          variables: { chatId: chatId as string },
+    // Escucha mensajes nuevos
+    const handleNewMessage = (msg: Message) => {
+      console.log("💬 Nuevo mensaje recibido:", msg);
+      if (msg.chatId === chatId) {
+        setMessages((prev) => {
+          const exists = prev.some(m => m.id === msg.id);
+          if (exists) return prev;
+          return [...prev, msg];
         });
+      }
+    };
+    onChatNew(handleNewMessage);
 
-        if (existing) {
-          // Update the specific message
-          const updatedMessages = existing.messages.map((m) =>
-            m.id === updated.id ? updated : m
-          );
-
-          // Write back to cache
-          client.cache.writeQuery({
-            query: GET_MESSAGES,
-            variables: { chatId: chatId as string },
-            data: { messages: updatedMessages },
+    // Escucha lecturas de mensajes
+    const handleMessageRead = (data: any) => {     
+      
+      if (data.chatId === chatId) {
+        setMessages(prev => {
+          return prev.map(msg => {
+            // Solo actualizamos los mensajes que fueron enviados por el usuario actual
+            // cuando el otro usuario los marca como leídos
+            if (msg.senderId === currentUserId && data.userId !== currentUserId) {
+              
+              return { ...msg, read: true };
+            }
+            return msg;
           });
-        }
-      } catch (err) {
-        console.warn("Cache update failed for read receipt, refetching:", err);
-        refetch?.();
+        });
       }
-    },
-  });
+    };
+    onChatRead(handleMessageRead);
 
+    return () => {
+      offChatHistory();
+      offChatNew(handleNewMessage);
+      leaveChat(chatId);
+      cleanupChatListeners();
+      console.log("🔌 Desconectado del chat", chatId);
+    };
+  }, [chatId]);
 
   return {
-    list: data?.messages ?? [],
-    loading,
-    error,
-    refetch,
+    list: messages,
   };
 }
 
@@ -127,7 +125,7 @@ export function useSendMessage(currentUserId?: string) {
         message: input.message,
         status: "sended",
         read: false,
-        timestamp: new Date().toISOString(),        
+        timestamp: new Date().toISOString(),
       },
     }),
     update: (cache, { data }) => {
@@ -139,25 +137,28 @@ export function useSendMessage(currentUserId?: string) {
         variables: { chatId: next.chatId as string },
       };
 
-      // 1) leer cache actual
       const prev = cache.readQuery<{ messages: Message[] }>(queryOptions);
       const prevList = prev?.messages ?? [];
 
-      // 2) quitar optimistas y evitar duplicados
       const noTemps = prevList.filter((m) => !m.id.startsWith("tmp-"));
       const exists = noTemps.some((m) => m.id === next.id);
       const merged = exists ? noTemps : [...noTemps, next];
       merged.sort((a, b) => +new Date(a.timestamp) - +new Date(b.timestamp));
-      // 3) escribir nuevo estado
       cache.writeQuery({
         ...queryOptions,
         data: { messages: merged },
       });
     },
   });
-  return {
-    send: ({ chatId, message, senderId }: InputMessage) =>
-      mutate({ variables: { input: { chatId, message, senderId } } }),
-    loading,
+  const send = ({ chatId, message, senderId }: InputMessage) => {
+    chatNew({ chatId, message, senderId });
+
+    mutate({ variables: { input: { chatId, message, senderId } } });
   };
+  return {
+    send,
+    loading
+  }
 }
+
+

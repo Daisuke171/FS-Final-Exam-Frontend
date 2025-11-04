@@ -43,6 +43,11 @@ export type FriendPayload = {
 	updatedAt: string;
 };
 
+export type RequestFriendByUsernameInput = {
+	requesterId: string;
+	username: string;
+};
+
 // --------------- Clases para Inputs de Mutations ---------------
 
 export class CreateFriendInviteInput {
@@ -79,3 +84,4 @@ export class CreateFriendInviteInputByUsername {
         };
     }
 }
+

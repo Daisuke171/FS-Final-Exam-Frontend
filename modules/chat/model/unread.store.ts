@@ -1,4 +1,29 @@
 import { create } from "zustand";
+
+type State = {
+  counts: Record<string, number>;
+  activeChatId: string | null;
+  inc: (chatId: string) => void;
+  clear: (chatId: string) => void;
+  setActiveChat: (chatId: string | null) => void;
+};
+
+export const useUnreadStore = create<State>((set) => ({
+  counts: {},
+  activeChatId: null,
+  inc: (chatId) =>
+    set((s) => ({ counts: { ...s.counts, [chatId]: (s.counts[chatId] ?? 0) + 1 } })),
+  clear: (chatId) =>
+    set((s) => {
+      if (!(chatId in s.counts)) return s;
+      const next = { ...s.counts };
+      delete next[chatId];
+      return { counts: next };
+    }),
+  setActiveChat: (chatId) => set({ activeChatId: chatId }),
+}));
+
+/* import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type UnreadState = {
@@ -37,3 +62,4 @@ export const useUnreadStore = create<UnreadState>()(
     }
   )
 );
+ */

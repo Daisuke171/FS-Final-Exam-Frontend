@@ -9,7 +9,6 @@ import { readMessage } from "../services/chat.socket";
 import { Icon } from "@iconify/react";
 import type { Msg, ChatWindowProps } from "../types/chatUI.types";
 import { InputMessage } from "../types/message.types";
-import { getSocket } from "@shared/lib/socket";
 import { useUnreadStore } from "../model/unread.store";
 import { motion } from "motion/react";
 
@@ -20,55 +19,71 @@ export default function ChatWindow({
   className = "",
   currentUserId,
 }: ChatWindowProps) {
+
   const chatId = friend?.chatId ?? "";
-
-  const { list, loading, refetch } = useGetMessages(chatId);
-
+  console.log(chatId);
+  
+  const { list } = useGetMessages(chatId, currentUserId); // ahora viene del socket
+  
   const { send } = useSendMessage(currentUserId);
+
   const [isTyping, setIsTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
-  // Get unread store methods
+  // Estado de no leídos
   const clearUnread = useUnreadStore((s) => s.clear);
-  const incrementUnread = useUnreadStore((s) => s.increment);
+  const alreadyReadRef = useRef<Set<string>>(new Set());
 
+  /* Transformar la lista en formato visual (me / friend) */
   const messages: Msg[] = useMemo(
-    () =>
-      list
+    () => {
+      if (!Array.isArray(list)) {
+        return [];
+      }
+
+      return list
         .slice()
         .sort(
           (a, b) =>
             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         )
-        .map((m) => ({
-          id: m.id,
-          from:
-            (currentUserId && m.senderId === currentUserId) ||
-            (!currentUserId && m.senderId !== (friend?.id ?? "")) // fallback: si no hay currentUserId, asumimos que el que no es el friend soy "yo"
-              ? "me"
-              : "friend",
-          text: m.message,
-          at: new Date(m.timestamp).getTime(),
-          read: m.read,
-        })),
-    [list, currentUserId, friend?.id]
+        .map((m) => {
+          const isMe = currentUserId && m.senderId === currentUserId;
+          return {
+            id: m.id,
+            from: isMe ? "me" : "friend",
+            text: m.message,
+            at: new Date(m.timestamp).getTime(),
+            read: m.read,
+          };
+        });
+    },
+    [list, currentUserId]
   );
 
-  // marcar como leídos al montar / cuando llega algo nuevo
+  /* Marcar mensajes como leídos cuando se visualiza */
   useEffect(() => {
-    if (!friend?.chatId) return;
-    // marca como leído todos los mensajes del otro
-    const messagesNews = messages.filter((m) => m.from === "friend" && !m.read);
+    if (!visible || !friend?.chatId) return;
 
-    if (messagesNews.length > 0) {
-      messagesNews.map((m) => readMessage(friend.chatId, m.id));
+    const unreadNow = messages.filter((m) => m.from === "friend" && !m.read);
+    if (unreadNow.length === 0) return;
+
+    // Sólo enviar read por los que no enviamos antes
+    for (const msg of unreadNow) {
+      if (!alreadyReadRef.current.has(msg.id)) {
+        readMessage(friend.chatId, msg.id);
+        alreadyReadRef.current.add(msg.id);
+      }
     }
-  }, [friend?.chatId, messages]);
+    clearUnread(friend.chatId);
+  }, [visible, friend?.chatId, messages, clearUnread]);
 
-  // Agrupar por “bloques” diarios dia : hoy - ayer - fechas anteriores
+  /* Agrupar mensajes por día */
   const groups = useMemo(() => {
-    const out: Array<{ timeLabel: string; msgs: Msg[] }> = [];
     const map = new Map<string, Msg[]>();
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
 
     for (const m of messages) {
       const d = new Date(m.at);
@@ -76,10 +91,6 @@ export default function ChatWindow({
       if (!map.has(dateKey)) map.set(dateKey, []);
       map.get(dateKey)!.push(m);
     }
-
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
 
     const labelFor = (d: Date) => {
       const diffDays = Math.floor(
@@ -95,81 +106,33 @@ export default function ChatWindow({
       });
     };
 
-    // Ordenar las fechas cronológicamente
-    const sortedDates = [...map.keys()]
-      .map((k) => new Date(k))
-      .sort((a, b) => a.getTime() - b.getTime());
-
-    for (const date of sortedDates) {
-      const msgs = map.get(date.toDateString())!;
-      out.push({
-        timeLabel: labelFor(date),
+    return [...map.entries()]
+      .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
+      .map(([dateKey, msgs]) => ({
+        timeLabel: labelFor(new Date(dateKey)),
         msgs: msgs.sort((a, b) => a.at - b.at),
-      });
-    }
-
-    return out;
+      }));
   }, [messages]);
 
-  // Auto-scroll al final
+  /* Auto-scroll al final */
   useEffect(() => {
+    if (!visible) return;
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages.length, visible]);
 
-  // WebSocket real-time integration
-  useEffect(() => {
-    if (!chatId || !visible) return;
-
-    const socket = getSocket("/chat");
-    if (!socket) return;
-
-    socket.emit("chat:join", { chatId });
-
-    if (currentUserId) {
-      socket.emit("chat:set_user", { id: currentUserId });
-    }
-
-    clearUnread(chatId);
-
-    const handleNewMessage = (data: any) => {
-      refetch?.();
-
-      if (data.senderId !== currentUserId && !visible) {
-        incrementUnread(chatId);
-      }
-    };
-
-    // Listen for message read updates
-    const handleMessageRead = (data: any) => {
-      incrementUnread(chatId);
-      refetch?.();
-    };
-
-    socket.on("chat:new", handleNewMessage);
-    socket.on("chat:read", handleMessageRead);
-
-    // Cleanup on unmount or when chatId changes
-    return () => {
-      console.log("🔌 Leaving chat room:", chatId);
-      socket.emit("chat:leave", { chatId });
-      socket.off("chat:new", handleNewMessage);
-      socket.off("chat:read", handleMessageRead);
-    };
-  }, [chatId, visible, currentUserId, clearUnread, incrementUnread, refetch]);
-
-  if (!visible || !friend) return null;
-
+  /* Enviar mensaje */
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
     const msg = new InputMessage(friend.chatId, text, currentUserId);
     void send(msg);
   };
 
+  if (!visible || !friend) return null;
   return (
     <motion.section
-      initial={{ opacity: 0, scale: 0.5 }}
+      initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.5 }}
+      exit={{ opacity: 0, scale: 0.9 }}
       className={cn(
         "flex flex-col rounded-2xl border border-cyan-300/30",
         "bg-gradient-to-b from-white/5 to-white/0 shadow-[0_0_20px_rgba(76,201,240,.15)]",
@@ -181,42 +144,31 @@ export default function ChatWindow({
       <div className="flex items-center justify-between px-3 py-2 bg-cyan-400/15 border-b border-cyan-300/30 shrink-0">
         <div className="flex items-center gap-3">
           <Avatar
-            src={friend.skin ?? "/avatars/derpy.svg"}
+            src={friend.skin ?? "/default-avatar.png"}
             alt={friend.nickname}
             size={16}
           />
           <div className="font-semibold">{friend.nickname}</div>
         </div>
-        <div className="flex items-center gap-5">
-          <IconBtn
-            icon="mdi:phone"
-            sizeIcon={16}
-            className="p-2 hidden"
-          />
-          <IconBtn
-            icon="mdi:close"
-            onClick={onClose}
-            className="p-2 rounded-full cursor-pointer"
-            sizeIcon={20}
-          />
-        </div>
+        <IconBtn
+          icon="mdi:close"
+          onClick={onClose}
+          className="p-2 rounded-full cursor-pointer"
+          sizeIcon={20}
+        />
       </div>
 
       {/* MENSAJES */}
       <div
         className={cn(
-          "flex-1 overflow-y-auto p-4 chat-scroll chat-inner-shadow bg-[var(--bg-container,transparent)]",
+          "flex-1 overflow-y-auto p-4 chat-scroll chat-inner-shadow",
           "max-h-[calc(70dvh-100px)] md:max-h-[calc(65dvh-100px)] lg:max-h-[calc(60dvh-100px)]"
         )}
       >
-        {loading && (
-          <div className="text-center text-sm opacity-70">Cargando…</div>
-        )}
-
         {groups.map((g, gi) => (
           <div key={gi}>
             {g.timeLabel && (
-              <div className="text-xs bg-gray-200 px-4 py-1 rounded-full text-gray-500 w-fit mx-auto">
+              <div className="text-xs bg-gray-200 px-4 py-1 rounded-full text-gray-500 w-fit mx-auto mb-2">
                 {g.timeLabel}
               </div>
             )}
@@ -224,19 +176,18 @@ export default function ChatWindow({
               const isMe = m.from === "me";
               return (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
                   key={m.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.15 }}
                   className={cn(
-                    "box-border px-4 py-2 m-4 w-fit max-w-[66%] min-h-9 rounded-2xl shadow-lg/5",
+                    "box-border px-4 py-2 m-3 w-fit max-w-[66%] min-h-9 rounded-2xl shadow-lg/5",
                     isMe
-                      ? "ml-auto mr-4 text-white rounded-br-none bg-[var(--violet,#7c3aed)]/50"
+                      ? "ml-auto mr-4 text-white rounded-br-none bg-violet-500/60"
                       : "ml-4 mr-auto bg-cyan-500/50 rounded-bl-none text-slate-100"
                   )}
                 >
-                  <div className="whitespace-pre-wrap break-words">
-                    {m.text}
-                  </div>
+                  <div className="whitespace-pre-wrap break-words">{m.text}</div>
                   <div className="flex items-center justify-end gap-1 mt-1 text-[10px]">
                     <span
                       className={cn(isMe ? "text-white/80" : "text-slate-300")}
@@ -246,8 +197,6 @@ export default function ChatWindow({
                         minute: "2-digit",
                       })}
                     </span>
-
-                    {/* solo mostrar tilde si es un mensaje mío */}
                     {isMe && (
                       <Icon
                         icon="mdi:check-all"

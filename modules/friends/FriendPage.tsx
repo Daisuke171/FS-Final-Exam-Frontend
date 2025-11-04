@@ -2,9 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { Session } from "next-auth";
-
 import FabMenu from "@shared/ui/FabMenu";
-import Loader from "@shared/ui/Loader";
 import { cn } from "@shared/lib/utils";
 import { FriendList } from "@modules/friends";
 import { ChatWindow } from "@modules/chat";
@@ -13,7 +11,8 @@ import { useFriends } from "@modules/friends/model/useFriends";
 import { useFriendsWS } from "@modules/friends/model/useFriendsWS";
 import { getFriendsSocket, authFriendsSocket } from "./services/friend.socket";
 import GlobalLoader from "@/components/ui/loaders/GlobalLoader";
-import { AnimatePresence } from "motion/react";
+import FormTitle from "@/components/register/FormTitle";
+import CallLauncher from "@modules/call/ui/CallLauncher";
 
 interface FriendsPageProps {
   session: Session | null;
@@ -56,12 +55,21 @@ export default function FriendsPage({ session, userId }: FriendsPageProps) {
   }
 
   return (
-    <main className="w-[90%] max-w-300 mx-auto px-4 pb-20 mt-16 md:pb-6 pt-8">
-      <div className="pb-4 flex items-center justify-center">
-        <h2 className="text-2xl font-light">AMIGOS</h2>
-      </div>
+    <main className="w-[90%] max-w-300 mx-auto px-4 pb-20 mt-16 md:pb-6 pt-8 relative">
+      <section className="pb-4 flex items-center justify-center">
+        <div className="absolute origin-top-right right-10 top-0 w-fit">
+          <CallLauncher
+            currentUser={{
+              id: userId ?? "",
+              nickname: session?.user?.name ?? "yo",
+              skin: session?.user?.image ?? "",
+            }}
+          />
+        </div>
+        <FormTitle title="AMIGOS" />
+      </section>
 
-      <div className="grid gap-4 md:grid-cols-[280px_1fr_auto] px-4">
+      <section className="grid gap-4 md:grid-cols-[280px_1fr_auto] px-4">
         <aside
           className={cn(
             selected
@@ -87,11 +95,11 @@ export default function FriendsPage({ session, userId }: FriendsPageProps) {
             friend={
               selected
                 ? {
-                    id: selected.peer.id,
-                    nickname: selected.peer.nickname,
-                    skin: selected.peer.activeSkin?.img,
-                    chatId: selected.chatId,
-                  }
+                  id: selected.peer.id,
+                  nickname: selected.peer.nickname,
+                  skin: selected.peer.activeSkin?.img,
+                  chatId: selected.chatId,
+                }
                 : undefined
             }
             visible={!!selected}
@@ -114,7 +122,7 @@ export default function FriendsPage({ session, userId }: FriendsPageProps) {
         <aside className="block">
           <FabMenu currentUserId={userId} />
         </aside>
-      </div>
+      </section>
     </main>
   );
 }
