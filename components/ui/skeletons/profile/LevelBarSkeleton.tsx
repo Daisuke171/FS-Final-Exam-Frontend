@@ -1,6 +1,6 @@
 export default function LevelBarSkeleton() {
   return (
-    <article className="w-full flex-grow max-w-105 px-3 place-self-center xl:max-w-90 flex flex-col justify-center gap-2 md:border-l border-dark-gray h-23 md:pl-8 xl:pl-5">
+    <article className="w-full flex-grow px-3 place-self-center max-w-105 flex flex-col justify-center gap-2 md:border-l border-dark-gray h-23 md:pl-8 xl:pl-5">
       <div className="flex justify-between items-center">
         <div className="h-5 w-17 bg-white/10 animate-pulse rounded-full"></div>
         <div className="h-5 w-20 bg-white/10 animate-pulse rounded-full"></div>

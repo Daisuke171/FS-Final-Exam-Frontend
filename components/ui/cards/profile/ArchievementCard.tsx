@@ -1,10 +1,16 @@
 import { Icon } from "@iconify/react";
 import { useState } from "react";
+import { Achievement } from "@/types/achievements.types";
 
-export type ArchievementCardProps = {
-  title: string;
-  desc: string;
-  type: "common" | "uncommon" | "rare" | "epic" | "legendary";
+const rarityMap: Record<
+  string,
+  "common" | "uncommon" | "rare" | "epic" | "legendary"
+> = {
+  COMMON: "common",
+  UNCOMMON: "uncommon",
+  RARE: "rare",
+  EPIC: "epic",
+  LEGENDARY: "legendary",
 };
 
 const background = {
@@ -46,13 +52,15 @@ const label = {
   epic: "Epic",
   legendary: "Legendary",
 };
+interface AchievementCardProps {
+  achievement: Achievement;
+}
 
 export default function ArchievementCard({
-  title,
-  desc,
-  type,
-}: ArchievementCardProps) {
+  achievement,
+}: AchievementCardProps) {
   const [flipped, setFlipped] = useState(false);
+  const type = rarityMap[achievement.rarity];
   const stars = starsMap[type];
   return (
     <div
@@ -85,8 +93,8 @@ export default function ArchievementCard({
             <p className="text-xs md:text-sm font-medium">{label[type]}</p>
           </div>
         </div>
-        <h3 className="text-font font-medium text-center text-xs md:text-sm">
-          {title}
+        <h3 className="text-font/80 font-medium text-center text-xs md:text-sm">
+          {achievement.title}
         </h3>
         <Icon
           icon="tabler:arrow-back"
@@ -104,7 +112,9 @@ export default function ArchievementCard({
             icon="material-symbols:info-outline"
             width="30"
           />
-          <p className="text-center font-medium text-xs md:text-sm">{desc}</p>
+          <p className="text-center font-medium text-xs md:text-sm">
+            {achievement.description}
+          </p>
         </div>
       </div>
     </div>
