@@ -2,7 +2,7 @@
 
 import { Icon } from "@iconify/react";
 import Image from "next/image";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react"
 
 export function ToastCall({
     show,

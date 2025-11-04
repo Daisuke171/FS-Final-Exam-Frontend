@@ -5,55 +5,65 @@ import { getSocket } from "@shared/lib/socket";
 import type { Message } from "@/modules/chat";
 
 export function useHandleEvents(chatId: string, currentUserId: string) {
-  const [ unread, setUnread] = useState(0);
-  const [ msgsUnreads, setMsgsUnreads ] = useState<Message[]>([]);
-  const { list } = useGetMessages(chatId);
+  const [unread, setUnread] = useState(0);
+  const [unreadIds, setUnreadIds] = useState<string[]>([]);
+
+
+  const { list } = useGetMessages(chatId, currentUserId);
 
   useEffect(() => {
     if (!chatId) return;
-
-    // Función para contar mensajes no leídos
-    const countUnread = () => {
-      const messagesNews = list.filter((m) => m.senderId !== currentUserId && !m.read);
-      setUnread(messagesNews.length);
-      setMsgsUnreads(messagesNews);
-    };
-
-    // Contar inicialmente
-    countUnread();
-
-    // Escuchar eventos de socket
-    const socket = getSocket("/chat");
-
-    const handleNewMessage = (data: any) => {
-      console.log("💌 Nuevo mensaje en FriendCard:", data);
-      if (data.chatId === chatId && data.senderId !== currentUserId) {
-        setUnread(prev => prev + 1);
-      }
-    };
-
-    const handleReadAll = (data: any) => {
-      console.log("👀 Mensajes leídos en FriendCard:", data);        
-      if (data.chatId === chatId) {
-        setUnread(0);
-        setMsgsUnreads([]);
-      }
-    };
-
-    socket.on("chat:new", handleNewMessage);
-    socket.on("chat:readAll", handleReadAll);
-    socket.on("local:message:new", handleNewMessage);
-
-    return () => {
-      socket.off("chat:new", handleNewMessage);
-      socket.off("chat:readAll", handleReadAll);
-      socket.off("local:message:new", handleNewMessage);
-    };
+    const incoming = (list || []).filter(
+      (m: Message) => m.chatId === chatId && m.senderId !== currentUserId && !m.read
+    );
+    setUnread(incoming.length);
+    setUnreadIds(incoming.map((m) => m.id));
   }, [chatId, currentUserId, list]);
 
-  return ({
-    unread,
-    list, 
-    msgsUnreads
-  });
+
+  useEffect(() => {
+    if (!chatId) return;
+    const socket = getSocket("/chat");
+
+    const onNew = (msg: Message) => {
+      if (msg.chatId !== chatId) return;
+      if (msg.senderId === currentUserId) return;
+      setUnreadIds((prev) => {
+        if (prev.includes(msg.id)) return prev;
+        setUnread((u) => u + 1);
+        return [...prev, msg.id];
+      });
+    };
+
+    const onRead = (data: any) => {
+      if (data?.chatId !== chatId) return;
+      setUnreadIds((prev) => {
+        if (!prev.includes(data.messageId)) return prev;
+        const next = prev.filter((id) => id !== data.messageId);
+        setUnread(next.length);
+        return next;
+      });
+    };
+
+    const onReadAll = (data: any) => {
+      if (data?.chatId !== chatId) return;
+      if (data?.userId !== currentUserId) return;
+      setUnread(0);
+      setUnreadIds([]);
+    };
+
+    socket.on("chat:new", onNew);
+    socket.on("local:message:new", onNew);
+    socket.on("chat:read", onRead);
+    socket.on("chat:readAll", onReadAll);
+
+    return () => {
+      socket.off("chat:new", onNew);
+      socket.off("local:message:new", onNew);
+      socket.off("chat:read", onRead);
+      socket.off("chat:readAll", onReadAll);
+    };
+  }, [chatId, currentUserId]);
+
+  return { unread, list, msgsUnreads: unreadIds };
 }

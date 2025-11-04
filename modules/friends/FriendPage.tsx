@@ -12,8 +12,6 @@ import { useFriendsWS } from "@modules/friends/model/useFriendsWS";
 import { getFriendsSocket, authFriendsSocket } from "./services/friend.socket";
 import GlobalLoader from "@/components/ui/loaders/GlobalLoader";
 import FormTitle from "@/components/register/FormTitle";
-import IconBtn from "@/shared/ui/IconBtn";
-
 import CallLauncher from "@modules/call/ui/CallLauncher";
 
 interface FriendsPageProps {

@@ -48,7 +48,6 @@ export function useGetMessages(chatId?: string, currentUserId?: string) {
 
     //  Escucha el historial inicial
     onChatHistory(chatId, (receivedMessages) => {
-      console.log("📜 Historial recibido:", receivedMessages);
       if (Array.isArray(receivedMessages) && receivedMessages.length > 0) {
         // Validar estructura de mensajes
         const validMessages = receivedMessages.filter(msg => 
@@ -59,7 +58,6 @@ export function useGetMessages(chatId?: string, currentUserId?: string) {
           'senderId' in msg && 
           'timestamp' in msg
         );
-        console.log("✅ Mensajes válidos encontrados:", validMessages.length);
         setMessages(validMessages);
       } else {
         console.warn("⚠️ No hay mensajes en el historial o formato inválido");
@@ -81,11 +79,7 @@ export function useGetMessages(chatId?: string, currentUserId?: string) {
     onChatNew(handleNewMessage);
 
     // Escucha lecturas de mensajes
-    const handleMessageRead = (data: any) => {
-      console.log("👀 Evento de lectura recibido:", {
-        eventData: data,
-        currentChatId: chatId
-      });
+    const handleMessageRead = (data: any) => {     
       
       if (data.chatId === chatId) {
         setMessages(prev => {
@@ -93,11 +87,7 @@ export function useGetMessages(chatId?: string, currentUserId?: string) {
             // Solo actualizamos los mensajes que fueron enviados por el usuario actual
             // cuando el otro usuario los marca como leídos
             if (msg.senderId === currentUserId && data.userId !== currentUserId) {
-              console.log("✅ Marcando mensaje como leído:", {
-                messageId: msg.id,
-                sender: msg.senderId,
-                reader: data.userId
-              });
+              
               return { ...msg, read: true };
             }
             return msg;

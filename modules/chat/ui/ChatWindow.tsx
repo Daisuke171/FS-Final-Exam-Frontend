@@ -32,12 +32,12 @@ export default function ChatWindow({
 
   // Estado de no leídos
   const clearUnread = useUnreadStore((s) => s.clear);
+  const alreadyReadRef = useRef<Set<string>>(new Set());
 
   /* Transformar la lista en formato visual (me / friend) */
   const messages: Msg[] = useMemo(
     () => {
       if (!Array.isArray(list)) {
-        console.error("❌ La lista de mensajes no es un array:", list);
         return [];
       }
 
@@ -63,27 +63,20 @@ export default function ChatWindow({
 
   /* Marcar mensajes como leídos cuando se visualiza */
   useEffect(() => {
-    if (!friend?.chatId || !visible) return;
+    if (!visible || !friend?.chatId) return;
 
-    // Marcar como leído cuando el chat está visible
-    const markAsRead = () => {
-      const unread = messages.filter((m) => m.from === "friend" && !m.read);
-      if (unread.length > 0) {
-        console.log("📬 Marcando mensajes como leídos...");
-        unread.map((msg) => {
-        readMessage(friend.chatId, msg.id );
-        
-        })
-        clearUnread(friend.chatId);
-      }  
-    };
+    const unreadNow = messages.filter((m) => m.from === "friend" && !m.read);
+    if (unreadNow.length === 0) return;
 
-    // Marcar inmediatamente y configurar un intervalo
-    markAsRead();
-    const interval = setInterval(markAsRead, 1000);
-
-    return () => clearInterval(interval);
-  }, [friend?.chatId, messages, currentUserId, clearUnread, visible]);
+    // Sólo enviar read por los que no enviamos antes
+    for (const msg of unreadNow) {
+      if (!alreadyReadRef.current.has(msg.id)) {
+        readMessage(friend.chatId, msg.id);
+        alreadyReadRef.current.add(msg.id);
+      }
+    }
+    clearUnread(friend.chatId);
+  }, [visible, friend?.chatId, messages, clearUnread]);
 
   /* Agrupar mensajes por día */
   const groups = useMemo(() => {
@@ -135,7 +128,6 @@ export default function ChatWindow({
   };
 
   if (!visible || !friend) return null;
-visible ?? clearUnread(friend.chatId)
   return (
     <motion.section
       initial={{ opacity: 0, scale: 0.9 }}

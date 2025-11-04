@@ -1,24 +1,24 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 const TARGET_SAMPLE_RATE = 16000;
 const CHANNELS = 1;
 const CHUNK_MS = 20;
-const SAMPLES_PER_CHUNK = (TARGET_SAMPLE_RATE * CHUNK_MS) / 1000;
+const SAMPLES_PER_CHUNK = (TARGET_SAMPLE_RATE * CHUNK_MS) / 1000; // 320 @16k
 
 export function useVoiceSocket(url = 'http://localhost:3010/call') {
   const socketRef = useRef<Socket | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
-  const processorRef = useRef<ScriptProcessorNode | null>(null);
+  const micNodeRef = useRef<AudioWorkletNode | null>(null); 
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
 
   const [connected, setConnected] = useState(false);
   const [joinedRoom, setJoinedRoom] = useState<string | null>(null);
   const [peers, setPeers] = useState<string[]>([]);
-  const [muted, _setMuted] = useState(true);             //  entrar muteado
+  const [muted, _setMuted] = useState(true);        
   const mutedRef = useRef<boolean>(true);
 
   const setMuted = useCallback((m: boolean) => {
@@ -26,7 +26,6 @@ export function useVoiceSocket(url = 'http://localhost:3010/call') {
     _setMuted(m);
   }, []);
 
-  // Jitter buffer simple
   const playbackQueueRef = useRef<Int16Array[]>([]);
   const playbackTimerRef = useRef<number | null>(null);
 
@@ -62,6 +61,7 @@ export function useVoiceSocket(url = 'http://localhost:3010/call') {
     }
   };
 
+  // ---- Utils ----
   const downsampleFloat32ToInt16 = (
     buffer: Float32Array,
     inRate: number,
@@ -90,6 +90,7 @@ export function useVoiceSocket(url = 'http://localhost:3010/call') {
     return out;
   };
 
+  // ---- Socket ----
   const connect = useCallback(() => {
     if (socketRef.current) return;
     const socket = io(url, { withCredentials: true, transports: ['websocket'] });
@@ -105,17 +106,21 @@ export function useVoiceSocket(url = 'http://localhost:3010/call') {
 
     socket.on('joined', ({ room, user }) => {
       setJoinedRoom(room);
-      console.log("🔔 joined", { room, user });
+      console.log('🔔 joined', { room, user });
     });
 
-    socket.on('peer:joined', ({ user }) => setPeers(p => [...new Set([...p, user])]));
-    socket.on('peer:left', ({ user }) => setPeers(p => p.filter(u => u !== user)));
+    socket.on('peer:joined', ({ user }) =>
+      setPeers((p) => [...new Set([...p, user])])
+    );
+    socket.on('peer:left', ({ user }) =>
+      setPeers((p) => p.filter((u) => u !== user))
+    );
 
     socket.on('peer:mute', ({ user, muted }) => {
       console.log('peer mute status', user, muted);
     });
 
-    // Audio entrante (PCM Int16)
+    // PCM entrante
     socket.on('audio', (arrbuf: ArrayBuffer) => {
       const int16 = new Int16Array(arrbuf);
       playbackQueueRef.current.push(int16);
@@ -136,16 +141,15 @@ export function useVoiceSocket(url = 'http://localhost:3010/call') {
     socketRef.current?.emit('join', { room, user });
   }, []);
 
+  // ---- Captura con AudioWorklet (Chrome-friendly) ----
   async function startCapture({
     echoCancellation = true,
     noiseSuppression = true,
     autoGainControl = true,
   } = {}) {
-    if (processorRef.current) {
-      return;
-    }
+    if (micStreamRef.current) return; // ya capturando
 
-    const constraints: MediaStreamConstraints = {
+    const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         channelCount: { ideal: 1 },
         sampleRate: { ideal: 48000 },
@@ -154,33 +158,50 @@ export function useVoiceSocket(url = 'http://localhost:3010/call') {
         autoGainControl,
       } as any,
       video: false,
-    };
-
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    });
     micStreamRef.current = stream;
 
-    const audioCtx =
+    const ac =
       audioCtxRef.current ||
       new (window.AudioContext || (window as any).webkitAudioContext)();
-    audioCtxRef.current = audioCtx;
-    const workRate = audioCtx.sampleRate;
+    audioCtxRef.current = ac;
 
-    const source = audioCtx.createMediaStreamSource(stream);
+    if (ac.state === 'suspended') {
+      try { await ac.resume(); } catch (e) {
+        console.warn('AudioContext resume error:', e);
+      }
+    }
+
+    // Cargar módulo del worklet
+    await ac.audioWorklet.addModule('/worklets/mic-processor.js');
+
+    const source = ac.createMediaStreamSource(stream);
     sourceRef.current = source;
 
-    const BUFFER_SIZE = 1024;
-    const processor = audioCtx.createScriptProcessor(BUFFER_SIZE, 1, 1);
-    processorRef.current = processor;
+    const micNode = new AudioWorkletNode(ac, 'mic-processor', {
+      numberOfInputs: 1,
+      numberOfOutputs: 0,
+      channelCount: 1,
+    });
+    micNodeRef.current = micNode;
 
-    const samplesNeeded = Math.round(SAMPLES_PER_CHUNK * (workRate / TARGET_SAMPLE_RATE));
+    source.connect(micNode);
+    
+    const workRate = ac.sampleRate; // normalmente 48000
+    const samplesNeeded = Math.round(
+      SAMPLES_PER_CHUNK * (workRate / TARGET_SAMPLE_RATE)
+    );
     let acc = new Float32Array(0);
 
-    processor.onaudioprocess = e => {
-      if (mutedRef.current) return;  // ⬅️ chequea el mute “en vivo”
-      const input = e.inputBuffer.getChannelData(0);
-      const tmp = new Float32Array(acc.length + input.length);
+    micNode.port.onmessage = (ev: MessageEvent) => {
+      if (ev.data?.type !== 'frame') return;
+      if (mutedRef.current) return; // respeta mute
+
+      const frameF32 = new Float32Array(ev.data.data);
+      // acumular y downsamplear a 16k
+      const tmp = new Float32Array(acc.length + frameF32.length);
       tmp.set(acc, 0);
-      tmp.set(input, acc.length);
+      tmp.set(frameF32, acc.length);
       acc = tmp;
 
       while (acc.length >= samplesNeeded) {
@@ -190,40 +211,36 @@ export function useVoiceSocket(url = 'http://localhost:3010/call') {
         socketRef.current?.emit('audio', int16.buffer);
       }
     };
-
-    source.connect(processor);
-    // Si querés eco local de monitoreo:
-    // processor.connect(audioCtx.destination);
   }
 
   function stopCapture() {
-    if (processorRef.current) {
-      processorRef.current.disconnect();
-      processorRef.current.onaudioprocess = null as any;
-      processorRef.current = null;
+    if (micNodeRef.current) {
+      try {
+        micNodeRef.current.port?.close?.();
+        micNodeRef.current.disconnect();
+      } catch {}
+      micNodeRef.current = null;
     }
     if (sourceRef.current) {
-      sourceRef.current.disconnect();
+      try { sourceRef.current.disconnect(); } catch {}
       sourceRef.current = null;
     }
     if (micStreamRef.current) {
-      micStreamRef.current.getTracks().forEach(t => t.stop());
+      micStreamRef.current.getTracks().forEach((t) => t.stop());
       micStreamRef.current = null;
     }
   }
 
   return {
-    // estado
     connected,
     joinedRoom,
     peers,
     muted,
-    // acciones
     connect,
     disconnect,
     join,
-    startCapture, 
+    startCapture,   // Toast: al activar mic
     stopCapture,
-    setMuted,      
+    setMuted,       // Toast: para toggle mute
   };
-} 
+}

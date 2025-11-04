@@ -5,7 +5,6 @@ import { Icon } from "@iconify/react";
 import { ModalCreateRoom } from "./ModalCreateRoom";
 import { ToastCall } from "./ToastCall";
 import { useVoiceSocket } from "@modules/call/hooks/useVoiceSocket";
-
 export interface CallerUser {
   id: string;
   nickname: string;
@@ -14,7 +13,7 @@ export interface CallerUser {
 
 export default function CallLauncher({
   currentUser,
-  wsUrl = process.env.NEXT_PUBLIC_API_WS ?? "http://localhost:3010/call",
+  wsUrl = process.env.NEXT_PUBLIC_URL_CALL ?? "http://localhost:3010/call",
 }: {
   currentUser: CallerUser;
   wsUrl?: string;
@@ -71,7 +70,7 @@ export default function CallLauncher({
         onJoin={onJoin}
       />
 
-      {/* Toast flotante de la llamada */}
+      {/* Toast flotante de la llamada */}           
       <ToastCall
         show={!!joinedRoom}
         room={joinedRoom ?? ""}

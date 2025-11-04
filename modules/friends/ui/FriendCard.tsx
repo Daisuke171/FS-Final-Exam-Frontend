@@ -4,6 +4,7 @@ import { Badge } from "@/shared/ui/Badge";
 import type { FriendPeer } from "../model/types";
 import { usePresenceStore } from "../model/presence.store";
 import {useHandleEvents} from "../hooks/useHandleEvents";
+import { useUnreadStore } from "@modules/chat/model/unread.store";
 
 interface FriendCardProps {
 	friend: FriendPeer;
@@ -12,9 +13,9 @@ interface FriendCardProps {
 
 export default function FriendCard({ friend, currentUserId }: FriendCardProps) {
 	const chatId = friend.chatId;
-	 const { unread } = useHandleEvents(chatId, currentUserId);
+	// const { unread } = useHandleEvents(chatId, currentUserId);
 	const isOnline = usePresenceStore((s) => s.isOnline(friend.peer.id));
-
+	const unread = useUnreadStore((s) => s.counts[chatId] ?? 0);
 
 	return (
 		<div

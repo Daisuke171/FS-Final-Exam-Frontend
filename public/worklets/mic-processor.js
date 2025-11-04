@@ -1,8 +1,8 @@
 class MicProcessor extends AudioWorkletProcessor {
-  constructor(options) {
+  constructor() {
     super();
-    this.sampleRate = sampleRate;       // 48000 típicamente
-    this.frameMs = 20;                  // 20 ms
+    this.sampleRate = sampleRate;       
+    this.frameMs = 10;                  // 10 ms
     this.frameSamples = (this.sampleRate * this.frameMs) / 1000; // 960
     this.acc = new Float32Array(0);
     this.port.start();

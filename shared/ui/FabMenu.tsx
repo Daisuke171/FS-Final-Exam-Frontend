@@ -6,6 +6,7 @@ import IconBtn from "./IconBtn";
 import { cn } from "@shared/lib/utils";
 import {
   CreateFriendInviteInput,
+  RequestFriendByUsernameInput,
 } from "@friends/model/types";
 import {
   useCreateLink,
@@ -27,14 +28,14 @@ type ModalKind = null | "add-user" | "share-link" | "friend-request";
 const ACTIONS: FabAction[] = [
   { id: "add-user", label: "Añadir usuario", rightEl: <span>＋</span> },
   { id: "share-link", label: "Compartir link", rightEl: <span>🔗</span> },
-  { id: "friend-request", label: "Solicitudes de amistad", rightEl: <span>💌</span>},
+  { id: "friend-request", label: "Solicitudes de amistad", rightEl: <span>💌</span> },
 ];
 
 interface FabMenuProps {
   currentUserId: string;
 }
 
-export default function FabMenu({currentUserId}: FabMenuProps) {
+export default function FabMenu({ currentUserId }: FabMenuProps) {
   const [open, setOpen] = useState(false);
   const [modal, setModal] = useState<ModalKind>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -55,11 +56,11 @@ export default function FabMenu({currentUserId}: FabMenuProps) {
   } = useCreateLink();
 
   const { list, loading } = useFriendsPendings(currentUserId);
-      const { accept } = useAcceptFriend();
+  const { accept } = useAcceptFriend();
   // const { list, loading: loadingPendings, refetch: refetchPendings } = useFriendsPendings(currentUserId);
 
   const { requestByUsername, loading: loadingInvite, error: errorInvite } = useRequestFriendByUsername();
-console.log(list);
+  console.log(list);
 
   // ===== Handlers =====
   const handleCreateLink = async () => {
@@ -88,8 +89,12 @@ console.log(list);
     e.preventDefault();
     setErrMsg(null);
     setSentOk(null);
-    const res = await requestByUsername(currentUserId, username);
-    const ok = res.data?.requestFriendByUsername; 
+    const input = {
+      requesterId: currentUserId,
+      username,
+    };
+    const res = await requestByUsername(input);
+    const ok = res.data?.requestFriendByUsername;
     if (ok) {
       setSentOk("Solicitud enviada correctamente ✅");
       setTimeout(() => {
@@ -128,6 +133,10 @@ console.log(list);
   useEffect(() => {
     if (open) firstItemRef.current?.focus();
   }, [open]);
+
+
+  const pendingCount = list.filter((f) => f.status === "PENDING").length;
+
 
   return (
     <>
@@ -177,16 +186,40 @@ console.log(list);
           ))}
         </div>
 
-        {/* Botón FAB */}
-        <IconBtn
-          icon={open ? "mdi:close" : "mdi:plus"}
-          label={open ? "Cerrar menú" : "Nuevo"}
-          onClick={() => setOpen((s) => !s)}
-          className={cn("w-12 h-12 rounded-full", "aria-expanded:ring-2")}
-          aria-haspopup="menu"
-          aria-expanded={open}
-          aria-controls="fab-menu"
-        />
+        {/* Botón FAB con badge */}
+        <div className="relative">
+          <IconBtn
+            icon={open ? "mdi:close" : "mdi:plus"}
+            label={open ? "Cerrar menú" : "Nuevo"}
+            onClick={() => setOpen((s) => !s)}
+            className={cn("w-12 h-12 rounded-full", "aria-expanded:ring-2")}
+            aria-haspopup="menu"
+            aria-expanded={open}
+            aria-controls="fab-menu"
+          />
+
+          {/* Badge de pendientes (solo cuando el menú está cerrado y hay pendientes) */}
+          {!open && pendingCount > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                // abrir directamente el modal de solicitudes
+                setModal("friend-request");
+                setOpen(false);
+              }}
+              title={`${pendingCount} solicitud${pendingCount > 1 ? "es" : ""} pendiente${pendingCount > 1 ? "s" : ""}`}
+              aria-label={`${pendingCount} solicitudes pendientes`}
+              className={cn(
+                "absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1",
+                "rounded-full bg-rose-500 text-white text-[10px] leading-[18px]",
+                "border border-white/20 shadow-[0_0_10px_rgba(244,63,94,.6)]",
+                "flex items-center justify-center select-none"
+              )}
+            >
+              {pendingCount > 9 ? "9+" : pendingCount}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ======= MODAL ADD-USER ======= */}
@@ -243,7 +276,7 @@ console.log(list);
             <button
               onClick={handleCreateLink}
               disabled={loadingLink}
-              className={cn(!link ? 
+              className={cn(!link ?
                 "px-3 py-1.5 rounded-md bg-cyan-600/60 hover:bg-cyan-600" : "hidden",
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
@@ -277,45 +310,45 @@ console.log(list);
         </Modal>
       )}
 
-       {/* ======= MODAL FRIEND-REQUEST ======= */}
-       {modal === "friend-request" && (
+      {/* ======= MODAL FRIEND-REQUEST ======= */}
+      {modal === "friend-request" && (
         <Modal onClose={() => setModal(null)} title="Solicitud de amistad" >
-           <div className="space-y-3">
+          <div className="space-y-3">
             {list.map((f) => {
-                const other = f.peer
-                return (
-                    <div
-                        key={f.id}
-                        className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-cyan-300/30"
-                    >
-                        <div className="font-semibold">{other.nickname}</div>
-                        {f.status === "PENDING" ? (
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => {accept(f.id, "ACCEPTED"); setModal(null)}}
-                                    className="px-3 py-1.5 rounded-md bg-cyan-600/80 hover:bg-cyan-500 text-white"
-                                >
-                                    Aceptar
-                                </button>
-                                <button
-                                    onClick={() => {accept(f.id, "DECLINED"); setModal(null)}}
-                                    className="px-3 py-1.5 rounded-md border border-white/10 hover:bg-white/5"
-                                >
-                                    Rechazar
-                                </button>
-                            </div>
-                        ) : f.status === "ACCEPTED" ? (
-                            <button
-                                onClick={() => {accept(f.id, "BLOCKED"), setModal(null)}}
-                                className="px-3 py-1.5 rounded-md bg-rose-600 hover:bg-rose-500 text-white"
-                            >
-                                Bloquear
-                            </button>
-                        ) : null}
+              const other = f.peer
+              return (
+                <div
+                  key={f.id}
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-cyan-300/30"
+                >
+                  <div className="font-semibold">{other.nickname}</div>
+                  {f.status === "PENDING" ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => { accept(f.id, "ACCEPTED"); setModal(null) }}
+                        className="px-3 py-1.5 rounded-md bg-cyan-600/80 hover:bg-cyan-500 text-white"
+                      >
+                        Aceptar
+                      </button>
+                      <button
+                        onClick={() => { accept(f.id, "DECLINED"); setModal(null) }}
+                        className="px-3 py-1.5 rounded-md border border-white/10 hover:bg-white/5"
+                      >
+                        Rechazar
+                      </button>
                     </div>
-                );
+                  ) : f.status === "ACCEPTED" ? (
+                    <button
+                      onClick={() => { accept(f.id, "BLOCKED"), setModal(null) }}
+                      className="px-3 py-1.5 rounded-md bg-rose-600 hover:bg-rose-500 text-white"
+                    >
+                      Bloquear
+                    </button>
+                  ) : null}
+                </div>
+              );
             })}
-        </div>
+          </div>
         </Modal>
       )}
     </>
