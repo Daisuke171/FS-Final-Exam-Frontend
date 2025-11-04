@@ -21,6 +21,7 @@ export default function LoginCard() {
             alt="Login image"
             width={700}
             height={700}
+            priority
             className="w-full h-full object-cover rounded-l-2xl"
           />
         </div>

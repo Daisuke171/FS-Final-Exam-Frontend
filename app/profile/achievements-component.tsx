@@ -1,100 +1,118 @@
-import ArchievementCard, {
-  ArchievementCardProps,
-} from "@/components/ui/cards/profile/ArchievementCard";
+import ArchievementCard from "@/components/ui/cards/profile/ArchievementCard";
 import { Icon } from "@iconify/react";
+import { useAchievements } from "@/hooks/useAchievements";
 
-export const achievements: ArchievementCardProps[] = [
-  // // 🧠 Code War
-  {
-    title: "Primer reto",
-    desc: "Completá tu primer Code War.",
-    type: "common",
-  },
-  {
-    title: "Lógica en acción",
-    desc: "Ganaste 3 Code Wars seguidas.",
-    type: "uncommon",
-  },
-  {
-    title: "Velocidad de código",
-    desc: "Resolvés un reto en menos de 1 min.",
-    type: "rare",
-  },
-  {
-    title: "Maestro del código",
-    desc: "Ganaste 25 Code Wars.",
-    type: "epic",
-  },
-  {
-    title: "Leyenda del teclado",
-    desc: "Alcanzaste 100 victorias en Code War.",
-    type: "legendary",
-  },
-  // ✊🖐✌ Piedra, Papel o Tijera
-  {
-    title: "Primera partida",
-    desc: "Jugá tu primer RPS.",
-    type: "common",
-  },
-  {
-    title: "Tres seguidas",
-    desc: "Ganaste 3 partidas seguidas.",
-    type: "uncommon",
-  },
-  {
-    title: "Mano maestra",
-    desc: "Ganaste 10 partidas en total.",
-    type: "rare",
-  },
-  {
-    title: "Invicto",
-    desc: "Ganá 10 seguidas sin perder.",
-    type: "epic",
-  },
-  {
-    title: "Rey del RPS",
-    desc: "100 victorias totales en RPS.",
-    type: "legendary",
-  },
-  // ❌⭕ Tic Tac Toe
-  {
-    title: "Primera cruz",
-    desc: "Jugá tu primer Tic Tac Toe.",
-    type: "common",
-  },
-  {
-    title: "Estratega",
-    desc: "Ganá 5 partidas de Tic Tac Toe.",
-    type: "uncommon",
-  },
-  {
-    title: "Tres en línea",
-    desc: "Ganaste 10 partidas seguidas.",
-    type: "rare",
-  },
-  {
-    title: "Genio del tablero",
-    desc: "50 victorias totales en Tic Tac Toe.",
-    type: "epic",
-  },
-  {
-    title: "Mente imparable",
-    desc: "100 victorias sin derrota.",
-    type: "legendary",
-  },
-];
+// export const achievements: ArchievementCardProps[] = [
+//   // // 🧠 Code War
+//   {
+//     title: "Primer reto",
+//     desc: "Completá tu primer Code War.",
+//     type: "common",
+//   },
+//   {
+//     title: "Lógica en acción",
+//     desc: "Ganaste 3 Code Wars seguidas.",
+//     type: "uncommon",
+//   },
+//   {
+//     title: "Velocidad de código",
+//     desc: "Resolvés un reto en menos de 1 min.",
+//     type: "rare",
+//   },
+//   {
+//     title: "Maestro del código",
+//     desc: "Ganaste 25 Code Wars.",
+//     type: "epic",
+//   },
+//   {
+//     title: "Leyenda del teclado",
+//     desc: "Alcanzaste 100 victorias en Code War.",
+//     type: "legendary",
+//   },
+//   // ✊🖐✌ Piedra, Papel o Tijera
+//   {
+//     title: "Primera partida",
+//     desc: "Jugá tu primer RPS.",
+//     type: "common",
+//   },
+//   {
+//     title: "Tres seguidas",
+//     desc: "Ganaste 3 partidas seguidas.",
+//     type: "uncommon",
+//   },
+//   {
+//     title: "Mano maestra",
+//     desc: "Ganaste 10 partidas en total.",
+//     type: "rare",
+//   },
+//   {
+//     title: "Invicto",
+//     desc: "Ganá 10 seguidas sin perder.",
+//     type: "epic",
+//   },
+//   {
+//     title: "Rey del RPS",
+//     desc: "100 victorias totales en RPS.",
+//     type: "legendary",
+//   },
+//   // ❌⭕ Tic Tac Toe
+//   {
+//     title: "Primera cruz",
+//     desc: "Jugá tu primer Tic Tac Toe.",
+//     type: "common",
+//   },
+//   {
+//     title: "Estratega",
+//     desc: "Ganá 5 partidas de Tic Tac Toe.",
+//     type: "uncommon",
+//   },
+//   {
+//     title: "Tres en línea",
+//     desc: "Ganaste 10 partidas seguidas.",
+//     type: "rare",
+//   },
+//   {
+//     title: "Genio del tablero",
+//     desc: "50 victorias totales en Tic Tac Toe.",
+//     type: "epic",
+//   },
+//   {
+//     title: "Mente imparable",
+//     desc: "100 victorias sin derrota.",
+//     type: "legendary",
+//   },
+// ];
+
+const skeletons = [1, 2, 3, 4];
 
 export default function AchievementsComponent() {
+  const { achievements, stats, loading, statsLoading } = useAchievements();
   return (
     <article className="w-full backdrop-blur-md bg-white/4 p-4 py-6 md:p-6 lg:p-8 rounded-2xl">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl lg:text-2xl text-font flex items-center gap-2 font-medium">
-          <Icon
-            icon="ri:medal-fill"
-            className="text-2xl lg:text-3xl"
-          />
-          Últimos logros
-        </h2>
+        <div className="flex items-center gap-5 w-full">
+          <h2 className="text-xl lg:text-2xl text-font flex items-center gap-2 font-medium">
+            <Icon
+              icon="ri:medal-fill"
+              className="text-2xl lg:text-3xl"
+            />
+            Últimos logros
+          </h2>
+          {statsLoading ? (
+            <div className="py-1 px-3 rounded-lg bg-white/7">
+              <p className="text-xl font-medium text-subtitle">
+                <span className="text-font">...</span> / ...
+              </p>
+            </div>
+          ) : (
+            <div className="py-1 px-3 rounded-lg bg-white/7">
+              <p className="text-xl font-medium text-subtitle">
+                <span className="text-font">{stats.unlocked}</span> /{" "}
+                {stats.total}
+              </p>
+            </div>
+          )}
+        </div>
         {achievements.length > 8 && (
           <button className="group font-medium hover:text-light-blue transition-all flex items-center gap-2 px-2 py-1 cursor-pointer">
             <Icon
@@ -107,7 +125,15 @@ export default function AchievementsComponent() {
         )}
       </div>
       <div className="custom-grid mt-10">
-        {achievements.length == 0 ? (
+        {loading &&
+          skeletons.map((skeleton) => (
+            <div
+              key={skeleton}
+              className="w-full max-w-32 md:max-w-40 h-46 md:h-54 p-3 md:p-4 md:pb-8 bg-white/4 
+              animate-pulse rounded-xl"
+            ></div>
+          ))}
+        {achievements.length == 0 && !loading ? (
           <div className="col-span-4 h-60 flex flex-col items-center justify-center">
             <Icon
               icon="fluent:trophy-off-28-filled"
@@ -124,10 +150,8 @@ export default function AchievementsComponent() {
         ) : (
           achievements.slice(0, 8).map((achievement) => (
             <ArchievementCard
-              key={achievement.title}
-              title={achievement.title}
-              desc={achievement.desc}
-              type={achievement.type}
+              key={achievement.id}
+              achievement={achievement}
             />
           ))
         )}

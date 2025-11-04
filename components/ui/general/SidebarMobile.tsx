@@ -199,7 +199,7 @@ export default function SidebarMobile({
         exit={{ opacity: 0 }}
         transition={{ delay: 0.1, duration: 0.2 }}
         onClick={closeSidebar}
-        className="fixed top-0 left-0 h-screen w-screen bg-black/40 backdrop-blur-md z-99"
+        className="fixed top-0 left-0 h-screen w-screen bg-black/70 z-99"
       ></motion.div>
     </>
   );

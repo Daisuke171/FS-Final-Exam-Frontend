@@ -21,7 +21,7 @@ export default function ProfileDropdown({
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="w-65 py-2 text-font bg-white/2 backdrop-blur-md rounded-lg border border-white/20 absolute top-12 -left-15 transform -translate-x-1/2 z-10"
+      className="w-65 py-2 text-font bg-white/2 backdrop-blur-md rounded-lg border border-white/20 absolute top-12 -left-15 transform -translate-x-1/2 z-60"
     >
       <div
         className="flex mb-4 relative items-center gap-3 pb-4 pt-2 after:absolute

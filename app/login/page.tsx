@@ -26,7 +26,7 @@ export default function LogIn() {
     redirect("/profile");
   }
   return (
-    <div className="flex pt-[calc(75px+2.5rem)] mb-[calc(57px+2.5rem)] md:mb-10 h-screen items-center justify-center">
+    <div className="flex md:pt-[calc(75px+2.5rem)] md:mb-10 min-h-screen items-center justify-center">
       <LoginCard />
     </div>
   );
